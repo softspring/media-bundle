@@ -1,0 +1,78 @@
+parameters:
+    sfs_media.admin.medias.list_view: '@@SfsMedia/admin/media/list.html.twig'
+    sfs_media.admin.medias.list_page_view: '@@SfsMedia/admin/media/list-page.html.twig'
+    sfs_media.admin.medias.create_view: '@@SfsMedia/admin/media/create.html.twig'
+    sfs_media.admin.medias.update_view: '@@SfsMedia/admin/media/update.html.twig'
+    sfs_media.admin.medias.delete_view: '@@SfsMedia/admin/media/delete.html.twig'
+    sfs_media.admin.medias.read_view: '@@SfsMedia/admin/media/read.html.twig'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+#        bind:
+#            $mediaTypes: '%sfs_media.types%'
+#            $em: '@sfs_media.entity_manager'
+
+    Softspring\MediaBundle\Form\Admin\:
+        resource: '../../../src/Form/Admin/Media*'
+
+    Softspring\MediaBundle\EventListener\Admin\:
+        resource: '../../../src/EventListener/Admin/Media*'
+
+    sfs_media.admin.media.controller:
+        class: Softspring\Component\CrudlController\Controller\CrudlController
+        public: true
+        calls:
+            - { method: setContainer, arguments: ['@service_container'] }
+        arguments:
+            $manager: '@Softspring\MediaBundle\Manager\MediaManagerInterface'
+            $eventDispatcher: '@event_dispatcher'
+            $config:
+                entity_attribute: 'media'
+                list:
+                    filter_form: '@Softspring\MediaBundle\Form\Admin\MediaListFilterFormInterface'
+                    is_granted: 'ROLE_SFS_MEDIA_ADMIN_MEDIAS_LIST'
+                    initialize_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_LIST_INITIALIZE
+                    view_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_LIST_VIEW
+                    view: '%sfs_media.admin.medias.list_view%'
+                    view_page: '%sfs_media.admin.medias.list_page_view%'
+                create:
+                    form: '@Softspring\MediaBundle\Form\Admin\MediaCreateFormInterface'
+                    is_granted: 'ROLE_SFS_MEDIA_ADMIN_MEDIAS_CREATE'
+                    initialize_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_INITIALIZE
+                    form_valid_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_FORM_VALID
+                    success_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_SUCCESS
+                    form_invalid_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_FORM_INVALID
+                    view_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_VIEW
+                    success_redirect_to: 'sfs_media_admin_medias_list'
+                    view: '%sfs_media.admin.medias.create_view%'
+                update:
+                    form: '@Softspring\MediaBundle\Form\Admin\MediaUpdateFormInterface'
+                    is_granted: 'ROLE_SFS_MEDIA_ADMIN_MEDIAS_UPDATE'
+                    param_converter_key: 'id'
+                    initialize_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_UPDATE_INITIALIZE
+                    form_valid_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_UPDATE_FORM_VALID
+                    success_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_UPDATE_SUCCESS
+                    form_invalid_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_UPDATE_FORM_INVALID
+                    view_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_UPDATE_VIEW
+                    success_redirect_to: 'sfs_media_admin_medias_list'
+                    view: '%sfs_media.admin.medias.update_view%'
+                delete:
+                    form: '@Softspring\MediaBundle\Form\Admin\MediaDeleteFormInterface'
+                    is_granted: 'ROLE_SFS_MEDIA_ADMIN_MEDIAS_DELETE'
+                    param_converter_key: 'id'
+                    initialize_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_DELETE_INITIALIZE
+                    form_valid_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_DELETE_FORM_VALID
+                    success_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_DELETE_SUCCESS
+                    form_invalid_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_DELETE_FORM_INVALID
+                    view_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_DELETE_VIEW
+                    success_redirect_to: 'sfs_media_admin_medias_list'
+                    view: '%sfs_media.admin.medias.delete_view%'
+                read:
+                    is_granted: 'ROLE_SFS_MEDIA_ADMIN_MEDIAS_DETAILS'
+                    param_converter_key: 'id'
+                    initialize_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_READ_INITIALIZE
+                    view_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_READ_VIEW
+                    view: '%sfs_media.admin.medias.read_view%'

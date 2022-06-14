@@ -1,0 +1,22 @@
+<?php
+
+namespace Softspring\MediaBundle\EntityListener;
+
+use Doctrine\ORM\Event\PreFlushEventArgs;
+use Softspring\MediaBundle\Manager\MediaManagerInterface;
+use Softspring\MediaBundle\Model\MediaInterface;
+
+class MediaListener
+{
+    protected MediaManagerInterface $mediaManager;
+
+    public function __construct(MediaManagerInterface $mediaManager)
+    {
+        $this->mediaManager = $mediaManager;
+    }
+
+    public function preFlush(MediaInterface $media, PreFlushEventArgs $eventArgs)
+    {
+        $this->mediaManager->processVersionsMedias($media);
+    }
+}

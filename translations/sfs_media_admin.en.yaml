@@ -1,0 +1,40 @@
+admin_medias:
+    list:
+        meta.title: "Medias"
+        title: "Medias"
+        breadcrumb: "Medias"
+        actions:
+            create.link: "New media"
+
+    create:
+        meta.title: "%type%"
+        title: "%type%"
+        breadcrumb: "New media"
+        actions:
+            create.button: "Upload media"
+            cancel.button: "Cancel"
+
+    read:
+        meta.title: "%name%"
+        title: "%name%"
+        breadcrumb: "Details"
+
+
+    form:
+        name.label: "Name"
+        description.label: "Description"
+        _original.label: "Main media"
+        upload.label: "File"
+        upload_requirements:
+            title: "Requirements"
+            minWidth: "min width %value%"
+            maxWidth: "max width %value%"
+            minHeight: "min height %value%"
+            maxHeight: "max height %value%"
+            mimeTypes: "allowed formats %value%"
+            allowSquare.true: "square media allowed"
+            allowSquare.false: "square media not allowed"
+            allowLandscape.true: "landscape media allowed"
+            allowLandscape.false: "landscape media not allowed"
+            allowPortrait.true: "portrait media allowed"
+            allowPortrait.false: "portrait media not allowed"

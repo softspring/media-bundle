@@ -1,0 +1,48 @@
+name: Build
+
+on:
+    push:
+        branches: [ 5.0 ]
+    pull_request:
+        branches: [ 5.0 ]
+
+permissions:
+    contents: read
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                php-versions: [ '7.4', '8.0' ]
+
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: Install PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php-versions }}
+#                  extensions: intl #optional
+                  ini-values: "post_max_size=256M" #optional
+
+            - name: Check PHP Version
+              run: php -v
+
+            - name: Validate composer.json and composer.lock
+              run: composer validate --strict
+
+            - name: Cache Composer packages
+              id: composer-cache
+              uses: actions/cache@v3
+              with:
+                  path: vendor
+                  key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-php-
+
+            - name: Install dependencies
+              run: composer update --prefer-dist --no-interaction --no-progress
+
+            - name: Code Style check
+              run: ./vendor/bin/php-cs-fixer fix -v --diff --dry-run

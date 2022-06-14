@@ -1,0 +1,54 @@
+{% trans_default_domain 'sfs_media_admin' %}
+
+{% form_theme filterForm 'bootstrap_5_horizontal_layout.html.twig' %}
+
+{{ form_start(filterForm) }}
+<div class="container mb-4">
+    <div class="row">
+        <div class="col">{{ form_widget(filterForm.text) }}</div>
+        {% if filterForm.type is defined %}<div class="col">{{ form_widget(filterForm.type) }}</div>{% endif %}
+        <div class="col-2"><button type="submit" class="btn btn-primary">Search</button></div>
+
+        {% if filterForm.type is defined %}
+        <div class="col-2">
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle disabled" type="button" id="dropdownCreateMedia" data-bs-toggle="dropdown" aria-expanded="false">
+                    {{ 'admin_medias.list.actions.create.link'|trans }}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownCreateMedia">
+                    {% for type in filterForm.vars.valid_types %}
+                        <li><a data-href="{{ url('sfs_media_admin_medias_create', {'type':type}) }}" class="dropdown-item">Create {{ type }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+        {{ form_rest(filterForm) }}
+    </div>
+</div>
+{{ form_end(filterForm) }}
+
+<div class="container-fluid user-select-none">
+    <div class="row">
+        {% for media in entities %}
+            <div class="col-3">
+                <div class="card text-center">
+                    <div class="ml-2 text-nowrap text-dark" data-media-type  role="button"
+                         data-media-id="{{ media.id }}"
+                         data-media-name="{{ media.name }}"
+                        {% for version in media.versions %}
+                            data-media-version-{{ version.version }}="{{ media|sfs_media_render_media([version.version], {'class':'img-fluid'})|e }}"
+                        {% endfor %}
+                    >
+                        {{ media|sfs_media_render_media(['_thumbnail'], {'class':'card-img-top img-thumbnail'}) }}
+                        <p class="card-title mb-0"><small><strong>{{ media.name }}</strong></small></p>
+                        <span class="small">
+                            {{ media_types[media.type].name }}
+                            {{ media.version('_original').width }}x{{ media.version('_original').height }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>

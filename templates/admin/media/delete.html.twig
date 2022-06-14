@@ -1,0 +1,14 @@
+{% trans_default_domain 'sfs_media_admin' %}
+{% extends '@SfsMedia/admin_layout.html.twig' %}
+{% block title %}{{ 'admin_medias.delete.meta.title'|trans }}{% endblock %}
+
+{% block content %}
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+        {{ form_rest(form) }}
+        <div class="d-flex justify-content-end align-items-center">
+            <a href="{{ url('sfs_media_admin_medias_list') }}" class="btn btn-outline-secondary ms-3">{{ 'admin_medias.delete.actions.cancel.button'|trans }}</a>
+            <input type="submit" value="{{ 'admin_medias.delete.actions.delete.button'|trans }}" class="btn btn-danger ms-3" />
+        </div>
+    {{ form_end(form) }}
+{% endblock content %}

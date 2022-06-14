@@ -1,0 +1,40 @@
+admin_medias:
+    list:
+        meta.title: "Archivos"
+        title: "Archivos"
+        breadcrumb: "Archivos"
+        actions:
+            create.link: "Nuevo archivo"
+
+    create:
+        meta.title: "%type%"
+        title: "%type%"
+        breadcrumb: "Nuevo archivo"
+        actions:
+            create.button: "Subir archivo"
+            cancel.button: "Cancelar"
+
+    read:
+        meta.title: "%name%"
+        title: "%name%"
+        breadcrumb: "Detalles"
+
+
+    form:
+        name.label: "Nombre de la archivo"
+        description.label: "Descripción"
+        _original.label: "Median principal"
+        upload.label: "Fichero"
+        upload_requirements:
+            title: "Requisitos"
+            minWidth: "ancho mínimo %value%"
+            maxWidth: "ancho máximo %value%"
+            minHeight: "alto mínimo %value%"
+            maxHeight: "alto máximo %value%"
+            mimeTypes: "formatos %value% permitidos"
+            allowSquare.true: "archivo cuadrada permitida"
+            allowSquare.false: "archivo cuadrada no permitida"
+            allowLandscape.true: "archivo horizontal permitida"
+            allowLandscape.false: "archivo horizontal no permitida"
+            allowPortrait.true: "archivo vertical permitida"
+            allowPortrait.false: "archivo vertical no permitida"

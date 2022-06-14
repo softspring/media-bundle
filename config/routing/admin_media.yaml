@@ -1,0 +1,29 @@
+sfs_media_admin_medias_list:
+    controller: sfs_media.admin.media.controller::list
+    path: /
+
+sfs_media_admin_medias_search_type:
+    controller: sfs_media.admin.media.controller::list
+    path: /search-form-type/{valid_types}
+    defaults:
+        config:
+            filter_form: 'Softspring\MediaBundle\Form\MediaTypeSearchFilterForm'
+            view: '@SfsMedia/admin/media/search_type.html.twig'
+            view_page: '@SfsMedia/admin/media/search_type.html.twig'
+            filter_event_name: 'sfs_media.search_filter.filter_event'
+
+sfs_media_admin_medias_create:
+    controller: sfs_media.admin.media.controller::create
+    path: /{type}/create
+
+sfs_media_admin_medias_update:
+    controller: sfs_media.admin.media.controller::update
+    path: /{media}/update
+
+sfs_media_admin_medias_delete:
+    controller: sfs_media.admin.media.controller::delete
+    path: /{media}/delete
+
+sfs_media_admin_medias_read:
+    controller: sfs_media.admin.media.controller::read
+    path: /{media}

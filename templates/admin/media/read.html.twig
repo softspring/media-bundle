@@ -1,0 +1,99 @@
+{% trans_default_domain 'sfs_media_admin' %}
+{% extends '@SfsMedia/admin_layout.html.twig' %}
+{% block title %}{{ 'admin_medias.read.meta.title'|trans({'%name%': media.name }) }}{% endblock %}
+
+{% block breadcrums_content %}
+    {{ parent() }}
+    <li class="breadcrumb-item"><a href="{{ url('sfs_media_admin_medias_list') }}">{{ 'admin_medias.list.breadcrumb'|trans }}</a></li>
+    <li class="breadcrumb-item active" aria-current="content">{{ 'admin_medias.read.breadcrumb'|trans({'%name%': media.name }) }}</li>
+{% endblock breadcrums_content %}
+
+
+{%- macro bytesToSize(bytes) -%}
+    {% set kilobyte = 1024 %}
+    {% set megabyte = kilobyte * 1024 %}
+    {% set gigabyte = megabyte * 1024 %}
+    {% set terabyte = gigabyte * 1024 %}
+
+    {% if bytes < kilobyte %}
+        {{ bytes ~ ' B' }}
+    {% elseif bytes < megabyte %}
+        {{ (bytes / kilobyte)|number_format(2, '.') ~ ' KiB' }}
+    {% elseif bytes < gigabyte %}
+        {{ (bytes / megabyte)|number_format(2, '.') ~ ' MiB' }}
+    {% elseif bytes < terabyte %}
+        {{ (bytes / gigabyte)|number_format(2, '.') ~ ' GiB' }}
+    {% else %}
+        {{ (bytes / terabyte)|number_format(2, '.') ~ ' TiB' }}
+    {% endif %}
+{%- endmacro -%}
+
+
+{% block content %}
+    <h1 class="h3 mb-4">{{ 'admin_medias.read.title'|trans({'%name%': media.name }) }}</h1>
+
+    {% if media.description %}
+        <p>{{ media.description|nl2br }}</p>
+    {% endif %}
+
+    {% set checkVersions = media.checkVersions(type_config) %}
+    {% for version in checkVersions.new %}
+        <div class="alert alert-warning" role="alert">
+            Missing <strong>{{ version }}</strong> in this media, seems to be a <strong>new version</strong> in config. You need to run media migrations command.
+        </div>
+    {% endfor %}
+    {% for version in checkVersions.delete %}
+        <div class="alert alert-warning" role="alert">
+            Media <strong>{{ version }}</strong> version has been <strong>deleted</strong> in config. You need to run media migrations command to cleanup medias.
+        </div>
+    {% endfor %}
+    {% for version,changedOptions in checkVersions.changed %}
+        <div class="alert alert-warning" role="alert">
+            Media <strong>{{ version }}</strong> version has been <strong>changed</strong> in config ({{ changedOptions|map((changedOption) => changedOption.string)|join(', ') }}). You need to run media migrations command to cleanup medias.
+        </div>
+    {% endfor %}
+
+    <div class="container-fluid bg-white p-4">
+        <div class="row">
+            <div class="col">
+                <h4>Original</h4>
+                <div>
+                    {{ media|sfs_media_render_media('_original', {'class':'img-thumbnail', 'alt': 'Original media', 'title': 'Original media'}) }}
+                </div>
+                {{ media.version('_original').width }}x{{ media.version('_original').height }}
+                {{ media.version('_original').fileMimeType }}
+                {{ _self.bytesToSize(media.version('_original').fileSize) }}
+            </div>
+        </div>
+
+        {% for version in media.versions|filter((version) => version.version not in ['_original'])|sort((a, b) => (a.width+a.height) <=> (b.width+b.height))|reverse %}
+            <div class="row mt-5">
+                <div class="col">
+                    <h4>{{ version.version }}</h4>
+                    <div>
+                        {{ media|sfs_media_render_media(version.version, {'class':'img-'~version.version}) }}
+                    </div>
+                    {{ version.width }}x{{ version.height }}
+                    {{ version.fileMimeType }}
+                    {{ _self.bytesToSize(version.fileSize) }}
+                    {% for option,value in version.options %}
+                        {{ option }}: {{ value }}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if type_config.pictures|length %}
+        <div class="container p-4">
+            <div class="row">
+                <div class="col">
+                    <h6>HTML</h6>
+                    <pre><code>{{ media|sfs_media_render_picture|replace({'>':">\n"})|e('html') }}</code></pre>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+
+{% endblock content %}

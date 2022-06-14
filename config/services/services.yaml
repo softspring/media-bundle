@@ -1,0 +1,58 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+        bind:
+            $em: '@sfs_media.entity_manager'
+            $storageClient: '@sfs_media.storage.google_cloud.storage_client'
+            $bucket: '%sfs_media.storage.google_cloud.storage_bucket%'
+            $mediaTypesConfig: '%sfs_media.types%'
+
+    _instanceof:
+        Softspring\MediaBundle\Media\NameGeneratorInterface:
+            tags: ['sfs_media.name_generator']
+        Softspring\MediaBundle\Type\MediaTypeProviderInterface:
+            tags: ['sfs_media.media_type_provider']
+
+    sfs_media.storage.google_cloud.storage_client:
+        class: Google\Cloud\Storage\StorageClient
+
+    Softspring\MediaBundle\Command\:
+        resource: '../../src/Command/*'
+
+    Softspring\MediaBundle\Form\:
+        resource: '../../src/Form/*'
+
+    Softspring\MediaBundle\Form\MediaTypeSearchFilterForm:
+        public: true
+
+    Softspring\MediaBundle\EventListener\:
+        resource: '../../src/EventListener/*'
+
+    Softspring\MediaBundle\Media\:
+        resource: '../../src/Media/*'
+
+    Softspring\MediaBundle\Manager\:
+        resource: '../../src/Manager/*'
+
+    Softspring\MediaBundle\Storage\:
+        resource: '../../src/Storage/*'
+
+    Softspring\MediaBundle\Type\:
+        resource: '../../src/Type/*'
+
+    Softspring\MediaBundle\Render\:
+        resource: '../../src/Render/*'
+
+    Softspring\MediaBundle\Twig\Extension\:
+        resource: '../../src/Twig/Extension/*'
+        tags: ['twig.extension']
+
+    Softspring\MediaBundle\EntityListener\MediaVersionListener:
+        tags:
+            - { name: 'doctrine.orm.entity_listener', event: 'preRemove', entity: 'Softspring\MediaBundle\Model\MediaVersion' }
+
+    Softspring\MediaBundle\EntityListener\MediaListener:
+        tags:
+            - { name: 'doctrine.orm.entity_listener', event: 'preFlush', entity: 'Softspring\MediaBundle\Model\Media',  priority: 10 }

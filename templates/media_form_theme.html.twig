@@ -1,0 +1,66 @@
+{% trans_default_domain 'sfs_media_admin' %}
+
+{% block media_version_row %}
+    <div class="row">
+        <div class="col-3">{{ form_label(form) }}</div>
+        <div class="col">{{ form_widget(form) }}</div>
+    </div>
+{% endblock media_version_row %}
+
+{% block media_version_widget %}
+    {{ form_widget(form.upload) }}
+    {{ form_errors(form.upload) }}
+    <p class="py-2 small">
+        <em>
+            {{ 'admin_medias.form.upload_requirements.title'|trans }}:
+            {% for attribute, value in form.vars.upload_requirements|filter((value, attribute) => attribute not in ['detectCorrupted']) %}
+                {% if value is same as true or value is same as false %}
+                    {{ ('admin_medias.form.upload_requirements.'~attribute~'.'~(value?'true':'false'))|trans }}{% if not loop.last %},{% endif %}
+                {% elseif value is iterable %}
+                    {{ ('admin_medias.form.upload_requirements.'~attribute)|trans({'%value%': value|join(',') }) }}{% if not loop.last %},{% endif %}
+                {% else %}
+                    {{ ('admin_medias.form.upload_requirements.'~attribute)|trans({'%value%': value }) }}{% if not loop.last %},{% endif %}
+                {% endif %}
+
+            {% endfor %}
+        </em>
+    </p>
+{% endblock media_version_widget %}
+
+{% block media_modal_row %}
+    {{ form_label(form) }}
+    {{ form_widget(form) }}
+{% endblock %}
+
+{% block media_modal_widget %}
+    {% set modalOpenAttributes = 'data-search-url="'~form.vars.modal_search_url~'" data-bs-toggle="modal" data-bs-target="#mediaTypeModal" data-media-type-field="'~form.vars.id~'" data-media-type-widget="'~form.vars.id~'_widget"' %}
+
+    <div id="{{ form.vars.id }}_widget" class="media-widget">
+        {% if show_thumbnail %}
+            <div data-media-type-thumbnail class="mb-2" {{ modalOpenAttributes|raw }} role="button">
+                {% if data %}
+                    {{ data|sfs_media_render_media(['_thumbnail'], {'class':'img-fluid'}) }}
+                {% else %}
+                    <img src="https://dummymedia.com/300x100/cfcfcf/205872.jpg&text=Select+media" class="img-fluid" />
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <div class="input-group">
+            <div class="form-control" id="{{ form.vars.id }}_text" {{ modalOpenAttributes|raw }} role="button">{% if data %}{{ data.name }}{% endif %}</div>
+            <button type="button" class="btn btn-secondary" data-media-type-clean
+                    data-media-type-field="{{ form.vars.id }}"
+                    data-media-type-widget="{{ form.vars.id }}_widget"
+            >X</button>
+            <button type="button" class="btn btn-primary" {{ modalOpenAttributes|raw }}>Select</button>
+        </div>
+
+        {% if data %}
+            {% for version in data.versions %}
+                {% set attr = attr|merge({('data-media-version-'~version.version): data|sfs_media_render_media([version.version], {'class':'img-fluid'})}) %}
+            {% endfor %}
+        {% endif %}
+
+        {{ form_widget(form, {'attr':attr}) }}{# renders hidden field #}
+    </div>
+{% endblock %}

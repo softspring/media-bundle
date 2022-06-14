@@ -1,0 +1,36 @@
+{% trans_default_domain 'sfs_media_admin' %}
+{% extends '@SfsMedia/admin_layout.html.twig' %}
+{% block title %}{{ 'admin_medias.list.meta.title'|trans }}{% endblock %}
+
+{% block breadcrums_content %}
+    {{ parent() }}
+    <li class="breadcrumb-item active" aria-current="content">{{ 'admin_medias.list.breadcrumb'|trans }}</li>
+{% endblock breadcrums_content %}
+
+{% block content %}
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3">{{ 'admin_medias.list.title'|trans }}</h1>
+
+        <div class="float-end">
+            {% if is_granted('ROLE_SFS_MEDIA_ADMIN_MEDIAS_CREATE') and media_types|length %}
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownCreateMedia" data-bs-toggle="dropdown" aria-expanded="false">
+                        {{ 'admin_medias.list.actions.create.link'|trans }}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownCreateMedia">
+                        {% for key,type in media_types %}
+                            <li><a href="{{ url('sfs_media_admin_medias_create', {'type':key}) }}" class="dropdown-item">{{ type.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {{ form_start(filterForm) }}
+    {{ form_widget(filterForm) }}
+    {{ form_rest(filterForm) }}
+    {{ form_end(filterForm) }}
+
+    {% include '@SfsMedia/admin/media/list-page.html.twig' %}
+{% endblock content %}
