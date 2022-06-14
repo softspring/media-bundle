@@ -1,9 +1,12 @@
 <?php
 
-namespace Softspring\MediaBundle\Manager;
+namespace Softspring\MediaBundle\EntityManager;
 
 use Softspring\MediaBundle\Type\MediaTypesCollection;
 
+/**
+ * @deprecated move to Type management (this is not an entity manager)
+ */
 class MediaTypeManager implements MediaTypeManagerInterface
 {
     protected MediaTypesCollection $mediaTypesCollection;

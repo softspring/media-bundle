@@ -3,20 +3,33 @@
 namespace Softspring\MediaBundle\EntityListener;
 
 use Doctrine\Persistence\Event\LifecycleEventArgs;
-use Softspring\MediaBundle\Manager\MediaVersionManagerInterface;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
+use Softspring\MediaBundle\Processor\ProcessorProvider;
+use Softspring\MediaBundle\Storage\StorageDriverInterface;
 
 class MediaVersionListener
 {
-    protected MediaVersionManagerInterface $manager;
+    protected StorageDriverInterface $storageDriver;
+    protected ProcessorProvider $processorProvider;
 
-    public function __construct(MediaVersionManagerInterface $manager)
+    public function __construct(StorageDriverInterface $storageDriver, ProcessorProvider $processorProvider)
     {
-        $this->manager = $manager;
+        $this->storageDriver = $storageDriver;
+        $this->processorProvider = $processorProvider;
+    }
+
+    public function prePersist(MediaVersionInterface $mediaVersion, LifecycleEventArgs $eventArgs)
+    {
+        $this->processorProvider->applyProcessors($mediaVersion);
+    }
+
+    public function preUpdate(MediaVersionInterface $mediaVersion, LifecycleEventArgs $eventArgs)
+    {
+        $this->processorProvider->applyProcessors($mediaVersion);
     }
 
     public function preRemove(MediaVersionInterface $mediaVersion, LifecycleEventArgs $eventArgs)
     {
-        $this->manager->removeFile($mediaVersion);
+        $this->storageDriver->remove($mediaVersion->getUrl());
     }
 }

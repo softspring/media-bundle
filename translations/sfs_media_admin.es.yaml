@@ -23,7 +23,7 @@ admin_medias:
     form:
         name.label: "Nombre de la archivo"
         description.label: "Descripción"
-        _original.label: "Median principal"
+        _original.label: "Archivo principal"
         upload.label: "Fichero"
         upload_requirements:
             title: "Requisitos"

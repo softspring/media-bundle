@@ -4,7 +4,7 @@ namespace Softspring\MediaBundle\Form;
 
 use Softspring\Component\CrudlController\Form\EntityListFilterForm;
 use Softspring\Component\CrudlController\Form\FormOptionsInterface;
-use Softspring\MediaBundle\Manager\MediaTypeManagerInterface;
+use Softspring\MediaBundle\EntityManager\MediaTypeManagerInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;

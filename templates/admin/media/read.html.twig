@@ -36,7 +36,6 @@
         <p>{{ media.description|nl2br }}</p>
     {% endif %}
 
-    {% set checkVersions = media.checkVersions(type_config) %}
     {% for version in checkVersions.new %}
         <div class="alert alert-warning" role="alert">
             Missing <strong>{{ version }}</strong> in this media, seems to be a <strong>new version</strong> in config. You need to run media migrations command.
@@ -58,7 +57,7 @@
             <div class="col">
                 <h4>Original</h4>
                 <div>
-                    {{ media|sfs_media_render_media('_original', {'class':'img-thumbnail', 'alt': 'Original media', 'title': 'Original media'}) }}
+                    {{ media|sfs_media_render_image('_original', {'class':'img-thumbnail', 'alt': 'Original media', 'title': 'Original media'}) }}
                 </div>
                 {{ media.version('_original').width }}x{{ media.version('_original').height }}
                 {{ media.version('_original').fileMimeType }}
@@ -71,7 +70,7 @@
                 <div class="col">
                     <h4>{{ version.version }}</h4>
                     <div>
-                        {{ media|sfs_media_render_media(version.version, {'class':'img-'~version.version}) }}
+                        {{ media|sfs_media_render_image(version.version, {'class':'img-'~version.version}) }}
                     </div>
                     {{ version.width }}x{{ version.height }}
                     {{ version.fileMimeType }}

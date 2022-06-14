@@ -43,4 +43,8 @@ interface MediaVersionInterface
     public function getOptions(): ?array;
 
     public function setOptions(?array $options): void;
+
+    public function getOriginalVersion(): ?MediaVersionInterface;
+
+    public function setOriginalVersion(?MediaVersionInterface $originalVersion): void;
 }

@@ -4,8 +4,9 @@ namespace Softspring\MediaBundle\EventListener\Admin;
 
 use Softspring\Component\CrudlController\Event\GetResponseEntityEvent;
 use Softspring\Component\Events\ViewEvent;
-use Softspring\MediaBundle\Manager\MediaManagerInterface;
-use Softspring\MediaBundle\Manager\MediaTypeManagerInterface;
+use Softspring\MediaBundle\EntityManager\MediaManagerInterface;
+use Softspring\MediaBundle\EntityManager\MediaTypeManagerInterface;
+use Softspring\MediaBundle\Helper\TypeChecker;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\SfsMediaEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -43,7 +44,8 @@ class MediaListener implements EventSubscriberInterface
 
         /** @var MediaInterface $media */
         $media = $event->getEntity();
-        $this->mediaManager->fillEntityForType($media, $type);
+        $media->setType($type);
+        $this->mediaManager->generateVersionEntities($media);
     }
 
     public function onCreateViewAddTypeConfig(ViewEvent $event): void
@@ -53,6 +55,11 @@ class MediaListener implements EventSubscriberInterface
 
     public function onReadViewAddTypeConfig(ViewEvent $event): void
     {
-        $event->getData()['type_config'] = $this->mediaTypesManager->getType($event->getData()['media']->getType());
+        /** @var MediaInterface $media */
+        $media = $event->getData()['media'];
+        $typeConfig = $this->mediaTypesManager->getType($media->getType());
+
+        $event->getData()['checkVersions'] = TypeChecker::checkMedia($media, $typeConfig);
+        $event->getData()['type_config'] = $typeConfig;
     }
 }

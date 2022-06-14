@@ -26,6 +26,11 @@ abstract class MediaVersion implements MediaVersionInterface
 
     protected ?array $options = null;
 
+    /**
+     * this field is not mapped.
+     */
+    protected ?MediaVersionInterface $originalVersion = null;
+
     public function __construct(string $version = null, MediaInterface $media = null)
     {
         $this->setVersion($version);
@@ -135,5 +140,15 @@ abstract class MediaVersion implements MediaVersionInterface
     public function setOptions(?array $options): void
     {
         $this->options = $options;
+    }
+
+    public function getOriginalVersion(): ?MediaVersionInterface
+    {
+        return $this->originalVersion;
+    }
+
+    public function setOriginalVersion(?MediaVersionInterface $originalVersion): void
+    {
+        $this->originalVersion = $originalVersion;
     }
 }

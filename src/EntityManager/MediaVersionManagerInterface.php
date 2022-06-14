@@ -1,20 +1,12 @@
 <?php
 
-namespace Softspring\MediaBundle\Manager;
+namespace Softspring\MediaBundle\EntityManager;
 
 use Softspring\Component\CrudlController\Manager\CrudlEntityManagerInterface;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
 
 interface MediaVersionManagerInterface extends CrudlEntityManagerInterface
 {
-    public function uploadFile(MediaVersionInterface $mediaVersion): void;
-
-    public function removeFile(MediaVersionInterface $mediaVersion): void;
-
-    public function downloadFile(MediaVersionInterface $mediaVersion): string;
-
-    public function fillFieldsFromUploadFile(MediaVersionInterface $mediaVersion): void;
-
     /**
      * @return MediaVersionInterface
      */

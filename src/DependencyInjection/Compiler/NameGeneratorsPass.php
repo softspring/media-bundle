@@ -7,6 +7,9 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * @deprecated use tagged_iterator in service definition
+ */
 class NameGeneratorsPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)

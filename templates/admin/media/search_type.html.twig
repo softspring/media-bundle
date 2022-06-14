@@ -37,10 +37,10 @@
                          data-media-id="{{ media.id }}"
                          data-media-name="{{ media.name }}"
                         {% for version in media.versions %}
-                            data-media-version-{{ version.version }}="{{ media|sfs_media_render_media([version.version], {'class':'img-fluid'})|e }}"
+                            data-media-version-{{ version.version }}="{{ media|sfs_media_render_image([version.version], {'class':'img-fluid'})|e }}"
                         {% endfor %}
                     >
-                        {{ media|sfs_media_render_media(['_thumbnail'], {'class':'card-img-top img-thumbnail'}) }}
+                        {{ media|sfs_media_render_image(['_thumbnail'], {'class':'card-img-top img-thumbnail'}) }}
                         <p class="card-title mb-0"><small><strong>{{ media.name }}</strong></small></p>
                         <span class="small">
                             {{ media_types[media.type].name }}

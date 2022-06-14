@@ -2,9 +2,10 @@
 
 namespace Softspring\MediaBundle\Command;
 
-use Softspring\MediaBundle\Manager\MediaManagerInterface;
-use Softspring\MediaBundle\Manager\MediaTypeManagerInterface;
-use Softspring\MediaBundle\Manager\MediaVersionManagerInterface;
+use Softspring\MediaBundle\EntityManager\MediaManagerInterface;
+use Softspring\MediaBundle\EntityManager\MediaTypeManagerInterface;
+use Softspring\MediaBundle\EntityManager\MediaVersionManagerInterface;
+use Softspring\MediaBundle\Helper\TypeChecker;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -41,16 +42,19 @@ class TypesMigrationCommand extends Command
 
             $output->writeln(sprintf('Media "%s" of type "%s"', $media->getName(), $media->getType()));
 
-            $checkVersions = $media->checkVersions($typeConfig);
+            $checkVersions = TypeChecker::checkMedia($media, $typeConfig);
 
-            foreach ($checkVersions['ok'] as $versionId) if ($versionId !== '_original') {
-                $output->writeln(sprintf(' - version "%s" is <fg=green>OK</>', $versionId));
+            foreach ($checkVersions['ok'] as $versionId) {
+                if ('_original' !== $versionId) {
+                    $output->writeln(sprintf(' - version "%s" is <fg=green>OK</>', $versionId));
+                }
             }
 
             foreach ($checkVersions['new'] as $versionId) {
                 $output->write(sprintf(' - version "%s" is new in config, needs to be created: ', $versionId));
                 try {
-                    $this->mediaManager->generateVersion($media, $versionId);
+                    $version = $this->mediaManager->generateVersionEntity($media, $versionId);
+                    $this->mediaVersionManager->saveEntity($version);
                     $output->writeln('<fg=green>CREATED</>');
                 } catch (\Exception $e) {
                     $output->writeln('<error>ERROR</error>');
@@ -61,7 +65,10 @@ class TypesMigrationCommand extends Command
                 $changedOptionsString = implode(', ', array_map(fn ($v) => $v['string'], $changes));
                 $output->write(sprintf(' - version "%s" needs to be recreated (%s): ', $versionId, $changedOptionsString));
                 try {
-                    $this->mediaManager->generateVersion($media, $versionId);
+                    $media->removeVersion($oldVersion = $media->getVersion($versionId));
+                    $this->mediaVersionManager->deleteEntity($oldVersion);
+                    $version = $this->mediaManager->generateVersionEntity($media, $versionId);
+                    $this->mediaVersionManager->saveEntity($version);
                     $output->writeln('<fg=green>RECREATED</>');
                 } catch (\Exception $e) {
                     $output->writeln('<error>ERROR</error>');
@@ -71,7 +78,8 @@ class TypesMigrationCommand extends Command
             foreach ($checkVersions['delete'] as $versionId) {
                 $output->write(sprintf(' - version "%s" to be deleted from database (has been deleted from config) ', $versionId));
                 try {
-                    $this->mediaManager->deleteVersion($media->getVersion($versionId));
+                    $media->removeVersion($version = $media->getVersion($versionId));
+                    $this->mediaVersionManager->deleteEntity($version);
                     $output->writeln('<fg=green>DELETED</>');
                 } catch (\Exception $e) {
                     $output->writeln('<error>ERROR</error>');

@@ -27,7 +27,7 @@ services:
         calls:
             - { method: setContainer, arguments: ['@service_container'] }
         arguments:
-            $manager: '@Softspring\MediaBundle\Manager\MediaManagerInterface'
+            $manager: '@Softspring\MediaBundle\EntityManager\MediaManagerInterface'
             $eventDispatcher: '@event_dispatcher'
             $config:
                 entity_attribute: 'media'

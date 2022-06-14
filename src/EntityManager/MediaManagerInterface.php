@@ -1,6 +1,6 @@
 <?php
 
-namespace Softspring\MediaBundle\Manager;
+namespace Softspring\MediaBundle\EntityManager;
 
 use Softspring\Component\CrudlController\Manager\CrudlEntityManagerInterface;
 use Softspring\MediaBundle\Model\MediaInterface;
@@ -10,13 +10,9 @@ interface MediaManagerInterface extends CrudlEntityManagerInterface
 {
     public function createEntityForType(string $type): MediaInterface;
 
-    public function fillEntityForType(MediaInterface $media, string $type): void;
+    public function generateVersionEntities(MediaInterface $media): void;
 
-    public function processVersionsMedias(MediaInterface $media): void;
-
-    public function generateVersion(MediaInterface $media, string $version): void;
-
-    public function deleteVersion(MediaVersionInterface $version): void;
+    public function generateVersionEntity(MediaInterface $media, string $versionKey): MediaVersionInterface;
 
     /**
      * @return MediaInterface

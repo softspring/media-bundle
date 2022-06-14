@@ -2,8 +2,8 @@
 
 namespace Softspring\MediaBundle\Form;
 
-use Softspring\MediaBundle\Manager\MediaManagerInterface;
-use Softspring\MediaBundle\Manager\MediaTypeManagerInterface;
+use Softspring\MediaBundle\EntityManager\MediaManagerInterface;
+use Softspring\MediaBundle\EntityManager\MediaTypeManagerInterface;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Event\SubmitEvent;

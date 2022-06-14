@@ -4,11 +4,11 @@
     <div class="row">
     {% for media in entities %}
         <div class="col-3">
-            <div class="card text-center">
+            <div class="card text-center mb-3">
                 {% if is_granted('ROLE_SFS_MEDIA_ADMIN_MEDIAS_DETAILS', media) %}
                     <a href="{{ url('sfs_media_admin_medias_read', {'media':media.id}) }}" class="ml-2 text-nowrap text-dark">
                 {% endif %}
-                    {{ media|sfs_media_render_media(['_thumbnail'], {'class':'card-img-top img-thumbnail'}) }}
+                    {{ media|sfs_media_render_image(['_thumbnail'], {'class':'card-img-top img-fluid', 'style':'min-height:200px; max-height: 200px; width: auto'}) }}
                 {% if is_granted('ROLE_SFS_MEDIA_ADMIN_MEDIAS_DETAILS', media) %}
                         <p class="card-title mb-0"><small><strong>{{ media.name }}</strong></small></p>
                         <span class="small">

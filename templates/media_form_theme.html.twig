@@ -39,7 +39,7 @@
         {% if show_thumbnail %}
             <div data-media-type-thumbnail class="mb-2" {{ modalOpenAttributes|raw }} role="button">
                 {% if data %}
-                    {{ data|sfs_media_render_media(['_thumbnail'], {'class':'img-fluid'}) }}
+                    {{ data|sfs_media_render_image(['_thumbnail'], {'class':'img-fluid'}) }}
                 {% else %}
                     <img src="https://dummymedia.com/300x100/cfcfcf/205872.jpg&text=Select+media" class="img-fluid" />
                 {% endif %}
@@ -57,7 +57,7 @@
 
         {% if data %}
             {% for version in data.versions %}
-                {% set attr = attr|merge({('data-media-version-'~version.version): data|sfs_media_render_media([version.version], {'class':'img-fluid'})}) %}
+                {% set attr = attr|merge({('data-media-version-'~version.version): data|sfs_media_render_image([version.version], {'class':'img-fluid'})}) %}
             {% endfor %}
         {% endif %}
 

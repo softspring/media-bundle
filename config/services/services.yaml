@@ -6,12 +6,15 @@ services:
         bind:
             $em: '@sfs_media.entity_manager'
             $mediaTypesConfig: '%sfs_media.types%'
+            $processors: !tagged_iterator { tag: sfs_media.media_processor, default_priority_method: getPriority }
 
     _instanceof:
         Softspring\MediaBundle\Media\NameGeneratorInterface:
             tags: ['sfs_media.name_generator']
         Softspring\MediaBundle\Type\MediaTypeProviderInterface:
             tags: ['sfs_media.media_type_provider']
+        Softspring\MediaBundle\Processor\ProcessorInterface:
+            tags: ['sfs_media.media_processor']
 
     Softspring\MediaBundle\Command\:
         resource: '../../src/Command/*'
@@ -28,8 +31,8 @@ services:
     Softspring\MediaBundle\Media\:
         resource: '../../src/Media/*'
 
-    Softspring\MediaBundle\Manager\:
-        resource: '../../src/Manager/*'
+    Softspring\MediaBundle\EntityManager\:
+        resource: '../../src/EntityManager/*'
 
     Softspring\MediaBundle\Type\:
         resource: '../../src/Type/*'
@@ -41,8 +44,12 @@ services:
         resource: '../../src/Twig/Extension/*'
         tags: ['twig.extension']
 
+    Softspring\MediaBundle\Processor\:
+        resource: '../../src/Processor/*'
+
     Softspring\MediaBundle\EntityListener\MediaVersionListener:
         tags:
+            - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'Softspring\MediaBundle\Model\MediaVersion' }
             - { name: 'doctrine.orm.entity_listener', event: 'preRemove', entity: 'Softspring\MediaBundle\Model\MediaVersion' }
 
     Softspring\MediaBundle\EntityListener\MediaListener:

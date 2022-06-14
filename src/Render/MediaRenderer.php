@@ -15,7 +15,7 @@ class MediaRenderer
         $this->mediaTypesCollection = $mediaTypesCollection;
     }
 
-    public function mediaUrl(MediaInterface $media, $version, array $attr = []): ?string
+    public function imageUrl(MediaInterface $media, $version, array $attr = []): ?string
     {
         if (is_array($version)) {
             foreach ($version as $singleVersion) {
@@ -34,11 +34,11 @@ class MediaRenderer
         }
     }
 
-    public function renderMedia(MediaInterface $media, $version, array $attr = []): string
+    public function renderImage(MediaInterface $media, $version, array $attr = []): string
     {
         if (is_array($version)) {
             foreach ($version as $singleVersion) {
-                if ($html = $this->renderMedia($media, $singleVersion, $attr)) {
+                if ($html = $this->renderImage($media, $singleVersion, $attr)) {
                     return $html;
                 }
             }

@@ -3,7 +3,7 @@
 namespace Softspring\MediaBundle\EntityListener;
 
 use Doctrine\ORM\Event\PreFlushEventArgs;
-use Softspring\MediaBundle\Manager\MediaManagerInterface;
+use Softspring\MediaBundle\EntityManager\MediaManagerInterface;
 use Softspring\MediaBundle\Model\MediaInterface;
 
 class MediaListener
@@ -17,6 +17,6 @@ class MediaListener
 
     public function preFlush(MediaInterface $media, PreFlushEventArgs $eventArgs)
     {
-        $this->mediaManager->processVersionsMedias($media);
+        // $this->mediaManager->processVersionsMedias($media);
     }
 }

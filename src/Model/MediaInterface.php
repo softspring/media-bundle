@@ -29,8 +29,6 @@ interface MediaInterface
 
     public function getVersion(string $version): ?MediaVersionInterface;
 
-    public function checkVersions(array $typeConfig): array;
-
     public function getUploadedAt(): ?\DateTime;
 
     public function markUploadedAtNow(): void;

@@ -11,6 +11,26 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
+    protected function getSupportedMimeTypes(): array
+    {
+        $supportedTypes = [
+            'mime' => [
+                'image/svg+xml',
+                'image/svg',
+            ],
+            'extension' => [
+                'svg',
+            ],
+        ];
+
+        function_exists('imagegif') && function_exists('imagecreatefromgif') && ($supportedTypes['extension'][] = 'gif') && ($supportedTypes['mime'][] = 'image/gif');
+        function_exists('imagejpeg') && function_exists('imagecreatefromjpeg') && ($supportedTypes['extension'][] = 'jpeg') && ($supportedTypes['mime'][] = 'image/jpeg');
+        function_exists('imagewebp') && function_exists('imagecreatefromwebp') && ($supportedTypes['extension'][] = 'webp') && ($supportedTypes['mime'][] = 'image/webp');
+        function_exists('imagepng') && function_exists('imagecreatefrompng') && ($supportedTypes['extension'][] = 'png') && ($supportedTypes['mime'][] = 'image/png');
+
+        return $supportedTypes;
+    }
+
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('sfs_media');
@@ -19,7 +39,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->validate()
                 ->ifTrue(function ($config) {
-                    return $config['driver'] === 'google_cloud_storage' && empty($config['google_cloud_storage']);
+                    return 'google_cloud_storage' === $config['driver'] && empty($config['google_cloud_storage']);
                 })
                 ->thenInvalid('google_cloud_storage config block is required when driver is google_cloud_storage.')
             ->end()
@@ -60,6 +80,26 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('types')
                     ->useAttributeAsKey('key')
                     ->prototype('array')
+                        ->validate()
+                            ->ifTrue(function ($config) {
+                                $supportedMimeTypes = $this->getSupportedMimeTypes();
+                                foreach ($config['upload_requirements']['mimeTypes'] ?? [] as $mimeType) {
+                                    if (!in_array($mimeType, $supportedMimeTypes['mime'])) {
+                                        return true;
+                                    }
+                                }
+
+                                foreach ($config['versions'] as $version) {
+                                    if (!in_array($version['type'], $supportedMimeTypes['extension'])) {
+                                        return true;
+                                    }
+                                }
+
+                                return false;
+                            })
+                            ->thenInvalid('Some configured formats are not supported. The allowed formats are: '.implode(', ', $this->getSupportedMimeTypes()['mime']).'. Maybe you need to install some libraries to support them.')
+                        ->end()
+
                         ->children()
                             ->scalarNode('name')->end()
                             ->scalarNode('description')->end()
@@ -116,7 +156,7 @@ class Configuration implements ConfigurationInterface
                 ->normalizeKeys(false)
                 ->children()
                     ->append($this->getUploadRequirementsNode())
-                    ->enumNode('type')->values(['jpeg', 'png', 'webp'])->defaultValue('jpeg')->end()
+                    ->enumNode('type')->values(['jpeg', 'png', 'webp'])->defaultValue('jpeg')->end()  // TODO NOT DEFAULT VALUE
                     ->integerNode('scale_width')->end()
                     ->integerNode('scale_height')->end()
                     ->integerNode('png_compression_level')->end()
@@ -126,8 +166,8 @@ class Configuration implements ConfigurationInterface
                     ->booleanNode('flatten')->end()
                     ->integerNode('resolution-x')->end()
                     ->integerNode('resolution-y')->end()
-                    ->scalarNode('resampling-filter')->defaultValue(ImageInterface::FILTER_LANCZOS)->end()
-                    ->scalarNode('resolution-units')->defaultValue(ImageInterface::RESOLUTION_PIXELSPERINCH)->end()
+                    ->scalarNode('resampling-filter')->defaultValue(ImageInterface::FILTER_LANCZOS)->end() // TODO DEFAULT ONLY FOR IMAGES
+                    ->scalarNode('resolution-units')->defaultValue(ImageInterface::RESOLUTION_PIXELSPERINCH)->end() // TODO DEFAULT ONLY FOR IMAGES
                 ->end()
             ->end()
         ;
