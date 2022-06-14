@@ -5,8 +5,6 @@ services:
         public: false
         bind:
             $em: '@sfs_media.entity_manager'
-            $storageClient: '@sfs_media.storage.google_cloud.storage_client'
-            $bucket: '%sfs_media.storage.google_cloud.storage_bucket%'
             $mediaTypesConfig: '%sfs_media.types%'
 
     _instanceof:
@@ -14,9 +12,6 @@ services:
             tags: ['sfs_media.name_generator']
         Softspring\MediaBundle\Type\MediaTypeProviderInterface:
             tags: ['sfs_media.media_type_provider']
-
-    sfs_media.storage.google_cloud.storage_client:
-        class: Google\Cloud\Storage\StorageClient
 
     Softspring\MediaBundle\Command\:
         resource: '../../src/Command/*'
@@ -35,9 +30,6 @@ services:
 
     Softspring\MediaBundle\Manager\:
         resource: '../../src/Manager/*'
-
-    Softspring\MediaBundle\Storage\:
-        resource: '../../src/Storage/*'
 
     Softspring\MediaBundle\Type\:
         resource: '../../src/Type/*'

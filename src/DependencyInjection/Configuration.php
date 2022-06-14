@@ -17,9 +17,27 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
+            ->validate()
+                ->ifTrue(function ($config) {
+                    return $config['driver'] === 'google_cloud_storage' && empty($config['google_cloud_storage']);
+                })
+                ->thenInvalid('google_cloud_storage config block is required when driver is google_cloud_storage.')
+            ->end()
+
             ->children()
                 ->scalarNode('entity_manager')
                     ->defaultValue('default')
+                ->end()
+
+                ->enumNode('driver')
+                    ->defaultValue('google_cloud_storage')
+                    ->values(['google_cloud_storage'])
+                ->end()
+
+                ->arrayNode('google_cloud_storage')
+                    ->children()
+                        ->scalarNode('bucket')->isRequired()->end()
+                    ->end()
                 ->end()
 
                 ->arrayNode('media')

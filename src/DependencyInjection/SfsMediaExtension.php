@@ -36,6 +36,11 @@ class SfsMediaExtension extends Extension implements PrependExtensionInterface
         if ($config['media']['admin_controller']) {
             $loader->load('controller/admin_medias.yaml');
         }
+
+        if ($config['driver'] === 'google_cloud_storage') {
+            $container->setParameter('sfs_media.storage.google_cloud_storage.bucket', $config['google_cloud_storage']['bucket']);
+            $loader->load('drivers/google_cloud_storage.yaml');
+        }
     }
 
     public function prepend(ContainerBuilder $container)
