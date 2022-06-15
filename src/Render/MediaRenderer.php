@@ -34,6 +34,25 @@ class MediaRenderer
         }
     }
 
+    public function renderVideo(MediaInterface $media, $version, array $attr = []): string
+    {
+        if (is_array($version)) {
+            foreach ($version as $singleVersion) {
+                if ($html = $this->renderVideo($media, $singleVersion, $attr)) {
+                    return $html;
+                }
+            }
+
+            return '';
+        } else {
+            if (!$mediaVersion = $media->getVersion($version)) {
+                return '';
+            }
+
+            return $this->renderVideoTag($mediaVersion, $attr);
+        }
+    }
+
     public function renderImage(MediaInterface $media, $version, array $attr = []): string
     {
         if (is_array($version)) {
@@ -53,7 +72,7 @@ class MediaRenderer
         }
     }
 
-    public function renderPicture(MediaInterface $media, string $picture = '_default', array $attr = []): string
+    public function renderPicture(MediaInterface $media, string $picture = '_default', array $imgAttr = [], array $pictureAttr = []): string
     {
         $config = $this->mediaTypesCollection->getType($media->getType());
 
@@ -61,7 +80,7 @@ class MediaRenderer
             throw new \Exception('picture config is not set for '.$media->getType());
         }
 
-        $html = '<picture>';
+        $html = '<picture '.$this->htmlAttributes($pictureAttr).'>';
         foreach ($config['pictures'][$picture]['sources'] ?? [] as $source) {
             $sourceAttrs = $source['attrs'] ?? [];
             $sourceAttrs['srcset'] = implode(', ', array_map(function ($srcset) use ($media) {
@@ -70,7 +89,7 @@ class MediaRenderer
             $html .= '<source '.$this->htmlAttributes($sourceAttrs).' />';
         }
 
-        $html .= $this->renderImgTag($media->getVersion($config['pictures'][$picture]['img']['src_version']), $attr);
+        $html .= $this->renderImgTag($media->getVersion($config['pictures'][$picture]['img']['src_version']), $imgAttr);
         $html .= '</picture>';
 
         return $html;
@@ -97,6 +116,56 @@ class MediaRenderer
         $attributes['src'] = $this->getFinalUrl($version);
 
         return '<img '.$this->htmlAttributes($attributes).' />';
+    }
+
+    protected function renderVideoTag(?MediaVersionInterface $version, array $attr = []): ?string
+    {
+        if (!$version) {
+            return null;
+        }
+
+        $attributes = $attr;
+        $attributes['src'] = $this->getFinalUrl($version);
+
+        if (!isset($attributes['controls'])) {
+            $attributes['controls'] = '';
+        } elseif ($attributes['controls'] === false) {
+            unset($attributes['controls']);
+        }
+
+        return '<video '.$this->htmlAttributes($attributes).' />';
+    }
+
+    public function renderVideoWithSources(MediaInterface $media, string $video = '_default', array $videoTagAttr = []): string
+    {
+        $config = $this->mediaTypesCollection->getType($media->getType());
+
+        if (!isset($config['video_sources'][$video])) {
+            throw new \Exception('video_sources config is not set for '.$media->getType());
+        }
+
+        if (!isset($videoTagAttr['controls'])) {
+            $videoTagAttr['controls'] = '';
+        } elseif ($videoTagAttr['controls'] === false) {
+            unset($videoTagAttr['controls']);
+        }
+
+        $html = '<video '.$this->htmlAttributes($videoTagAttr).'>';
+        foreach ($config['video_sources'][$video]['sources'] ?? [] as $source) {
+            $version = $media->getVersion($source['version']);
+
+            if (!$version) {
+                continue;
+            }
+
+            $sourceAttrs = $source['attrs'] ?? [];
+            $sourceAttrs['src'] = $this->getFinalUrl($version);
+            $sourceAttrs['type'] = $version->getFileMimeType();
+            $html .= '<source '.$this->htmlAttributes($sourceAttrs).' />';
+        }
+        $html .= '</video>';
+
+        return $html;
     }
 
     protected function getFinalUrl(?MediaVersionInterface $version): ?string

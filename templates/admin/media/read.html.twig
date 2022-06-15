@@ -51,13 +51,22 @@
             Media <strong>{{ version }}</strong> version has been <strong>changed</strong> in config ({{ changedOptions|map((changedOption) => changedOption.string)|join(', ') }}). You need to run media migrations command to cleanup medias.
         </div>
     {% endfor %}
+    {% for version in checkVersions.manual %}
+        <div class="alert alert-warning" role="alert">
+            Missing <strong>{{ version }}</strong> version in this media, seems to be <strong>new</strong> in config. It's mandatory that you provide this file manually.
+        </div>
+    {% endfor %}
 
     <div class="container-fluid bg-white p-4">
         <div class="row">
             <div class="col">
                 <h4>Original</h4>
                 <div>
-                    {{ media|sfs_media_render_image('_original', {'class':'img-thumbnail', 'alt': 'Original media', 'title': 'Original media'}) }}
+                    {% if media.isVideo %}
+                        {{ media|sfs_media_render_video('_original', {'class':'img-thumbnail', 'alt': 'Original media', 'title': 'Original media'}) }}
+                    {% elseif media.isImage %}
+                        {{ media|sfs_media_render_image('_original', {'class':'img-thumbnail', 'alt': 'Original media', 'title': 'Original media'}) }}
+                    {% endif %}
                 </div>
                 {{ media.version('_original').width }}x{{ media.version('_original').height }}
                 {{ media.version('_original').fileMimeType }}
@@ -70,7 +79,11 @@
                 <div class="col">
                     <h4>{{ version.version }}</h4>
                     <div>
-                        {{ media|sfs_media_render_image(version.version, {'class':'img-'~version.version}) }}
+                        {% if media.isVideo %}
+                            {{ media|sfs_media_render_video(version.version, {'class':'img-'~version.version}) }}
+                        {% elseif media.isImage %}
+                            {{ media|sfs_media_render_image(version.version, {'class':'img-'~version.version}) }}
+                        {% endif %}
                     </div>
                     {{ version.width }}x{{ version.height }}
                     {{ version.fileMimeType }}
@@ -89,6 +102,17 @@
                 <div class="col">
                     <h6>HTML</h6>
                     <pre><code>{{ media|sfs_media_render_picture|replace({'>':">\n"})|e('html') }}</code></pre>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if type_config.video_sources|length %}
+        <div class="container p-4">
+            <div class="row">
+                <div class="col">
+                    <h6>HTML</h6>
+                    <pre><code>{{ media|sfs_media_render_video_set|replace({'>':">\n"})|e('html') }}</code></pre>
                 </div>
             </div>
         </div>

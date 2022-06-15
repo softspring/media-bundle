@@ -7,6 +7,8 @@ use Doctrine\Common\Collections\Collection;
 
 abstract class Media implements MediaInterface
 {
+    protected ?int $mediaType = null;
+
     protected ?string $type = null;
 
     protected ?string $name = null;
@@ -23,6 +25,26 @@ abstract class Media implements MediaInterface
     public function __construct()
     {
         $this->versions = new ArrayCollection();
+    }
+
+    public function getMediaType(): ?int
+    {
+        return $this->mediaType;
+    }
+
+    public function setMediaType(?int $mediaType): void
+    {
+        $this->mediaType = $mediaType;
+    }
+
+    public function isVideo(): bool
+    {
+        return $this->getMediaType() === self::MEDIA_TYPE_VIDEO;
+    }
+
+    public function isImage(): bool
+    {
+        return $this->getMediaType() === self::MEDIA_TYPE_IMAGE;
     }
 
     public function getType(): ?string

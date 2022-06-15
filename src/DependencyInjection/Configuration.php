@@ -2,7 +2,6 @@
 
 namespace Softspring\MediaBundle\DependencyInjection;
 
-use Imagine\Image\ImageInterface;
 use Softspring\MediaBundle\Media\DefaultNameGenerator;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
@@ -17,16 +16,18 @@ class Configuration implements ConfigurationInterface
             'mime' => [
                 'image/svg+xml',
                 'image/svg',
+                'video/webm',
+                'video/mp4',
             ],
-            'extension' => [
+            'versionTypeExtensions' => [
                 'svg',
             ],
         ];
 
-        function_exists('imagegif') && function_exists('imagecreatefromgif') && ($supportedTypes['extension'][] = 'gif') && ($supportedTypes['mime'][] = 'image/gif');
-        function_exists('imagejpeg') && function_exists('imagecreatefromjpeg') && ($supportedTypes['extension'][] = 'jpeg') && ($supportedTypes['mime'][] = 'image/jpeg');
-        function_exists('imagewebp') && function_exists('imagecreatefromwebp') && ($supportedTypes['extension'][] = 'webp') && ($supportedTypes['mime'][] = 'image/webp');
-        function_exists('imagepng') && function_exists('imagecreatefrompng') && ($supportedTypes['extension'][] = 'png') && ($supportedTypes['mime'][] = 'image/png');
+        function_exists('imagegif') && function_exists('imagecreatefromgif') && ($supportedTypes['versionTypeExtensions'][] = 'gif') && ($supportedTypes['mime'][] = 'image/gif');
+        function_exists('imagejpeg') && function_exists('imagecreatefromjpeg') && ($supportedTypes['versionTypeExtensions'][] = 'jpeg') && ($supportedTypes['mime'][] = 'image/jpeg');
+        function_exists('imagewebp') && function_exists('imagecreatefromwebp') && ($supportedTypes['versionTypeExtensions'][] = 'webp') && ($supportedTypes['mime'][] = 'image/webp');
+        function_exists('imagepng') && function_exists('imagecreatefrompng') && ($supportedTypes['versionTypeExtensions'][] = 'png') && ($supportedTypes['mime'][] = 'image/png');
 
         return $supportedTypes;
     }
@@ -35,6 +36,8 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder('sfs_media');
         $rootNode = $treeBuilder->getRootNode();
+
+        $supportedMimeTypes = $this->getSupportedMimeTypes();
 
         $rootNode
             ->validate()
@@ -81,32 +84,52 @@ class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('key')
                     ->prototype('array')
                         ->validate()
-                            ->ifTrue(function ($config) {
-                                $supportedMimeTypes = $this->getSupportedMimeTypes();
+                            ->ifTrue(function ($config) use ($supportedMimeTypes) {
                                 foreach ($config['upload_requirements']['mimeTypes'] ?? [] as $mimeType) {
                                     if (!in_array($mimeType, $supportedMimeTypes['mime'])) {
                                         return true;
                                     }
                                 }
 
+                                return false;
+                            })
+                            ->thenInvalid('Some configured upload_requirements mimeTypes are not supported. The allowed formats are: '.implode(', ', $this->getSupportedMimeTypes()['mime']).'. Maybe you need to install some libraries to support them.'." \n\n%s")
+                            ->ifTrue(function ($config) use ($supportedMimeTypes) {
                                 foreach ($config['versions'] as $version) {
-                                    if (!in_array($version['type'], $supportedMimeTypes['extension'])) {
+                                    if (!empty($version['type']) && !in_array($version['type'], $supportedMimeTypes['versionTypeExtensions'])) {
                                         return true;
                                     }
                                 }
 
                                 return false;
                             })
-                            ->thenInvalid('Some configured formats are not supported. The allowed formats are: '.implode(', ', $this->getSupportedMimeTypes()['mime']).'. Maybe you need to install some libraries to support them.')
+                            ->thenInvalid('Some configured version types are not supported. The allowed formats are: '.implode(', ', $this->getSupportedMimeTypes()['versionTypeExtensions']).'. Maybe you need to install some libraries to support them.'." \n\n%s")
+                            ->ifTrue(function ($config) use ($supportedMimeTypes) {
+                                foreach ($config['versions'] as $version) {
+                                    foreach ($version['upload_requirements']['mimeTypes'] ?? [] as $mimeType) {
+                                        if (!in_array($mimeType, $supportedMimeTypes['mime'])) {
+                                            return true;
+                                        }
+                                    }
+                                }
+
+                                return false;
+                            })
+                            ->thenInvalid('Some configured version upload_requirements mimeTypes are not supported. The allowed formats are: '.implode(', ', $this->getSupportedMimeTypes()['mime']).'. Maybe you need to install some libraries to support them.'." \n\n%s")
                         ->end()
 
                         ->children()
+                            ->enumNode('type')
+                                ->values(['video', 'image'])
+                                ->defaultValue('image')
+                            ->end()
                             ->scalarNode('name')->end()
                             ->scalarNode('description')->end()
                             ->scalarNode('generator')->defaultValue(DefaultNameGenerator::class)->end()
                             ->append($this->getUploadRequirementsNode())
                             ->append($this->getVersionsNode())
                             ->append($this->getPicturesNode())
+                            ->append($this->getVideoSourcessNode())
                         ->end()
                     ->end()
                 ->end()
@@ -133,10 +156,10 @@ class Configuration implements ConfigurationInterface
                 ->integerNode('minRatio')->end()
                 ->integerNode('minPixels')->end()
                 ->integerNode('maxPixels')->end()
-                ->booleanNode('allowSquare')->defaultTrue()->end()
-                ->booleanNode('allowLandscape')->defaultTrue()->end()
-                ->booleanNode('allowPortrait')->defaultTrue()->end()
-                ->booleanNode('detectCorrupted')->defaultFalse()->end()
+                ->booleanNode('allowSquare')->end()
+                ->booleanNode('allowLandscape')->end()
+                ->booleanNode('allowPortrait')->end()
+                ->booleanNode('detectCorrupted')->end()
                 ->arrayNode('mimeTypes')->scalarPrototype()->end()->end()
             ->end()
         ;
@@ -156,7 +179,7 @@ class Configuration implements ConfigurationInterface
                 ->normalizeKeys(false)
                 ->children()
                     ->append($this->getUploadRequirementsNode())
-                    ->enumNode('type')->values(['jpeg', 'png', 'webp'])->defaultValue('jpeg')->end()  // TODO NOT DEFAULT VALUE
+                    ->enumNode('type')->values(['jpeg', 'png', 'webp'])->end()
                     ->integerNode('scale_width')->end()
                     ->integerNode('scale_height')->end()
                     ->integerNode('png_compression_level')->end()
@@ -166,8 +189,8 @@ class Configuration implements ConfigurationInterface
                     ->booleanNode('flatten')->end()
                     ->integerNode('resolution-x')->end()
                     ->integerNode('resolution-y')->end()
-                    ->scalarNode('resampling-filter')->defaultValue(ImageInterface::FILTER_LANCZOS)->end() // TODO DEFAULT ONLY FOR IMAGES
-                    ->scalarNode('resolution-units')->defaultValue(ImageInterface::RESOLUTION_PIXELSPERINCH)->end() // TODO DEFAULT ONLY FOR IMAGES
+                    ->scalarNode('resampling-filter')->end()
+                    ->scalarNode('resolution-units')->end()
                 ->end()
             ->end()
         ;
@@ -203,6 +226,34 @@ class Configuration implements ConfigurationInterface
                                         ->end()
                                     ->end()
                                 ->end()
+                                ->arrayNode('attrs')
+                                    ->scalarPrototype()->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+
+        return $node;
+    }
+
+    public function getVideoSourcessNode(): NodeDefinition
+    {
+        $treeBuilder = new TreeBuilder('video_sources');
+
+        /** @var ArrayNodeDefinition $connectionNode */
+        $node = method_exists(TreeBuilder::class, 'getRootNode') ? $treeBuilder->getRootNode() : $treeBuilder->root('video_sources');
+
+        $node
+            ->useAttributeAsKey('key')
+            ->arrayPrototype()
+                ->children()
+                    ->arrayNode('sources')
+                        ->arrayPrototype()
+                            ->children()
+                                ->scalarNode('version')->isRequired()->end()
                                 ->arrayNode('attrs')
                                     ->scalarPrototype()->end()
                                 ->end()

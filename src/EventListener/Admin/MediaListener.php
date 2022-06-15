@@ -44,8 +44,7 @@ class MediaListener implements EventSubscriberInterface
 
         /** @var MediaInterface $media */
         $media = $event->getEntity();
-        $media->setType($type);
-        $this->mediaManager->generateVersionEntities($media);
+        $this->mediaManager->createEntityForType($type, $media);
     }
 
     public function onCreateViewAddTypeConfig(ViewEvent $event): void

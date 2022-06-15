@@ -2,6 +2,7 @@
 
 namespace Softspring\MediaBundle\DependencyInjection;
 
+use Imagine\Image\ImageInterface;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
 use Symfony\Component\Config\Definition\Processor;
@@ -28,7 +29,7 @@ class SfsMediaExtension extends Extension implements PrependExtensionInterface
         $container->setParameter('sfs_media.media.find_field_name', $config['media']['find_field_name'] ?? null);
         $container->setParameter('sfs_media.version.class', $config['version']['class']);
         $container->setParameter('sfs_media.version.find_field_name', $config['version']['find_field_name'] ?? null);
-        $container->setParameter('sfs_media.types', $config['types'] ?? null);
+        $container->setParameter('sfs_media.types', $this->fixConfigTypes($config['types'] ?? null));
 
         // load services
         $loader->load('services.yaml');
@@ -41,6 +42,31 @@ class SfsMediaExtension extends Extension implements PrependExtensionInterface
             $container->setParameter('sfs_media.storage.google_cloud_storage.bucket', $config['google_cloud_storage']['bucket']);
             $loader->load('drivers/google_cloud_storage.yaml');
         }
+    }
+
+    /**
+     * Update config types, this can not be done in processors because it would be not used to compare with database versions.
+     * Also, can not be set in configuration as default values, because is exclusive for some types
+     */
+    protected function fixConfigTypes(?array $types = null): ?array
+    {
+        if ($types === null) {
+            return null;
+        }
+
+        foreach ($types as $type => $config) {
+            if ($config['type'] == 'image') {
+                foreach ($config['versions'] as $version => $versionConfig) {
+                    if (!isset($versionConfig['upload_requirements'])) {
+                        empty($versionConfig['type']) && $types[$type]['versions'][$version]['type'] = 'jpeg'; // default jpeg
+                        empty($versionConfig['resampling-filter']) && $types[$type]['versions'][$version]['resampling-filter'] = ImageInterface::FILTER_LANCZOS;
+                        empty($versionConfig['resolution-units']) && $types[$type]['versions'][$version]['resolution-units'] = ImageInterface::RESOLUTION_PIXELSPERINCH;
+                    }
+                }
+            }
+        }
+
+        return $types;
     }
 
     public function prepend(ContainerBuilder $container)

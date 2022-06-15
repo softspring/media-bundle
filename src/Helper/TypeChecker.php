@@ -14,6 +14,7 @@ class TypeChecker
             'ok' => [],
             'changed' => [],
             'delete' => [],
+            'manual' => [],
         ];
 
         /** @var MediaVersionInterface $version */
@@ -31,10 +32,11 @@ class TypeChecker
             $changedOptions = [];
             foreach ($version->getOptions() as $option => $value) {
                 if (empty($typeConfig['versions'][$version->getVersion()][$option]) || $typeConfig['versions'][$version->getVersion()][$option] !== $value) {
+                    $configuredOption = $typeConfig['versions'][$version->getVersion()][$option] ?? null;
                     $changedOptions[$option] = [
-                        'config' => $typeConfig['versions'][$version->getVersion()][$option],
+                        'config' => $configuredOption,
                         'db' => $value,
-                        'string' => "$option: $value => {$typeConfig['versions'][$version->getVersion()][$option]}",
+                        'string' => "$option: $value => $configuredOption",
                     ];
                 }
             }
@@ -50,7 +52,11 @@ class TypeChecker
         $configuredVersions = array_keys($typeConfig['versions']);
         $newVersions = array_diff($configuredVersions, $dbVersions);
         foreach ($newVersions as $version) {
-            $checkResult['new'][] = $version;
+            if (!empty($typeConfig['versions'][$version]['upload_requirements'])) {
+                $checkResult['manual'][] = $version;
+            } else {
+                $checkResult['new'][] = $version;
+            }
         }
 
         return $checkResult;
