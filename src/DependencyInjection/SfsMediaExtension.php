@@ -46,16 +46,16 @@ class SfsMediaExtension extends Extension implements PrependExtensionInterface
 
     /**
      * Update config types, this can not be done in processors because it would be not used to compare with database versions.
-     * Also, can not be set in configuration as default values, because is exclusive for some types
+     * Also, can not be set in configuration as default values, because is exclusive for some types.
      */
     protected function fixConfigTypes(?array $types = null): ?array
     {
-        if ($types === null) {
+        if (null === $types) {
             return null;
         }
 
         foreach ($types as $type => $config) {
-            if ($config['type'] == 'image') {
+            if ('image' === $config['type']) {
                 foreach ($config['versions'] as $version => $versionConfig) {
                     if (!isset($versionConfig['upload_requirements'])) {
                         empty($versionConfig['type']) && $types[$type]['versions'][$version]['type'] = 'jpeg'; // default jpeg

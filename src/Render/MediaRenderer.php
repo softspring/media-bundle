@@ -129,7 +129,7 @@ class MediaRenderer
 
         if (!isset($attributes['controls'])) {
             $attributes['controls'] = '';
-        } elseif ($attributes['controls'] === false) {
+        } elseif (false === $attributes['controls']) {
             unset($attributes['controls']);
         }
 
@@ -146,7 +146,7 @@ class MediaRenderer
 
         if (!isset($videoTagAttr['controls'])) {
             $videoTagAttr['controls'] = '';
-        } elseif ($videoTagAttr['controls'] === false) {
+        } elseif (false === $videoTagAttr['controls']) {
             unset($videoTagAttr['controls']);
         }
 

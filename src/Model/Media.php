@@ -39,12 +39,12 @@ abstract class Media implements MediaInterface
 
     public function isVideo(): bool
     {
-        return $this->getMediaType() === self::MEDIA_TYPE_VIDEO;
+        return self::MEDIA_TYPE_VIDEO === $this->getMediaType();
     }
 
     public function isImage(): bool
     {
-        return $this->getMediaType() === self::MEDIA_TYPE_IMAGE;
+        return self::MEDIA_TYPE_IMAGE === $this->getMediaType();
     }
 
     public function getType(): ?string

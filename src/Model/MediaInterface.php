@@ -6,10 +6,10 @@ use Doctrine\Common\Collections\Collection;
 
 interface MediaInterface
 {
-    const MEDIA_TYPE_UNKNOWN = null;
-    const MEDIA_TYPE_IMAGE = 1;
-    const MEDIA_TYPE_VIDEO = 2;
-    const MEDIA_TYPE_OTHER = 99;
+    public const MEDIA_TYPE_UNKNOWN = null;
+    public const MEDIA_TYPE_IMAGE = 1;
+    public const MEDIA_TYPE_VIDEO = 2;
+    public const MEDIA_TYPE_OTHER = 99;
 
     public function getMediaType(): ?int;
 
