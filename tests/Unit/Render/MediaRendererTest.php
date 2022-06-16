@@ -12,7 +12,7 @@ use Softspring\MediaBundle\Type\MediaTypesCollection;
 
 class MediaRendererTest extends TestCase
 {
-    const TYPES = [
+    public const TYPES = [
         'background' => [
             'versions' => [
                 'xl' => [],
@@ -24,27 +24,27 @@ class MediaRendererTest extends TestCase
                     'sources' => [
                         [
                             'srcset' => [
-                                [ 'version' => 'l', 'suffix' => '1x' ],
-                                [ 'version' => 'xl', 'suffix' => '2x' ],
+                                ['version' => 'l', 'suffix' => '1x'],
+                                ['version' => 'xl', 'suffix' => '2x'],
                             ],
                             'attrs' => [
                                 'media' => '(min-width: 200w)',
-                            ]
+                            ],
                         ],
                         [
                             'srcset' => [
-                                [ 'version' => 's', 'suffix' => null ],
+                                ['version' => 's', 'suffix' => null],
                             ],
                             'attrs' => [
                                 'media' => '(min-width: 200w)',
-                            ]
+                            ],
                         ],
                     ],
                     'img' => [
-                        'src_version' => 'xl'
-                    ]
-                ]
-            ]
+                        'src_version' => 'xl',
+                    ],
+                ],
+            ],
         ],
     ];
 
@@ -80,7 +80,6 @@ class MediaRendererTest extends TestCase
 
         $expectedLImg = '<img width="800" height="600" class="img-fluid" src="https://example.com/image.l.jpeg" />';
         $this->assertEquals($expectedLImg, $renderer->renderImage($media, ['bad', 'l'], ['class' => 'img-fluid']));
-
 
         $versionS = new MediaVersion('s', $media);
         $versionS->setUrl('gs://bucket/image.s.jpeg');

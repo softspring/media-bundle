@@ -19,7 +19,7 @@ class TypeCheckerTest extends TestCase
                 'v2' => ['scale_width' => 100, 'scale_height' => 200],
                 'v3' => ['scale_width' => 100],
                 'v4' => ['upload_requirements' => ['mimeType' => ['image/jpeg']]],
-            ]
+            ],
         ];
 
         $originalVersion = new MediaVersion('_original', $media);
@@ -36,7 +36,7 @@ class TypeCheckerTest extends TestCase
 
         $this->assertEquals([
             'new' => [
-                'v3'
+                'v3',
             ],
             'ok' => [
                 '_original',
@@ -52,10 +52,10 @@ class TypeCheckerTest extends TestCase
                 ],
             ],
             'delete' => [
-                'v100'
+                'v100',
             ],
             'manual' => [
-                'v4'
+                'v4',
             ],
         ], $result);
     }

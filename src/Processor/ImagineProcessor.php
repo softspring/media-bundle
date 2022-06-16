@@ -79,7 +79,7 @@ class ImagineProcessor implements ProcessorInterface
         $fileNameParts = explode('.', $fileName);
         $fileExtension = end($fileNameParts);
         if (isset($options['type']) && $options['type'] !== $fileExtension) {
-            $fileNameParts[count($fileNameParts)-1] = $options['type'];
+            $fileNameParts[count($fileNameParts) - 1] = $options['type'];
             $fileName = implode('.', $fileNameParts);
             touch($fileName);
             $version->setUpload(new File($fileName));

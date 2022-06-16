@@ -5,7 +5,6 @@ namespace Softspring\MediaBundle\Tests\Unit\Entity;
 use PHPUnit\Framework\TestCase;
 use Softspring\MediaBundle\Entity\Media;
 use Softspring\MediaBundle\Entity\MediaVersion;
-use Softspring\MediaBundle\Model\MediaInterface;
 use Symfony\Component\HttpFoundation\File\File;
 
 class MediaVersionTest extends TestCase
@@ -112,7 +111,6 @@ class MediaVersionTest extends TestCase
         $this->assertEquals(date('H:i:s d-m-Y'), $version->getUploadedAt()->format('H:i:s d-m-Y'));
         $this->assertEquals(date('H:i:s d-m-Y'), $version->getMedia()->getUploadedAt()->format('H:i:s d-m-Y'));
     }
-
 
     public function testId()
     {

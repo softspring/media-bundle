@@ -51,7 +51,7 @@ class ImagineProcessorTest extends TestCase
         $originalVersion->setFileMimeType('image/invalid');
         $version = new MediaVersion('xs');
         $version->setOriginalVersion($originalVersion);
-        $version->setOptions(['type'=>'jpeg']);
+        $version->setOptions(['type' => 'jpeg']);
         $this->assertFalse($processor->supports($version));
     }
 
@@ -62,7 +62,7 @@ class ImagineProcessorTest extends TestCase
         $originalVersion->setFileMimeType('image/jpeg');
         $version = new MediaVersion('xs');
         $version->setOriginalVersion($originalVersion);
-        $version->setOptions(['type'=>'invalid']);
+        $version->setOptions(['type' => 'invalid']);
         $this->assertFalse($processor->supports($version));
     }
 
@@ -73,7 +73,7 @@ class ImagineProcessorTest extends TestCase
         $originalVersion->setFileMimeType('image/jpeg');
         $version = new MediaVersion('xs');
         $version->setOriginalVersion($originalVersion);
-        $version->setOptions(['type'=>'png']);
+        $version->setOptions(['type' => 'png']);
         $this->assertTrue($processor->supports($version));
     }
 
@@ -84,7 +84,7 @@ class ImagineProcessorTest extends TestCase
         $originalVersion->setFileMimeType('image/jpeg');
         $version = new MediaVersion('xs');
         $version->setOriginalVersion($originalVersion);
-        $version->setOptions(['type'=>'png']);
+        $version->setOptions(['type' => 'png']);
         $version->setUpload(new UploadedFile('/tmp/uploadedFile', 'name.jpeg', null, 100, true));
         $this->assertTrue($processor->process($version) || true);
     }
@@ -96,7 +96,7 @@ class ImagineProcessorTest extends TestCase
         $originalVersion = new MediaVersion('_original');
         $originalVersion->setFileMimeType('image/jpeg');
 
-        $originFilePath = __DIR__ . '/resources/energy.250x141.96ppi.jpg';
+        $originFilePath = __DIR__.'/resources/energy.250x141.96ppi.jpg';
         $filePath = __DIR__.'/results/testJpegToPngConversion.jpeg';
         $filePathPng = __DIR__.'/results/testJpegToPngConversion.png';
         is_file($filePath) && unlink($filePath);
@@ -105,7 +105,7 @@ class ImagineProcessorTest extends TestCase
         $version = new MediaVersion('xs');
         $version->setUpload(new File(__DIR__.'/results/testJpegToPngConversion.jpeg'));
         $version->setOriginalVersion($originalVersion);
-        $version->setOptions(['type'=>'png', 'png_compression_level' => 9]);
+        $version->setOptions(['type' => 'png', 'png_compression_level' => 9]);
 
         $processor->process($version);
 
@@ -125,7 +125,7 @@ class ImagineProcessorTest extends TestCase
         $originalVersion = new MediaVersion('_original');
         $originalVersion->setFileMimeType('image/jpeg');
 
-        $originFilePath = __DIR__ . '/resources/energy.250x141.96ppi.jpg';
+        $originFilePath = __DIR__.'/resources/energy.250x141.96ppi.jpg';
         $filePath = __DIR__.'/results/testChangeResolution.jpeg';
         is_file($filePath) && unlink($filePath);
         copy($originFilePath, $filePath);
@@ -134,7 +134,7 @@ class ImagineProcessorTest extends TestCase
         $version->setUpload(new File(__DIR__.'/results/testChangeResolution.jpeg'));
         $version->setOriginalVersion($originalVersion);
         $version->setOptions([
-            'type'=>'jpeg',
+            'type' => 'jpeg',
             'jpeg_compression' => 70,
             'resolution-x' => 72,
             'resolution-y' => 72,
@@ -163,7 +163,7 @@ class ImagineProcessorTest extends TestCase
         $originalVersion->setWidth(250);
         $originalVersion->setHeight(141);
 
-        $originFilePath = __DIR__ . '/resources/energy.250x141.96ppi.jpg';
+        $originFilePath = __DIR__.'/resources/energy.250x141.96ppi.jpg';
         $filePath = __DIR__.'/results/testScaleWidth.jpeg';
         is_file($filePath) && unlink($filePath);
         copy($originFilePath, $filePath);
@@ -172,7 +172,7 @@ class ImagineProcessorTest extends TestCase
         $version->setUpload(new File(__DIR__.'/results/testScaleWidth.jpeg'));
         $version->setOriginalVersion($originalVersion);
         $version->setOptions([
-            'type'=>'jpeg',
+            'type' => 'jpeg',
             'jpeg_compression' => 70,
             'scale_width' => 100,
         ]);
@@ -195,7 +195,7 @@ class ImagineProcessorTest extends TestCase
         $originalVersion->setWidth(250);
         $originalVersion->setHeight(141);
 
-        $originFilePath = __DIR__ . '/resources/energy.250x141.96ppi.jpg';
+        $originFilePath = __DIR__.'/resources/energy.250x141.96ppi.jpg';
         $filePath = __DIR__.'/results/testScaleHeight.jpeg';
         is_file($filePath) && unlink($filePath);
         copy($originFilePath, $filePath);
@@ -204,7 +204,7 @@ class ImagineProcessorTest extends TestCase
         $version->setUpload(new File(__DIR__.'/results/testScaleHeight.jpeg'));
         $version->setOriginalVersion($originalVersion);
         $version->setOptions([
-            'type'=>'jpeg',
+            'type' => 'jpeg',
             'jpeg_compression' => 70,
             'scale_height' => 100,
         ]);
@@ -227,7 +227,7 @@ class ImagineProcessorTest extends TestCase
         $originalVersion->setWidth(250);
         $originalVersion->setHeight(141);
 
-        $originFilePath = __DIR__ . '/resources/energy.250x141.96ppi.jpg';
+        $originFilePath = __DIR__.'/resources/energy.250x141.96ppi.jpg';
         $filePath = __DIR__.'/results/testScaleBoth.jpeg';
         is_file($filePath) && unlink($filePath);
         copy($originFilePath, $filePath);
@@ -236,7 +236,7 @@ class ImagineProcessorTest extends TestCase
         $version->setUpload(new File(__DIR__.'/results/testScaleBoth.jpeg'));
         $version->setOriginalVersion($originalVersion);
         $version->setOptions([
-            'type'=>'jpeg',
+            'type' => 'jpeg',
             'jpeg_compression' => 70,
             'scale_width' => 100,
             'scale_height' => 100,
@@ -253,6 +253,6 @@ class ImagineProcessorTest extends TestCase
 
     public function testWorkWithPngTransparent()
     {
-        $this->assertTrue(!!'TODO');
+        $this->assertTrue((bool) 'TODO');
     }
 }

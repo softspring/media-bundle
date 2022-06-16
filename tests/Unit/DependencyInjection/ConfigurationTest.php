@@ -2,8 +2,8 @@
 
 namespace Softspring\MediaBundle\Tests\Unit\DependencyInjection;
 
-use Softspring\MediaBundle\DependencyInjection\Configuration;
 use PHPUnit\Framework\TestCase;
+use Softspring\MediaBundle\DependencyInjection\Configuration;
 use Softspring\MediaBundle\Media\DefaultNameGenerator;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
@@ -29,9 +29,9 @@ class ConfigurationTest extends TestCase
         $configs = [
             'sfs_media' => [
                 'google_cloud_storage' => [
-                    'bucket' => 'test-bucket'
-                ]
-            ]
+                    'bucket' => 'test-bucket',
+                ],
+            ],
         ];
         $expected = [
             'google_cloud_storage' => [
@@ -62,7 +62,7 @@ class ConfigurationTest extends TestCase
         $configs = [
             'sfs_media' => [
                 'google_cloud_storage' => [
-                    'bucket' => 'test-bucket'
+                    'bucket' => 'test-bucket',
                 ],
                 'entity_manager' => 'other_em',
                 'media' => [
@@ -94,7 +94,6 @@ class ConfigurationTest extends TestCase
                             ],
                         ],
                         'pictures' => [
-
                         ],
 //            versions:
 //                _thumbnail: { type: 'jpeg', scale_width: 300, jpeg_quality: 70, resolution-x: 72, resolution-y: 72 } # admin thumbnail
@@ -110,9 +109,9 @@ class ConfigurationTest extends TestCase
 //                        - { srcset: [{ version: xs }], attrs: { media: "(min-width: 200w)", sizes: "50vw" } }
 //                    img:
 //                        src_version: xl
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ];
         $expected = [
             'google_cloud_storage' => [
@@ -153,10 +152,8 @@ class ConfigurationTest extends TestCase
                         ],
                     ],
                     'pictures' => [
-
                     ],
                     'video_sources' => [
-
                     ],
                 ],
             ],
