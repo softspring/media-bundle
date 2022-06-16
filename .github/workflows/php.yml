@@ -46,3 +46,6 @@ jobs:
 
             - name: Code Style check
               run: ./vendor/bin/php-cs-fixer fix -v --diff --dry-run
+
+            - name: Run tests
+              run: ./vendor/bin/phpunit --coverage-text
