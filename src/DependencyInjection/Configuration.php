@@ -2,6 +2,7 @@
 
 namespace Softspring\MediaBundle\DependencyInjection;
 
+use Imagine\Image\ImageInterface;
 use Softspring\MediaBundle\Media\DefaultNameGenerator;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
@@ -265,5 +266,30 @@ class Configuration implements ConfigurationInterface
         ;
 
         return $node;
+    }
+
+    /**
+     * Update config types, this can not be done in processors because it would be not used to compare with database versions.
+     * Also, can not be set in configuration as default values, because is exclusive for some types.
+     */
+    public static function fixConfigTypes(?array $types = null): ?array
+    {
+        if (null === $types) {
+            return null;
+        }
+
+        foreach ($types as $type => $config) {
+            if ('image' === $config['type']) {
+                foreach ($config['versions'] as $version => $versionConfig) {
+                    if (!isset($versionConfig['upload_requirements'])) {
+                        empty($versionConfig['type']) && $types[$type]['versions'][$version]['type'] = 'jpeg'; // default jpeg
+                        empty($versionConfig['resampling-filter']) && $types[$type]['versions'][$version]['resampling-filter'] = ImageInterface::FILTER_LANCZOS;
+                        empty($versionConfig['resolution-units']) && $types[$type]['versions'][$version]['resolution-units'] = ImageInterface::RESOLUTION_PIXELSPERINCH;
+                    }
+                }
+            }
+        }
+
+        return $types;
     }
 }

@@ -40,6 +40,7 @@ class TypeChecker
                     ];
                 }
             }
+            // TODO search for old configuration values
             if (!empty($changedOptions)) {
                 $checkResult['changed'][$version->getVersion()] = $changedOptions;
                 continue;

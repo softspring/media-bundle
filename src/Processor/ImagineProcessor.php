@@ -5,6 +5,7 @@ namespace Softspring\MediaBundle\Processor;
 use Imagine\Gd\Imagine;
 use Imagine\Image\Box;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImagineProcessor implements ProcessorInterface
@@ -50,25 +51,40 @@ class ImagineProcessor implements ProcessorInterface
         $originalVersion = $version->getOriginalVersion();
         $options = $version->getOptions();
 
+        $imagine = new Imagine();
+        $gdMedia = $imagine->open($version->getUpload()->getRealPath());
+
+        // scale if needed
         $scaleWidth = $options['scale_width'] ?? null;
         $scaleHeight = $options['scale_height'] ?? null;
-        if (null === $scaleWidth && null === $scaleHeight) {
-            throw new \Exception('You should configure scale_width or scale_height');
-        } elseif (null !== $scaleWidth && null === $scaleHeight) {
+        if (null !== $scaleWidth && null === $scaleHeight) {
             $scaleHeight = $scaleWidth * $originalVersion->getHeight() / $originalVersion->getWidth();
         } elseif (null === $scaleWidth && null !== $scaleHeight) {
             $scaleWidth = $scaleHeight * $originalVersion->getWidth() / $originalVersion->getHeight();
         }
+        if ($scaleWidth && $scaleHeight) {
+            $gdMedia->resize(new Box($scaleWidth, $scaleHeight));
+        }
 
-        $imagine = new Imagine();
-        $gdMedia = $imagine->open($version->getUpload()->getRealPath());
-        $gdMedia->resize(new Box($scaleWidth, $scaleHeight));
-        $version->setWidth($scaleWidth);
-        $version->setHeight($scaleHeight);
+        $version->setWidth($gdMedia->getSize()->getWidth());
+        $version->setHeight($gdMedia->getSize()->getHeight());
 
         // https://imagine.readthedocs.io/en/stable/usage/introduction.html#save-medias
         $validOptions = array_flip(['png_compression_level', 'webp_quality', 'flatten', 'jpeg_quality', 'resolution-units', 'resolution-x', 'resolution-y', 'resampling-filter']);
         $saveOptions = array_intersect_key($options, $validOptions);
+        $saveOptions['format'] = $options['type'];
+
+        // change format if needed
+        $fileName = $version->getUpload()->getRealPath();
+        $fileNameParts = explode('.', $fileName);
+        $fileExtension = end($fileNameParts);
+        if (isset($options['type']) && $options['type'] !== $fileExtension) {
+            $fileNameParts[count($fileNameParts)-1] = $options['type'];
+            $fileName = implode('.', $fileNameParts);
+            touch($fileName);
+            $version->setUpload(new File($fileName));
+        }
+
         $gdMedia->save($version->getUpload()->getRealPath(), $saveOptions);
     }
 }

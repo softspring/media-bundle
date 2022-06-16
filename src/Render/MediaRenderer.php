@@ -72,7 +72,7 @@ class MediaRenderer
         }
     }
 
-    public function renderPicture(MediaInterface $media, string $picture = '_default', array $imgAttr = [], array $pictureAttr = []): string
+    public function renderPicture(MediaInterface $media, string $picture = '_default', array $pictureAttr = [], array $imgAttr = []): string
     {
         $config = $this->mediaTypesCollection->getType($media->getType());
 
