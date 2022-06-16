@@ -50,8 +50,11 @@ class StoreFileProcessor implements ProcessorInterface
 
         $version->setUrl($this->storage->store($upload, $name));
 
-        // cleanup tmp image
-        unlink($version->getUpload()->getRealPath());
+        if (!$version->isKeepTmpFile()) {
+            // cleanup tmp image
+            unlink($version->getUpload()->getRealPath());
+        }
+
         $version->setUpload(null);
     }
 }

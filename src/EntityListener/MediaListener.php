@@ -17,6 +17,6 @@ class MediaListener
 
     public function preFlush(MediaInterface $media, PreFlushEventArgs $eventArgs)
     {
-        // $this->mediaManager->processVersionsMedias($media);
+        $this->mediaManager->generateVersionEntities($media);
     }
 }

@@ -12,6 +12,8 @@ abstract class MediaVersion implements MediaVersionInterface
 
     protected ?File $upload = null;
 
+    protected bool $keepTmpFile = false;
+
     protected ?string $url = null;
 
     protected ?int $width = null;
@@ -64,9 +66,10 @@ abstract class MediaVersion implements MediaVersionInterface
         return $this->upload;
     }
 
-    public function setUpload(?File $upload): void
+    public function setUpload(?File $upload, bool $keepTmpFile = false): void
     {
         $this->upload = $upload;
+        $this->keepTmpFile = $keepTmpFile;
 
         if (!$this->uploadedAt) {
             $this->uploadedAt = gmdate('U');
@@ -75,6 +78,11 @@ abstract class MediaVersion implements MediaVersionInterface
         if ($this->getMedia()) {
             $this->getMedia()->markUploadedAtNow();
         }
+    }
+
+    public function isKeepTmpFile(): bool
+    {
+        return $this->keepTmpFile;
     }
 
     public function getUrl(): ?string

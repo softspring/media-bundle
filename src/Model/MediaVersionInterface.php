@@ -16,7 +16,9 @@ interface MediaVersionInterface
 
     public function getUpload(): ?File;
 
-    public function setUpload(?File $upload): void;
+    public function setUpload(?File $upload, bool $keepTmpFile = false): void;
+
+    public function isKeepTmpFile(): bool;
 
     public function getUrl(): ?string;
 

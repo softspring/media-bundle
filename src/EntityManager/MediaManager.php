@@ -52,12 +52,16 @@ class MediaManager implements MediaManagerInterface
     {
         $typeDefinition = $this->mediaTypeManager->getType($media->getType());
 
-        $originalVersion = $this->mediaVersionManager->createEntity();
-        $originalVersion->setVersion('_original');
-        $media->addVersion($originalVersion);
+        if (!$media->getVersion('_original')) {
+            $originalVersion = $this->mediaVersionManager->createEntity();
+            $originalVersion->setVersion('_original');
+            $media->addVersion($originalVersion);
+        }
 
         foreach ($typeDefinition['versions'] as $key => $versionOptions) {
-            $this->generateVersionEntity($media, $key);
+            if (!$media->getVersion($key)) {
+                $this->generateVersionEntity($media, $key);
+            }
         }
     }
 
