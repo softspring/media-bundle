@@ -17,7 +17,7 @@
 
         <field name="description" column="description" type="string" nullable="true"/>
 
-        <field name="uploadedAt" column="uploadedAt" type="integer" nullable="true">
+        <field name="createdAt" column="createdAt" type="integer" nullable="true">
             <options>
                 <option name="unsigned">true</option>
             </options>

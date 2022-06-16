@@ -3,6 +3,7 @@
 namespace Softspring\MediaBundle\Model;
 
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 abstract class MediaVersion implements MediaVersionInterface
 {
@@ -25,6 +26,8 @@ abstract class MediaVersion implements MediaVersionInterface
     protected ?string $fileMimeType = null;
 
     protected ?int $uploadedAt = null;
+
+    protected ?int $generatedAt = null;
 
     protected ?array $options = null;
 
@@ -71,12 +74,10 @@ abstract class MediaVersion implements MediaVersionInterface
         $this->upload = $upload;
         $this->keepTmpFile = $keepTmpFile;
 
-        if (!$this->uploadedAt) {
+        if ($upload instanceof UploadedFile) {
             $this->uploadedAt = gmdate('U');
-        }
-
-        if ($this->getMedia()) {
-            $this->getMedia()->markUploadedAtNow();
+        } elseif ($upload instanceof File) {
+            $this->generatedAt = gmdate('U');
         }
     }
 
@@ -138,6 +139,11 @@ abstract class MediaVersion implements MediaVersionInterface
     public function getUploadedAt(): ?\DateTime
     {
         return $this->uploadedAt ? \DateTime::createFromFormat('U', $this->uploadedAt) : null;
+    }
+
+    public function getGeneratedAt(): ?\DateTime
+    {
+        return $this->generatedAt ? \DateTime::createFromFormat('U', $this->generatedAt) : null;
     }
 
     public function getOptions(): ?array

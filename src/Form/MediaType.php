@@ -66,7 +66,6 @@ class MediaType extends AbstractType
             }
 
             $media->setType($options['media_type']);
-            $media->markUploadedAtNow();
         });
     }
 }

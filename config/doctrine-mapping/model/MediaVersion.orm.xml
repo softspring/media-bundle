@@ -32,6 +32,11 @@
                 <option name="unsigned">true</option>
             </options>
         </field>
+        <field name="generatedAt" column="generatedAt" type="integer" nullable="true">
+            <options>
+                <option name="unsigned">true</option>
+            </options>
+        </field>
         <field name="options" column="options" type="json" nullable="true" />
     </mapped-superclass>
 

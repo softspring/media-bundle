@@ -42,6 +42,8 @@ interface MediaVersionInterface
 
     public function getUploadedAt(): ?\DateTime;
 
+    public function getGeneratedAt(): ?\DateTime;
+
     public function getOptions(): ?array;
 
     public function setOptions(?array $options): void;

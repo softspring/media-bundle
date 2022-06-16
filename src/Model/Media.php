@@ -20,7 +20,7 @@ abstract class Media implements MediaInterface
      */
     protected ?Collection $versions;
 
-    protected ?int $uploadedAt = null;
+    protected ?int $createdAt = null;
 
     public function __construct()
     {
@@ -77,14 +77,14 @@ abstract class Media implements MediaInterface
         $this->description = $description;
     }
 
-    public function getUploadedAt(): ?\DateTime
+    public function getCreatedAt(): ?\DateTime
     {
-        return $this->uploadedAt ? \DateTime::createFromFormat('U', $this->uploadedAt) : null;
+        return $this->createdAt ? \DateTime::createFromFormat('U', $this->createdAt) : null;
     }
 
-    public function markUploadedAtNow(): void
+    public function markCreatedAtNow(): void
     {
-        $this->uploadedAt = gmdate('U');
+        $this->createdAt = gmdate('U');
     }
 
     public function getVersions(): Collection
@@ -97,7 +97,6 @@ abstract class Media implements MediaInterface
         if (empty($this->versions[$version->getVersion()])) {
             $this->versions[$version->getVersion()] = $version;
             $version->setMedia($this);
-            $this->markUploadedAtNow();
         }
     }
 
@@ -105,7 +104,6 @@ abstract class Media implements MediaInterface
     {
         if (!empty($this->versions[$version->getVersion()])) {
             unset($this->versions[$version->getVersion()]);
-            $this->markUploadedAtNow(); // TODO mark as not uploaded ??
         }
     }
 

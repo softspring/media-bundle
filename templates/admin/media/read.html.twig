@@ -71,6 +71,8 @@
                 {{ media.version('_original').width }}x{{ media.version('_original').height }}
                 {{ media.version('_original').fileMimeType }}
                 {{ _self.bytesToSize(media.version('_original').fileSize) }}
+                <br/>
+                <em>Uploaded at: {{ media.version('_original').uploadedAt|date_span('H:i:s d-m-Y') }}</em>
             </div>
         </div>
 
@@ -91,6 +93,14 @@
                     {% for option,value in version.options %}
                         {{ option }}: {{ value }}
                     {% endfor %}
+                    <br/>
+                    <em>
+                        {% if version.uploadedAt %}
+                            Uploaded at: {{ version.uploadedAt|date_span('H:i:s d-m-Y') }}
+                        {% elseif version.generatedAt %}
+                            Automatically generated at: {{ version.generatedAt|date_span('H:i:s d-m-Y') }}
+                        {% endif %}
+                    </em>
                 </div>
             </div>
         {% endfor %}

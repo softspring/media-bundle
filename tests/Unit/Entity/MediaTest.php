@@ -58,16 +58,6 @@ class MediaTest extends TestCase
         $this->assertEquals('Test media description', $media->getDescription());
     }
 
-    public function testUploaded()
-    {
-        $media = new Media();
-
-        $this->assertNull($media->getUploadedAt());
-
-        $media->markUploadedAtNow();
-        $this->assertEquals(date('H:i:s d-m-Y'), $media->getUploadedAt()->format('H:i:s d-m-Y'));
-    }
-
     public function testVersions()
     {
         $media = new Media();

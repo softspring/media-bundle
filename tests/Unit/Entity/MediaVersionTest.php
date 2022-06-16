@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Softspring\MediaBundle\Entity\Media;
 use Softspring\MediaBundle\Entity\MediaVersion;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class MediaVersionTest extends TestCase
 {
@@ -104,12 +105,28 @@ class MediaVersionTest extends TestCase
 
         $this->assertNull($version->getUpload());
         $this->assertNull($version->getUploadedAt());
-        $this->assertNull($version->getMedia()->getUploadedAt());
+        $this->assertNull($version->getGeneratedAt());
+
+        $version->setUpload($file = new UploadedFile('example', 'test'));
+        $this->assertEquals($file, $version->getUpload());
+        $this->assertEquals(date('H:i:s d-m-Y'), $version->getUploadedAt()->format('H:i:s d-m-Y'));
+        $this->assertNull($version->getGeneratedAt());
+    }
+
+    public function testGenerated()
+    {
+        $version = new MediaVersion();
+        $media = new Media();
+        $version->setMedia($media);
+
+        $this->assertNull($version->getUpload());
+        $this->assertNull($version->getUploadedAt());
+        $this->assertNull($version->getGeneratedAt());
 
         $version->setUpload($file = new File('example', false));
         $this->assertEquals($file, $version->getUpload());
-        $this->assertEquals(date('H:i:s d-m-Y'), $version->getUploadedAt()->format('H:i:s d-m-Y'));
-        $this->assertEquals(date('H:i:s d-m-Y'), $version->getMedia()->getUploadedAt()->format('H:i:s d-m-Y'));
+        $this->assertNull($version->getUploadedAt());
+        $this->assertEquals(date('H:i:s d-m-Y'), $version->getGeneratedAt()->format('H:i:s d-m-Y'));
     }
 
     public function testId()
