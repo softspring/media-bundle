@@ -95,6 +95,8 @@ class Configuration implements ConfigurationInterface
                                 return false;
                             })
                             ->thenInvalid('Some configured upload_requirements mimeTypes are not supported. The allowed formats are: '.implode(', ', $this->getSupportedMimeTypes()['mime']).'. Maybe you need to install some libraries to support them.'." \n\n%s")
+                        ->end()
+                        ->validate()
                             ->ifTrue(function ($config) use ($supportedMimeTypes) {
                                 foreach ($config['versions'] as $version) {
                                     if (!empty($version['type']) && !in_array($version['type'], $supportedMimeTypes['versionTypeExtensions'])) {
@@ -105,6 +107,8 @@ class Configuration implements ConfigurationInterface
                                 return false;
                             })
                             ->thenInvalid('Some configured version types are not supported. The allowed formats are: '.implode(', ', $this->getSupportedMimeTypes()['versionTypeExtensions']).'. Maybe you need to install some libraries to support them.'." \n\n%s")
+                        ->end()
+                        ->validate()
                             ->ifTrue(function ($config) use ($supportedMimeTypes) {
                                 foreach ($config['versions'] as $version) {
                                     foreach ($version['upload_requirements']['mimeTypes'] ?? [] as $mimeType) {
