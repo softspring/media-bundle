@@ -114,6 +114,7 @@ class MediaRenderer
         ], $attr);
 
         $attributes['src'] = $this->getFinalUrl($version);
+        $attributes['alt'] = $version->getMedia()->getName() ?: $version->getMedia()->getDescription();
 
         return '<img '.$this->htmlAttributes($attributes).' />';
     }
