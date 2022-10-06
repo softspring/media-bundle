@@ -61,7 +61,7 @@ class MediaRendererTest extends TestCase
         $versionXl->setWidth(1800);
         $versionXl->setHeight(1600);
 
-        $expectedXlImg = '<img width="1800" height="1600" class="img-fluid" src="https://example.com/image.xl.jpeg" />';
+        $expectedXlImg = '<img width="1800" height="1600" class="img-fluid" src="https://example.com/image.xl.jpeg" alt="" />';
         $this->assertEquals($expectedXlImg, $renderer->renderImage($media, 'xl', ['class' => 'img-fluid']));
 
         $versionL = new MediaVersion('l', $media);
@@ -69,7 +69,7 @@ class MediaRendererTest extends TestCase
         $versionL->setWidth(800);
         $versionL->setHeight(600);
 
-        $expectedLImg = '<img width="800" height="600" class="img-fluid" src="https://example.com/image.l.jpeg" />';
+        $expectedLImg = '<img width="800" height="600" class="img-fluid" src="https://example.com/image.l.jpeg" alt="" />';
         $this->assertEquals($expectedLImg, $renderer->renderImage($media, 'l', ['class' => 'img-fluid']));
 
         $expectedLImg = '';
@@ -78,7 +78,7 @@ class MediaRendererTest extends TestCase
         $expectedLImg = '';
         $this->assertEquals($expectedLImg, $renderer->renderImage($media, ['bad', 'bad2'], ['class' => 'img-fluid']));
 
-        $expectedLImg = '<img width="800" height="600" class="img-fluid" src="https://example.com/image.l.jpeg" />';
+        $expectedLImg = '<img width="800" height="600" class="img-fluid" src="https://example.com/image.l.jpeg" alt="" />';
         $this->assertEquals($expectedLImg, $renderer->renderImage($media, ['bad', 'l'], ['class' => 'img-fluid']));
 
         $versionS = new MediaVersion('s', $media);
@@ -86,10 +86,10 @@ class MediaRendererTest extends TestCase
         $versionS->setWidth(800);
         $versionS->setHeight(600);
 
-        $expectedLImg = '<img width="800" height="600" class="img-fluid" src="https://storage.googleapis.com/bucket/image.s.jpeg" />';
+        $expectedLImg = '<img width="800" height="600" class="img-fluid" src="https://storage.googleapis.com/bucket/image.s.jpeg" alt="" />';
         $this->assertEquals($expectedLImg, $renderer->renderImage($media, 's', ['class' => 'img-fluid']));
 
-        $expectedPicture = '<picture class="img-fluid"><source media="(min-width: 200w)" srcset="https://example.com/image.l.jpeg 1x, https://example.com/image.xl.jpeg 2x" /><source media="(min-width: 200w)" srcset="https://storage.googleapis.com/bucket/image.s.jpeg" /><img width="1800" height="1600" data-example="1" src="https://example.com/image.xl.jpeg" /></picture>';
+        $expectedPicture = '<picture class="img-fluid"><source media="(min-width: 200w)" srcset="https://example.com/image.l.jpeg 1x, https://example.com/image.xl.jpeg 2x" /><source media="(min-width: 200w)" srcset="https://storage.googleapis.com/bucket/image.s.jpeg" /><img width="1800" height="1600" data-example="1" src="https://example.com/image.xl.jpeg" alt="" /></picture>';
         $this->assertEquals($expectedPicture, $renderer->renderPicture($media, '_default', ['class' => 'img-fluid'], ['data-example' => true]));
     }
 

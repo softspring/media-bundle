@@ -107,7 +107,7 @@ class MediaVersionTest extends TestCase
         $this->assertNull($version->getUploadedAt());
         $this->assertNull($version->getGeneratedAt());
 
-        $version->setUpload($file = new UploadedFile('example', 'test'));
+        $version->setUpload($file = new UploadedFile('tests/example.png', 'test', null, null, true));
         $this->assertEquals($file, $version->getUpload());
         $this->assertEquals(date('H:i:s d-m-Y'), $version->getUploadedAt()->format('H:i:s d-m-Y'));
         $this->assertNull($version->getGeneratedAt());
