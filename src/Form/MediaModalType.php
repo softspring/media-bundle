@@ -49,9 +49,9 @@ class MediaModalType extends AbstractType
     {
         $builder->addModelTransformer(new CallbackTransformer(function ($value) {
             return $value;
-            }, function ($value) {
-                return is_string($value) ? $this->em->getRepository(MediaInterface::class)->findOneById($value) : $value;
-            }));
+        }, function ($value) {
+            return is_string($value) ? $this->em->getRepository(MediaInterface::class)->findOneById($value) : $value;
+        }));
     }
 
     public function buildView(FormView $view, FormInterface $form, array $options)
