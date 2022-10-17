@@ -6,6 +6,7 @@
 [![License](https://poser.pugx.org/softspring/media-bundle/license.svg)](https://packagist.org/packages/softspring/media-bundle)
 [![Total Downloads](https://poser.pugx.org/softspring/media-bundle/downloads)](https://packagist.org/packages/softspring/media-bundle)
 [![Build status](https://github.com/softspring/media-bundle/actions/workflows/php.yml/badge.svg?branch=5.0)](https://github.com/softspring/media-bundle/actions/workflows/php.yml)
+![Coverage](https://raw.githubusercontent.com/softspring/media-bundle/5.0/.github/badges/coverage.svg)
 
 # Installation
 

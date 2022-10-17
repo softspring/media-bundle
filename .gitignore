@@ -3,5 +3,6 @@ vendor/
 composer.lock
 .coverage-report/
 .php-cs-fixer.cache
-.php_cs.cache
 .phpunit.result.cache
+.phpunit.cache
+clover.xml
