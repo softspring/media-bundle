@@ -14,7 +14,8 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                php-versions: [ '7.4', '8.0' ]
+                php-versions: [ '7.4', '8.1' ]
+                composer-prefer: [ '', '--prefer-lowest' ]
 
         steps:
             - uses: actions/checkout@v3
@@ -42,7 +43,7 @@ jobs:
                       ${{ runner.os }}-php-
 
             - name: Install dependencies
-              run: composer update --prefer-dist --no-interaction --no-progress
+              run: composer update --prefer-dist --no-interaction --no-progress ${{ matrix.composer-prefer }}
 
             - name: Code Style check
               run: ./vendor/bin/php-cs-fixer fix -v --diff --dry-run
