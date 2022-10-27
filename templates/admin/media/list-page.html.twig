@@ -13,7 +13,9 @@
                                 <div class="bi bi-play-btn h1 my-auto"></div>
                             </div>
                         {% elseif media.isImage %}
-                            {{ media|sfs_media_render_image(['_thumbnail'], {'class':'card-img-top img-fluid', 'style':'min-height:200px; max-height: 200px; width: auto'}) }}
+                            <div style="min-height:200px; max-height: 200px; width: auto; display: flex; align-items: center;" class="bg-light  overflow-hidden">
+                                {{ media|sfs_media_render_image(['_thumbnail'], {'class':'card-img-top img-fluid', 'style':' max-height: 200px;'}) }}
+                            </div>
                         {% endif %}
                 {% if is_granted('ROLE_SFS_MEDIA_ADMIN_MEDIAS_DETAILS', media) %}
                         <p class="card-title mb-0"><small><strong>{{ media.name }}</strong></small></p>
