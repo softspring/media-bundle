@@ -48,11 +48,11 @@
 
         <div class="input-group">
             <div class="form-control" id="{{ form.vars.id }}_text" {{ modalOpenAttributes|raw }} role="button">{% if data %}{{ data.name }}{% endif %}</div>
-            <button type="button" class="btn btn-secondary" data-media-type-clean
+            <button type="button" class="btn px-3 btn-secondary" data-media-type-clean
                     data-media-type-field="{{ form.vars.id }}"
                     data-media-type-widget="{{ form.vars.id }}_widget"
-            >X</button>
-            <button type="button" class="btn btn-primary" {{ modalOpenAttributes|raw }}>Select</button>
+            ><i class="bi bi-trash"></i></button>
+            <button type="button" class="btn px-3 btn-primary" {{ modalOpenAttributes|raw }}><i class="bi bi-images"></i></button>
         </div>
 
         {% if data %}
