@@ -120,6 +120,12 @@ if (mediaTypeModal) {
             thumbnail.innerHTML = mediaInput.dataset['mediaVersion-_thumbnail'];
         }
 
+        if (window.bootstrap === undefined) {
+            console.error('media-type modal script requires window.bootstrap defined. You can define it with:\n\n' +
+                'import * as bootstrap from \'bootstrap\';\n' +
+                'window.bootstrap = bootstrap;')
+        }
+
         // hides modal
         window.bootstrap.Modal.getInstance(mediaTypeModal).hide();
 
@@ -133,7 +139,7 @@ if (mediaTypeModal) {
     document.addEventListener('click', function (event) {
         if (!event.target || !event.target.hasAttribute('data-media-type-clean')) return;
 
-        const mediaInput = document.getElementById(mediaTypeModal.clickedButton.dataset.mediaTypeField);
+        const mediaInput = document.getElementById(event.target.dataset.mediaTypeField);
 
         mediaInput.value = '';
         document.getElementById(event.target.dataset.mediaTypeField + '_text').innerHTML = '';
