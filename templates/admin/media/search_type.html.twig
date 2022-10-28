@@ -33,14 +33,25 @@
         {% for media in entities %}
             <div class="col-3">
                 <div class="card text-center">
-                    <div class="ml-2 text-nowrap text-dark" data-media-type  role="button"
+                    <div class="ml-2 text-nowrap text-dark" role="button"
                          data-media-id="{{ media.id }}"
                          data-media-name="{{ media.name }}"
+                         data-media-type="{{ media.type }}"
                         {% for version in media.versions %}
-                            data-media-version-{{ version.version }}="{{ media|sfs_media_render_image([version.version], {'class':'img-fluid'})|e }}"
+                            {% if media.isImage %}
+                                data-media-version-{{ version.version }}="{{ media|sfs_media_render_image([version.version], {'class':'img-fluid'})|e }}"
+                            {% elseif media.isVideo %}
+                                data-media-version-{{ version.version }}="{{ media|sfs_media_render_video([version.version], {'class':'img-fluid'})|e }}"
+                            {% endif %}
                         {% endfor %}
                     >
-                        {{ media|sfs_media_render_image(['_thumbnail'], {'class':'card-img-top img-thumbnail'}) }}
+                        {% if media.isImage %}
+                            {{ media|sfs_media_render_image(['_thumbnail'], {'class':'card-img-top img-thumbnail'}) }}
+                        {% elseif media.isVideo %}
+                            <div style="height:200px" class="bg-dark text-center row p-0 m-0 w-100">
+                                <div class="bi bi-play-btn h1 my-auto text-white"></div>
+                            </div>
+                        {% endif %}
                         <p class="card-title mb-0"><small><strong>{{ media.name }}</strong></small></p>
                         <span class="small">
                             {{ media_types[media.type].name }}

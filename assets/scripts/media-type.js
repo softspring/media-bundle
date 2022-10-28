@@ -100,8 +100,17 @@ if (mediaTypeModal) {
 
         const mediaInput = document.getElementById(mediaTypeModal.clickedButton.dataset.mediaTypeField);
 
+        // clean previews data versions
+        for (let key in mediaInput.dataset) {
+            if (!key.match(/^mediaVersion/i)) {
+                continue;
+            }
+            delete mediaInput.dataset[key];
+        }
+
         // sets input hidden value and data elements
         mediaInput.value = selectedMedia.dataset.mediaId;
+        mediaInput.dataset.mediaType = selectedMedia.dataset.mediaType;
         // propagate data version
         for (let key in selectedMedia.dataset) {
             if (!key.match(/^mediaVersion/i)) {
@@ -117,7 +126,11 @@ if (mediaTypeModal) {
         const widget = document.getElementById(mediaTypeModal.clickedButton.dataset.mediaTypeWidget);
         const thumbnail = widget.querySelector('[data-media-type-thumbnail]');
         if (thumbnail) {
-            thumbnail.innerHTML = mediaInput.dataset['mediaVersion-_thumbnail'];
+            if (mediaInput.dataset['mediaVersion-_thumbnail']) {
+                thumbnail.innerHTML = mediaInput.dataset['mediaVersion-_thumbnail'];
+            } else {
+                thumbnail.innerHTML = '';
+            }
         }
 
         if (window.bootstrap === undefined) {

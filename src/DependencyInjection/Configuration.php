@@ -122,6 +122,30 @@ class Configuration implements ConfigurationInterface
                             })
                             ->thenInvalid('Some configured version upload_requirements mimeTypes are not supported. The allowed formats are: '.implode(', ', $this->getSupportedMimeTypes()['mime']).'. Maybe you need to install some libraries to support them.'." \n\n%s")
                         ->end()
+                        ->validate()
+                            ->ifTrue(function ($config) use ($supportedMimeTypes) {
+                                $type = $config['type'];
+
+                                foreach ($config['upload_requirements']['mimeTypes'] ?? [] as $mimeType) {
+                                    switch ($type) {
+                                        case 'image':
+                                            if (substr($mimeType, 0, 6) !== 'image/') {
+                                                return true;
+                                            }
+                                            break;
+
+                                        case 'video':
+                                            if (substr($mimeType, 0, 6) !== 'video/') {
+                                                return true;
+                                            }
+                                            break;
+                                    }
+                                }
+
+                                return false;
+                            })
+                            ->thenInvalid('Some of the allowed mimeTypes are not compatible with media type (image, video). Check your configuration.'." \n\n%s")
+                        ->end()
 
                         ->children()
                             ->enumNode('type')
@@ -166,6 +190,8 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('allowPortrait')->end()
                 ->booleanNode('detectCorrupted')->end()
                 ->arrayNode('mimeTypes')->scalarPrototype()->end()->end()
+                ->scalarNode('maxSize')->end()
+                ->booleanNode('binaryFormat')->end()
             ->end()
         ;
 
