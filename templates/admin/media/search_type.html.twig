@@ -7,10 +7,10 @@
     <div class="row">
         <div class="col">{{ form_widget(filterForm.text) }}</div>
         {% if filterForm.type is defined %}<div class="col">{{ form_widget(filterForm.type) }}</div>{% endif %}
-        <div class="col-2"><button type="submit" class="btn btn-primary">Search</button></div>
+        <div class="col"><button type="submit" class="btn btn-primary">Search</button></div>
 
         {% if filterForm.type is defined %}
-        <div class="col-2">
+        <div class="col">
             <div class="dropdown">
                 <button class="btn btn-primary dropdown-toggle disabled" type="button" id="dropdownCreateMedia" data-bs-toggle="dropdown" aria-expanded="false">
                     {{ 'admin_medias.list.actions.create.link'|trans }}
@@ -55,7 +55,12 @@
                         <p class="card-title mb-0"><small><strong>{{ media.name }}</strong></small></p>
                         <span class="small">
                             {{ media_types[media.type].name }}
-                            {{ media.version('_original').width }}x{{ media.version('_original').height }}
+
+                            {% if media.isVideo %}
+                                {# nothing yet #}
+                            {% elseif media.isImage %}
+                                {{ media.version('_original').width }}x{{ media.version('_original').height }}
+                            {% endif %}
                         </span>
                     </div>
                 </div>
