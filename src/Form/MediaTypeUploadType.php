@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class MediaType extends AbstractType
+class MediaTypeUploadType extends AbstractType
 {
     protected MediaTypeManagerInterface $mediaTypeManager;
 
@@ -41,7 +41,7 @@ class MediaType extends AbstractType
         $builder->add('name');
         $builder->add('description');
 
-        $builder->add('_original', MediaVersionType::class, [
+        $builder->add('_original', MediaVersionUploadType::class, [
             'property_path' => 'versions[_original]',
             'upload_requirements' => $typeDefinition['upload_requirements'],
         ]);
@@ -50,7 +50,7 @@ class MediaType extends AbstractType
             if (!isset($config['upload_requirements'])) {
                 continue;
             }
-            $builder->add($key, MediaVersionType::class, [
+            $builder->add($key, MediaVersionUploadType::class, [
                 'property_path' => "versions[$key]",
                 'upload_requirements' => $config['upload_requirements'],
             ]);

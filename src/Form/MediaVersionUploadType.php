@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Image;
 
-class MediaVersionType extends AbstractType
+class MediaVersionUploadType extends AbstractType
 {
     protected MediaVersionManagerInterface $mediaVersionManager;
 
