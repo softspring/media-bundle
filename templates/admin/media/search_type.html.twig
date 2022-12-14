@@ -46,11 +46,13 @@
                         {% endfor %}
                     >
                         {% if media.isImage %}
-                            {{ media|sfs_media_render_image(['_thumbnail'], {'class':'card-img-top img-thumbnail'}) }}
+                        <div style="min-height:200px; max-height: 200px; width: auto; display: flex; align-items: center;" class="card-img-top bg-light overflow-hidden">
+                            {{ media|sfs_media_render_image(['_thumbnail'], {'class':'img-thumbnail'}) }}
+                        </div>
                         {% elseif media.isVideo %}
-                            <div style="height:200px" class="bg-dark text-center row p-0 m-0 w-100">
-                                <div class="bi bi-play-btn h1 my-auto text-white"></div>
-                            </div>
+                        <div style="height:200px" class="bg-dark text-center row p-0 m-0 w-100">
+                            <div class="bi bi-play-btn h1 my-auto text-white"></div>
+                        </div>
                         {% endif %}
                         <p class="card-title mb-0"><small><strong>{{ media.name }}</strong></small></p>
                         <span class="small">

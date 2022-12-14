@@ -13,8 +13,8 @@
                                 <div class="bi bi-play-btn h1 my-auto text-white"></div>
                             </div>
                         {% elseif media.isImage %}
-                            <div style="min-height:200px; max-height: 200px; width: auto; display: flex; align-items: center;" class="bg-light  overflow-hidden">
-                                {{ media|sfs_media_render_image(['_thumbnail'], {'class':'card-img-top img-fluid', 'style':' max-height: 200px;'}) }}
+                            <div style="min-height:200px; max-height: 200px; width: auto; display: flex; align-items: center;" class="card-img-top bg-light overflow-hidden">
+                                {{ media|sfs_media_render_image(['_thumbnail'], {'class':'img-fluid w-auto mx-auto', 'style':' max-height: 200px;'}) }}
                             </div>
                         {% endif %}
                         <p class="card-title mb-0"><small><strong>{{ media.name }}</strong></small></p>
