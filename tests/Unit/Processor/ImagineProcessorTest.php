@@ -19,6 +19,10 @@ class ImagineProcessorTest extends TestCase
         if (!is_dir($this->resultsPath)) {
             mkdir($this->resultsPath);
         }
+
+        if (isset($_ENV['GITHUB_ACTION'])) {
+            $this->markTestSkipped('Test skipped in GitHubActions');
+        }
     }
 
     public function testPriority()
