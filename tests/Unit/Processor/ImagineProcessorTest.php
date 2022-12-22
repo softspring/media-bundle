@@ -15,7 +15,10 @@ class ImagineProcessorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->resultsPath = sys_get_temp_dir();
+        $this->resultsPath = sys_get_temp_dir().'/imagine-processor-test';
+        if (!is_dir($this->resultsPath)) {
+            mkdir($this->resultsPath);
+        }
     }
 
     public function testPriority()
