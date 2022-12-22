@@ -11,6 +11,13 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImagineProcessorTest extends TestCase
 {
+    protected string $resultsPath;
+
+    protected function setUp(): void
+    {
+        $this->resultsPath = sys_get_temp_dir();
+    }
+
     public function testPriority()
     {
         $this->assertEquals(0, ImagineProcessor::getPriority());
@@ -98,13 +105,13 @@ class ImagineProcessorTest extends TestCase
         $originalVersion->setFileMimeType('image/jpeg');
 
         $originFilePath = __DIR__.'/resources/energy.250x141.96ppi.jpg';
-        $filePath = __DIR__.'/results/testJpegToPngConversion.jpeg';
-        $filePathPng = __DIR__.'/results/testJpegToPngConversion.png';
+        $filePath = "{$this->resultsPath}/testJpegToPngConversion.jpeg";
+        $filePathPng = "{$this->resultsPath}/testJpegToPngConversion.png";
         is_file($filePath) && unlink($filePath);
         copy($originFilePath, $filePath);
 
         $version = new MediaVersion('xs');
-        $version->setUpload(new File(__DIR__.'/results/testJpegToPngConversion.jpeg'));
+        $version->setUpload(new File("{$this->resultsPath}/testJpegToPngConversion.jpeg"));
         $version->setOriginalVersion($originalVersion);
         $version->setOptions(['type' => 'png', 'png_compression_level' => 9]);
 
@@ -127,12 +134,12 @@ class ImagineProcessorTest extends TestCase
         $originalVersion->setFileMimeType('image/jpeg');
 
         $originFilePath = __DIR__.'/resources/energy.250x141.96ppi.jpg';
-        $filePath = __DIR__.'/results/testChangeResolution.jpeg';
+        $filePath = "{$this->resultsPath}/testChangeResolution.jpeg";
         is_file($filePath) && unlink($filePath);
         copy($originFilePath, $filePath);
 
         $version = new MediaVersion('xs');
-        $version->setUpload(new File(__DIR__.'/results/testChangeResolution.jpeg'));
+        $version->setUpload(new File("{$this->resultsPath}/testChangeResolution.jpeg"));
         $version->setOriginalVersion($originalVersion);
         $version->setOptions([
             'type' => 'jpeg',
@@ -165,12 +172,12 @@ class ImagineProcessorTest extends TestCase
         $originalVersion->setHeight(141);
 
         $originFilePath = __DIR__.'/resources/energy.250x141.96ppi.jpg';
-        $filePath = __DIR__.'/results/testScaleWidth.jpeg';
+        $filePath = "{$this->resultsPath}/testScaleWidth.jpeg";
         is_file($filePath) && unlink($filePath);
         copy($originFilePath, $filePath);
 
         $version = new MediaVersion('xs');
-        $version->setUpload(new File(__DIR__.'/results/testScaleWidth.jpeg'));
+        $version->setUpload(new File("{$this->resultsPath}/testScaleWidth.jpeg"));
         $version->setOriginalVersion($originalVersion);
         $version->setOptions([
             'type' => 'jpeg',
@@ -197,12 +204,12 @@ class ImagineProcessorTest extends TestCase
         $originalVersion->setHeight(141);
 
         $originFilePath = __DIR__.'/resources/energy.250x141.96ppi.jpg';
-        $filePath = __DIR__.'/results/testScaleHeight.jpeg';
+        $filePath = "{$this->resultsPath}/testScaleHeight.jpeg";
         is_file($filePath) && unlink($filePath);
         copy($originFilePath, $filePath);
 
         $version = new MediaVersion('xs');
-        $version->setUpload(new File(__DIR__.'/results/testScaleHeight.jpeg'));
+        $version->setUpload(new File("{$this->resultsPath}/testScaleHeight.jpeg"));
         $version->setOriginalVersion($originalVersion);
         $version->setOptions([
             'type' => 'jpeg',
@@ -229,12 +236,12 @@ class ImagineProcessorTest extends TestCase
         $originalVersion->setHeight(141);
 
         $originFilePath = __DIR__.'/resources/energy.250x141.96ppi.jpg';
-        $filePath = __DIR__.'/results/testScaleBoth.jpeg';
+        $filePath = "{$this->resultsPath}/testScaleBoth.jpeg";
         is_file($filePath) && unlink($filePath);
         copy($originFilePath, $filePath);
 
         $version = new MediaVersion('xs');
-        $version->setUpload(new File(__DIR__.'/results/testScaleBoth.jpeg'));
+        $version->setUpload(new File("{$this->resultsPath}/testScaleBoth.jpeg"));
         $version->setOriginalVersion($originalVersion);
         $version->setOptions([
             'type' => 'jpeg',
