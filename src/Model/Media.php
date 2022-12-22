@@ -15,9 +15,6 @@ abstract class Media implements MediaInterface
 
     protected ?string $description = null;
 
-    /**
-     * @var MediaVersion[]|Collection|null
-     */
     protected ?Collection $versions;
 
     protected ?int $createdAt = null;
@@ -79,12 +76,12 @@ abstract class Media implements MediaInterface
 
     public function getCreatedAt(): ?\DateTime
     {
-        return $this->createdAt ? \DateTime::createFromFormat('U', $this->createdAt) : null;
+        return $this->createdAt ? \DateTime::createFromFormat('U', "{$this->createdAt}") : null;
     }
 
     public function markCreatedAtNow(): void
     {
-        $this->createdAt = gmdate('U');
+        $this->createdAt = (int) gmdate('U');
     }
 
     public function getVersions(): Collection

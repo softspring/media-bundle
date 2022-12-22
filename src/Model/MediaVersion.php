@@ -32,7 +32,7 @@ abstract class MediaVersion implements MediaVersionInterface
     protected ?array $options = null;
 
     /**
-     * this field is not mapped.
+     * This field is not mapped.
      */
     protected ?MediaVersionInterface $originalVersion = null;
 
@@ -75,9 +75,9 @@ abstract class MediaVersion implements MediaVersionInterface
         $this->keepTmpFile = $keepTmpFile;
 
         if ($upload instanceof UploadedFile) {
-            $this->uploadedAt = gmdate('U');
+            $this->uploadedAt = (int) gmdate('U');
         } elseif ($upload instanceof File) {
-            $this->generatedAt = gmdate('U');
+            $this->generatedAt = (int) gmdate('U');
         }
     }
 
@@ -138,12 +138,12 @@ abstract class MediaVersion implements MediaVersionInterface
 
     public function getUploadedAt(): ?\DateTime
     {
-        return $this->uploadedAt ? \DateTime::createFromFormat('U', $this->uploadedAt) : null;
+        return $this->uploadedAt ? \DateTime::createFromFormat('U', "{$this->uploadedAt}") : null;
     }
 
     public function getGeneratedAt(): ?\DateTime
     {
-        return $this->generatedAt ? \DateTime::createFromFormat('U', $this->generatedAt) : null;
+        return $this->generatedAt ? \DateTime::createFromFormat('U', "{$this->generatedAt}") : null;
     }
 
     public function getOptions(): ?array

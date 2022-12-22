@@ -1,0 +1,10 @@
+parameters:
+    ignoreErrors:
+        -
+            message: "#Right side of && is always true.#"
+            count: 4
+            path: src/DependencyInjection/Configuration.php
+        -
+            message: "#Variable \\$connectionNode in PHPDoc tag \\@var does not match assigned variable \\$node.#"
+            count: 4
+            path: src/DependencyInjection/Configuration.php

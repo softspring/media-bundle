@@ -11,6 +11,8 @@ interface MediaInterface
     public const MEDIA_TYPE_VIDEO = 2;
     public const MEDIA_TYPE_OTHER = 99;
 
+    public function getId();
+
     public function getMediaType(): ?int;
 
     public function setMediaType(?int $mediaType): void;

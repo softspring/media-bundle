@@ -86,7 +86,8 @@ class ImagineProcessorTest extends TestCase
         $version->setOriginalVersion($originalVersion);
         $version->setOptions(['type' => 'png']);
         $version->setUpload(new UploadedFile('/tmp/uploadedFile', 'name.jpeg', null, 100, true));
-        $this->assertTrue($processor->process($version) || true);
+        $processor->process($version);
+        $this->assertTrue(true);
     }
 
     public function testJpegToPngConversion()

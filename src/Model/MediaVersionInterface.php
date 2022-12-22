@@ -6,6 +6,8 @@ use Symfony\Component\HttpFoundation\File\File;
 
 interface MediaVersionInterface
 {
+    public function getId();
+
     public function getMedia(): ?MediaInterface;
 
     public function setMedia(?MediaInterface $media): void;

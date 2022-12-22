@@ -8,7 +8,7 @@ use Softspring\MediaBundle\Model\MediaVersionInterface;
 
 interface MediaManagerInterface extends CrudlEntityManagerInterface
 {
-    public function createEntityForType(string $type): MediaInterface;
+    public function createEntityForType(string $type, ?MediaInterface $media = null): MediaInterface;
 
     public function generateVersionEntities(MediaInterface $media): void;
 
