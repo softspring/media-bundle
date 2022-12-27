@@ -8,3 +8,13 @@ parameters:
             message: "#Variable \\$connectionNode in PHPDoc tag \\@var does not match assigned variable \\$node.#"
             count: 4
             path: src/DependencyInjection/Configuration.php
+        -
+            message: "#^Parameter \\#1 \\$func of method Doctrine\\\\Common\\\\Collections\\\\Collection\\<mixed,mixed\\>\\:\\:map\\(\\) expects Closure\\(mixed\\=\\)\\: string\\|null, Closure\\(Softspring\\\\MediaBundle\\\\Model\\\\MediaVersionInterface\\)\\: string\\|null given\\.$#"
+            count: 1
+            path: src/Helper/TypeChecker.php
+            reportUnmatched: false
+        -
+            message: "#^Parameter \\#1 \\$p of method Doctrine\\\\Common\\\\Collections\\\\Collection\\<mixed,mixed\\>\\:\\:filter\\(\\) expects Closure\\(mixed\\=\\)\\: bool, Closure\\(Softspring\\\\MediaBundle\\\\Model\\\\MediaVersionInterface\\)\\: bool given\\.$#"
+            count: 1
+            path: src/Model/Media.php
+            reportUnmatched: false
