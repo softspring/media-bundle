@@ -128,7 +128,7 @@ class MediaRenderer
         $attributes = $attr;
         $attributes['src'] = $this->getFinalUrl($version);
 
-        if (isset($attributes['controls']) && $attributes['controls'] !== false) {
+        if (isset($attributes['controls']) && false !== $attributes['controls']) {
             $attributes['controls'] = '';
         } else {
             unset($attributes['controls']);
@@ -145,7 +145,7 @@ class MediaRenderer
             throw new \Exception('video_sources config is not set for '.$media->getType());
         }
 
-        if (isset($videoTagAttr['controls']) && $videoTagAttr['controls'] !== false) {
+        if (isset($videoTagAttr['controls']) && false !== $videoTagAttr['controls']) {
             $videoTagAttr['controls'] = '';
         } else {
             unset($videoTagAttr['controls']);
