@@ -41,6 +41,9 @@ class MediaModalType extends AbstractType
             'required' => false,
             'media_types' => [],
             'media_attr' => [],
+            'image_attr' => [],
+            'video_attr' => [],
+            'picture_attr' => [],
             'show_thumbnail' => false,
         ]);
     }
@@ -57,7 +60,9 @@ class MediaModalType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['show_thumbnail'] = $options['show_thumbnail'];
-        $view->vars['media_attr'] = $options['media_attr'];
+        $view->vars['image_attr'] = $options['media_attr'] + $options['image_attr'];
+        $view->vars['video_attr'] = $options['media_attr'] + $options['video_attr'];
+        $view->vars['picture_attr'] = $options['media_attr'] + $options['picture_attr'];
         $view->vars['attr']['data-media-type-config'] = json_encode($options['media_types']);
         $view->vars['attr']['data-media-type-types'] = implode(',', array_keys($options['media_types']));
         $view->vars['modal_search_url'] = $this->router->generate('sfs_media_admin_medias_search_type', [

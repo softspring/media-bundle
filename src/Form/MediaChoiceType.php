@@ -37,6 +37,9 @@ class MediaChoiceType extends AbstractType
             'required' => false,
             'media_types' => [],
             'media_attr' => [],
+            'image_attr' => [],
+            'video_attr' => [],
+            'picture_attr' => [],
             'query_builder' => fn (EntityRepository $entityRepository) => $entityRepository->createQueryBuilder('i'),
             'choice_label' => function (MediaInterface $media) {
                 return $media->getName();
@@ -67,11 +70,11 @@ class MediaChoiceType extends AbstractType
 
                 foreach ($mediaType as $mode => $version) {
                     if ('image' == $mode) {
-                        $attrs['data-media-preview-image'] = $this->mediaRenderer->renderImage($media, $version, $options['media_attr']);
+                        $attrs['data-media-preview-image'] = $this->mediaRenderer->renderImage($media, $version, $options['media_attr'] + $options['image_attr']);
                     } elseif ('video' == $mode) {
-                        $attrs['data-media-preview-video'] = $this->mediaRenderer->renderVideo($media, $version, $options['media_attr']);
+                        $attrs['data-media-preview-video'] = $this->mediaRenderer->renderVideo($media, $version, $options['media_attr'] + $options['video_attr']);
                     } elseif ('picture' == $mode) {
-                        $attrs['data-media-preview-picture'] = $this->mediaRenderer->renderPicture($media, $version, $options['media_attr']);
+                        $attrs['data-media-preview-picture'] = $this->mediaRenderer->renderPicture($media, $version, $options['media_attr'] + $options['picture_attr']);
                     } else {
                         throw new \Exception("Bad $mode mode for media_type. Only 'image', 'video' and 'picture' are allowed");
                     }
@@ -84,6 +87,8 @@ class MediaChoiceType extends AbstractType
 
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['media_attr'] = $options['media_attr'];
+        $view->vars['image_attr'] = $options['media_attr'] + $options['image_attr'];
+        $view->vars['video_attr'] = $options['media_attr'] + $options['video_attr'];
+        $view->vars['picture_attr'] = $options['media_attr'] + $options['picture_attr'];
     }
 }
