@@ -17,6 +17,7 @@ class MediaListener
 
     public function preFlush(MediaInterface $media, PreFlushEventArgs $eventArgs)
     {
+        $media->markCreatedAtNow();
         $this->mediaManager->generateVersionEntities($media);
     }
 }

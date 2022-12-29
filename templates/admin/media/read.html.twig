@@ -63,7 +63,7 @@
                 <h4>Original</h4>
                 <div>
                     {% if media.isVideo %}
-                        {{ media|sfs_media_render_video('_original', {'class':'img-thumbnail', 'alt': 'Original media', 'title': 'Original media'}) }}
+                        {{ media|sfs_media_render_video('_original', {'class':'img-thumbnail', 'controls': '', 'alt': 'Original media', 'title': 'Original media'}) }}
                     {% elseif media.isImage %}
                         {{ media|sfs_media_render_image('_original', {'class':'img-thumbnail', 'alt': 'Original media', 'title': 'Original media'}) }}
                     {% endif %}
@@ -82,7 +82,7 @@
                     <h4>{{ version.version }}</h4>
                     <div>
                         {% if media.isVideo %}
-                            {{ media|sfs_media_render_video(version.version, {'class':'img-'~version.version}) }}
+                            {{ media|sfs_media_render_video(version.version, {'class':'img-'~version.version, 'controls': ''}) }}
                         {% elseif media.isImage %}
                             {{ media|sfs_media_render_image(version.version, {'class':'img-'~version.version}) }}
                         {% endif %}

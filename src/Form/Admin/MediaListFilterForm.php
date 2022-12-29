@@ -2,11 +2,12 @@
 
 namespace Softspring\MediaBundle\Form\Admin;
 
-use Softspring\Component\CrudlController\Form\EntityListFilterForm;
+use Softspring\Component\DoctrinePaginator\Form\PaginatorFiltersForm;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class MediaListFilterForm extends EntityListFilterForm implements MediaListFilterFormInterface
+class MediaListFilterForm extends PaginatorFiltersForm implements MediaListFilterFormInterface
 {
     public function configureOptions(OptionsResolver $resolver)
     {
@@ -15,11 +16,20 @@ class MediaListFilterForm extends EntityListFilterForm implements MediaListFilte
         $resolver->setDefaults([
             'translation_domain' => 'sfs_media_admin',
             'label_format' => 'admin_medias.list.filter_form.%name%.label',
+            'rpp_valid_values' => [50],
+            'rpp_default_value' => 50,
+            'order_valid_fields' => ['name', 'createdAt'],
+            'order_default_value' => 'createdAt',
+            'order_direction_default_value' => 'desc',
         ]);
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         parent::buildForm($builder, $options);
+
+        $builder->add('name', TextType::class, [
+            'property_path' => '[name__like]',
+        ]);
     }
 }

@@ -5,6 +5,8 @@ admin_medias:
         breadcrumb: "Medias"
         actions:
             create.link: "New media"
+        filter_form:
+            name.label: "File name"
 
     create:
         meta.title: "%type%"
