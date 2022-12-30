@@ -2,8 +2,8 @@
 
 namespace Softspring\MediaBundle\Form\Admin;
 
-use Softspring\Component\CrudlController\Form\EntityListFilterFormInterface;
+use Softspring\Component\DoctrineQueryFilters\FilterFormInterface;
 
-interface MediaListFilterFormInterface extends EntityListFilterFormInterface
+interface MediaListFilterFormInterface extends FilterFormInterface
 {
 }
