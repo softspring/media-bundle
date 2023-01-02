@@ -28,7 +28,7 @@ class MediaTypeSearchFilterListener implements EventSubscriberInterface
         $validTypes = explode(',', $request->attributes->get('valid_types'));
 
         $filters = $event->getFilters();
-        $filters['type_in'] = $filters['type_in'] ?? $validTypes;
+        $filters['type__in'] = $filters['type__in'] ?? $validTypes;
 
         $event->setFilters($filters);
     }
