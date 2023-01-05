@@ -3,7 +3,6 @@
 namespace Softspring\MediaBundle\Form;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Softspring\Component\DoctrinePaginator\Form\PaginatorFiltersForm;
 use Softspring\Component\DoctrinePaginator\Form\PaginatorForm;
 use Softspring\MediaBundle\EntityManager\MediaTypeManagerInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
