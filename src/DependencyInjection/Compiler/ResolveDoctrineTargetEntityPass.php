@@ -2,7 +2,7 @@
 
 namespace Softspring\MediaBundle\DependencyInjection\Compiler;
 
-use Softspring\CoreBundle\DependencyInjection\Compiler\AbstractResolveDoctrineTargetEntityPass;
+use Softspring\Component\DoctrineTargetEntityResolver\DependencyInjection\Compiler\AbstractResolveDoctrineTargetEntityPass;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

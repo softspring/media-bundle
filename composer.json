@@ -15,6 +15,7 @@
         "softspring/crudl-controller": "^5.0",
         "softspring/doctrine-paginator": "^5.0",
         "softspring/doctrine-query-filters": "^5.0",
+        "softspring/doctrine-target-entity-resolver": "^5.0",
         "softspring/events": "^5.0",
         "symfony/config": "^5.4|^6.0",
         "symfony/dependency-injection": "^5.4|^6.0",
