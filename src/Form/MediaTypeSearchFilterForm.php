@@ -2,7 +2,9 @@
 
 namespace Softspring\MediaBundle\Form;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Softspring\Component\DoctrinePaginator\Form\PaginatorFiltersForm;
+use Softspring\Component\DoctrinePaginator\Form\PaginatorForm;
 use Softspring\MediaBundle\EntityManager\MediaTypeManagerInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -13,14 +15,15 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 
-class MediaTypeSearchFilterForm extends PaginatorFiltersForm
+class MediaTypeSearchFilterForm extends PaginatorForm
 {
     protected MediaTypeManagerInterface $typeManager;
     protected RouterInterface $router;
     protected RequestStack $requestStack;
 
-    public function __construct(MediaTypeManagerInterface $typeManager, RouterInterface $router, RequestStack $requestStack)
+    public function __construct(MediaTypeManagerInterface $typeManager, RouterInterface $router, RequestStack $requestStack, EntityManagerInterface $em)
     {
+        parent::__construct($em);
         $this->typeManager = $typeManager;
         $this->router = $router;
         $this->requestStack = $requestStack;
