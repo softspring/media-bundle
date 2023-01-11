@@ -5,6 +5,7 @@ namespace Softspring\MediaBundle\Form;
 use Doctrine\ORM\EntityManagerInterface;
 use Softspring\Component\DoctrinePaginator\Form\PaginatorForm;
 use Softspring\MediaBundle\EntityManager\MediaTypeManagerInterface;
+use Softspring\MediaBundle\Model\MediaInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -33,6 +34,7 @@ class MediaTypeSearchFilterForm extends PaginatorForm
         parent::configureOptions($resolver);
 
         $resolver->setDefaults([
+            'class' => MediaInterface::class,
             'valid_types' => null,
         ]);
         $resolver->setAllowedTypes('valid_types', ['array', 'null']);
