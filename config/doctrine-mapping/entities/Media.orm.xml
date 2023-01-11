@@ -14,6 +14,7 @@
         </id>
 
         <one-to-many field="versions" target-entity="Softspring\MediaBundle\Model\MediaVersionInterface" mapped-by="media">
+            <cache usage="NONSTRICT_READ_WRITE" region="default" />
             <cascade>
                 <cascade-persist/>
             </cascade>
