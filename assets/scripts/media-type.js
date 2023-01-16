@@ -59,6 +59,57 @@ if (mediaTypeModal) {
         http_request.send();
     }
 
+    document.addEventListener('click', function (event) {
+        if (!event.target.matches('[data-media-modal-create-href]')) {
+            return;
+        }
+
+        var createFormUrl = event.target.dataset.mediaModalCreateHref;
+
+        loadCreateForm(createFormUrl);
+    });
+
+    function loadCreateForm(createFormUrl) {
+        var mediaTypeModalBody = mediaTypeModal.querySelector('.modal-body');
+        var mediaTypeModalFooter = mediaTypeModal.querySelector('.modal-footer');
+
+        var http_request = new XMLHttpRequest();
+        http_request.onreadystatechange = function () {
+            if (http_request.readyState === 4) {
+                mediaTypeModalBody.innerHTML = http_request.response;
+                mediaTypeModalFooter.style.setProperty('display', '');
+                configureCreateForm(createFormUrl)
+            }
+        };
+        http_request.open('GET', event.target.dataset.mediaModalCreateHref, true);
+        http_request.send();
+    }
+
+    function configureCreateForm(createFormUrl) {
+        var mediaTypeModalBody = mediaTypeModal.querySelector('.modal-body');
+        var mediaTypeModalFooter = mediaTypeModal.querySelector('.modal-footer');
+
+        var createForm = mediaTypeModalBody.querySelector('form');
+        createForm.onsubmit = function (event) {
+            event.preventDefault();
+            let formData = new FormData(createForm);
+
+            [...createForm.querySelectorAll('input[type=file]')].forEach((inputFile) => formData.append(inputFile.attributes['name'], inputFile.files[0]));
+
+            const xhr = new XMLHttpRequest()
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    mediaTypeModalBody.innerHTML = xhr.response;
+                    configureCreateForm(createFormUrl);
+                }
+            }
+
+            xhr.open('POST', createFormUrl);
+            xhr.send(formData);
+        }
+    }
+
+
     /**
      * Click on modal media, to be selected
      */

@@ -12,12 +12,12 @@
         {% if filterForm.type is defined %}
         <div class="col">
             <div class="dropdown">
-                <button class="btn btn-primary dropdown-toggle disabled" type="button" id="dropdownCreateMedia" data-bs-toggle="dropdown" aria-expanded="false">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownCreateMedia" data-bs-toggle="dropdown" aria-expanded="false">
                     {{ 'admin_medias.list.actions.create.link'|trans }}
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownCreateMedia">
                     {% for type in filterForm.vars.valid_types %}
-                        <li><a data-href="{{ url('sfs_media_admin_medias_create', {'type':type}) }}" class="dropdown-item">Create {{ type }}</a></li>
+                        <li><a data-media-modal-create-href="{{ url('sfs_media_admin_medias_create_ajax', {'type':type}) }}" class="dropdown-item">Create {{ type }}</a></li>
                     {% endfor %}
                 </ul>
             </div>

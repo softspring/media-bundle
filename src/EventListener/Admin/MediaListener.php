@@ -11,6 +11,7 @@ use Softspring\MediaBundle\Helper\TypeChecker;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\SfsMediaEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class MediaListener implements EventSubscriberInterface
 {
@@ -30,8 +31,10 @@ class MediaListener implements EventSubscriberInterface
             SfsMediaEvents::ADMIN_MEDIAS_LIST_VIEW => 'onListViewAddTypes',
             SfsMediaEvents::ADMIN_MEDIAS_CREATE_INITIALIZE => 'onCreateInitializeAddType',
             SfsMediaEvents::ADMIN_MEDIAS_CREATE_FORM_PREPARE => 'onCreateFormPrepare',
+            SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_FORM_PREPARE => 'onCreateFormPrepare',
             SfsMediaEvents::ADMIN_MEDIAS_CREATE_VIEW => 'onCreateViewAddTypeConfig',
             SfsMediaEvents::ADMIN_MEDIAS_READ_VIEW => 'onReadViewAddTypeConfig',
+            SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_SUCCESS => 'onAjaxCreateSuccess',
         ];
     }
 
@@ -68,5 +71,10 @@ class MediaListener implements EventSubscriberInterface
 
         $event->getData()['checkVersions'] = TypeChecker::checkMedia($media, $typeConfig);
         $event->getData()['type_config'] = $typeConfig;
+    }
+
+    public function onAjaxCreateSuccess(GetResponseEntityEvent $event): void
+    {
+        $event->setResponse(new JsonResponse([]));
     }
 }

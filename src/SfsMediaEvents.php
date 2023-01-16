@@ -147,6 +147,41 @@ class SfsMediaEvents
     /**
      * @Event("Softspring\Component\CrudlController\Event\GetResponseEntityEvent")
      */
+    public const ADMIN_MEDIAS_CREATE_AJAX_INITIALIZE = 'sfs_media.admin.medias.create_ajax_initialize';
+
+    /**
+     * @Event("Softspring\Component\CrudlController\Event\FormPrepareEvent")
+     */
+    public const ADMIN_MEDIAS_CREATE_AJAX_FORM_PREPARE = 'sfs_media.admin.medias.create_ajax_form_prepare';
+
+    /**
+     * @Event("Softspring\Component\Events\FormEvent")
+     */
+    public const ADMIN_MEDIAS_CREATE_AJAX_FORM_INIT = 'sfs_media.admin.medias.create_ajax_form_init';
+    
+    /**
+     * @Event("Softspring\Component\CrudlController\Event\GetResponseFormEvent")
+     */
+    public const ADMIN_MEDIAS_CREATE_AJAX_FORM_VALID = 'sfs_media.admin.medias.create_ajax_form_valid';
+
+    /**
+     * @Event("Softspring\Component\CrudlController\Event\GetResponseEntityEvent")
+     */
+    public const ADMIN_MEDIAS_CREATE_AJAX_SUCCESS = 'sfs_media.admin.medias.create_ajax_success';
+
+    /**
+     * @Event("Softspring\Component\CrudlController\Event\GetResponseFormEvent")
+     */
+    public const ADMIN_MEDIAS_CREATE_AJAX_FORM_INVALID = 'sfs_media.admin.medias.create_ajax_form_invalid';
+
+    /**
+     * @Event("Softspring\Component\Events\ViewEvent")
+     */
+    public const ADMIN_MEDIAS_CREATE_AJAX_VIEW = 'sfs_media.admin.medias.create_ajax_view';
+
+    /**
+     * @Event("Softspring\Component\CrudlController\Event\GetResponseEntityEvent")
+     */
     public const ADMIN_MEDIAS_UPDATE_INITIALIZE = 'sfs_media.admin.medias.update_initialize';
 
     /**
