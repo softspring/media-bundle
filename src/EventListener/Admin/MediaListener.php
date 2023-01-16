@@ -52,7 +52,7 @@ class MediaListener implements EventSubscriberInterface
     public function onCreateFormPrepare(FormPrepareEvent $event): void
     {
         $type = $event->getRequest()->attributes->get('type');
-        $event->setFormOptions($event->getFormOptions()+['media_type' => $type]);
+        $event->setFormOptions($event->getFormOptions() + ['media_type' => $type]);
     }
 
     public function onCreateViewAddTypeConfig(ViewEvent $event): void
