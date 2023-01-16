@@ -42,6 +42,8 @@ services:
                     form: '@Softspring\MediaBundle\Form\Admin\MediaCreateFormInterface'
                     is_granted: 'ROLE_SFS_MEDIA_ADMIN_MEDIAS_CREATE'
                     initialize_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_INITIALIZE
+                    form_prepare_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_FORM_PREPARE
+                    form_init_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_FORM_INIT
                     form_valid_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_FORM_VALID
                     success_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_SUCCESS
                     form_invalid_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_FORM_INVALID
@@ -53,6 +55,8 @@ services:
                     is_granted: 'ROLE_SFS_MEDIA_ADMIN_MEDIAS_UPDATE'
                     param_converter_key: 'id'
                     initialize_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_UPDATE_INITIALIZE
+                    form_prepare_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_UPDATE_FORM_PREPARE
+                    form_init_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_UPDATE_FORM_INIT
                     form_valid_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_UPDATE_FORM_VALID
                     success_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_UPDATE_SUCCESS
                     form_invalid_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_UPDATE_FORM_INVALID

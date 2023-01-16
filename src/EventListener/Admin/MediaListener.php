@@ -2,6 +2,7 @@
 
 namespace Softspring\MediaBundle\EventListener\Admin;
 
+use Softspring\Component\CrudlController\Event\FormPrepareEvent;
 use Softspring\Component\CrudlController\Event\GetResponseEntityEvent;
 use Softspring\Component\Events\ViewEvent;
 use Softspring\MediaBundle\EntityManager\MediaManagerInterface;
@@ -28,6 +29,7 @@ class MediaListener implements EventSubscriberInterface
         return [
             SfsMediaEvents::ADMIN_MEDIAS_LIST_VIEW => 'onListViewAddTypes',
             SfsMediaEvents::ADMIN_MEDIAS_CREATE_INITIALIZE => 'onCreateInitializeAddType',
+            SfsMediaEvents::ADMIN_MEDIAS_CREATE_FORM_PREPARE => 'onCreateFormPrepare',
             SfsMediaEvents::ADMIN_MEDIAS_CREATE_VIEW => 'onCreateViewAddTypeConfig',
             SfsMediaEvents::ADMIN_MEDIAS_READ_VIEW => 'onReadViewAddTypeConfig',
         ];
@@ -45,6 +47,12 @@ class MediaListener implements EventSubscriberInterface
         /** @var MediaInterface $media */
         $media = $event->getEntity();
         $this->mediaManager->createEntityForType($type, $media);
+    }
+
+    public function onCreateFormPrepare(FormPrepareEvent $event): void
+    {
+        $type = $event->getRequest()->attributes->get('type');
+        $event->setFormOptions($event->getFormOptions()+['media_type' => $type]);
     }
 
     public function onCreateViewAddTypeConfig(ViewEvent $event): void

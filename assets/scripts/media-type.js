@@ -175,3 +175,23 @@ if (mediaTypeModal) {
         mediaInput.dispatchEvent(new Event('sfs_media.unselected', {bubbles: true}));
     });
 }
+
+document.addEventListener('change', function (event) {
+    if (!event.target.matches('#media_create_form__original_upload')) {
+        return;
+    }
+
+    document.getElementById('media_create_form_name').value = event.target.files[0].name;
+
+    const originalPreview = document.getElementById('media_create_form__original_preview');
+
+    if (originalPreview && event.target.files.length > 0){
+        var src = URL.createObjectURL(event.target.files[0]);
+        var preview = document.createElement('img');
+        preview.src = src;
+        preview.classList.add('img-fluid');
+
+        originalPreview.innerHTML = '';
+        originalPreview.appendChild(preview);
+    }
+})

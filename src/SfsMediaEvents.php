@@ -115,6 +115,16 @@ class SfsMediaEvents
     public const ADMIN_MEDIAS_CREATE_INITIALIZE = 'sfs_media.admin.medias.create_initialize';
 
     /**
+     * @Event("Softspring\Component\CrudlController\Event\FormPrepareEvent")
+     */
+    public const ADMIN_MEDIAS_CREATE_FORM_PREPARE = 'sfs_media.admin.medias.create_form_prepare';
+
+    /**
+     * @Event("Softspring\Component\Events\FormEvent")
+     */
+    public const ADMIN_MEDIAS_CREATE_FORM_INIT = 'sfs_media.admin.medias.create_form_init';
+    
+    /**
      * @Event("Softspring\Component\CrudlController\Event\GetResponseFormEvent")
      */
     public const ADMIN_MEDIAS_CREATE_FORM_VALID = 'sfs_media.admin.medias.create_form_valid';
@@ -138,6 +148,16 @@ class SfsMediaEvents
      * @Event("Softspring\Component\CrudlController\Event\GetResponseEntityEvent")
      */
     public const ADMIN_MEDIAS_UPDATE_INITIALIZE = 'sfs_media.admin.medias.update_initialize';
+
+    /**
+     * @Event("Softspring\Component\CrudlController\Event\FormPrepareEvent")
+     */
+    public const ADMIN_MEDIAS_UPDATE_FORM_PREPARE = 'sfs_media.admin.medias.update_form_prepare';
+
+    /**
+     * @Event("Softspring\Component\Events\FormEvent")
+     */
+    public const ADMIN_MEDIAS_UPDATE_FORM_INIT = 'sfs_media.admin.medias.update_form_init';
 
     /**
      * @Event("Softspring\Component\CrudlController\Event\GetResponseFormEvent")
