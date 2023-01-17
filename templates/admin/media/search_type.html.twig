@@ -9,8 +9,8 @@
         {% if filterForm.type is defined %}<div class="col">{{ form_widget(filterForm.type) }}</div>{% endif %}
         <div class="col"><button type="submit" class="btn btn-primary">Search</button></div>
 
-        {% if filterForm.type is defined %}
         <div class="col">
+            {% if filterForm.vars.valid_types|length > 1 %}
             <div class="dropdown">
                 <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownCreateMedia" data-bs-toggle="dropdown" aria-expanded="false">
                     {{ 'admin_medias.list.actions.create.link'|trans }}
@@ -21,8 +21,13 @@
                     {% endfor %}
                 </ul>
             </div>
+            {% else %}
+                {% set type = filterForm.vars.valid_types[0] %}
+                <a data-media-modal-create-href="{{ url('sfs_media_admin_medias_create_ajax', {'type':type}) }}" class="btn btn-primary" type="button" id="dropdownCreateMedia" data-bs-toggle="dropdown" aria-expanded="false">
+                    {{ 'admin_medias.list.actions.create.link'|trans }}
+                </a>
+            {% endif %}
         </div>
-        {% endif %}
         {{ form_rest(filterForm) }}
     </div>
 </div>
