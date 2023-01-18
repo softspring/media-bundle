@@ -158,7 +158,7 @@ class SfsMediaEvents
      * @Event("Softspring\Component\Events\FormEvent")
      */
     public const ADMIN_MEDIAS_CREATE_AJAX_FORM_INIT = 'sfs_media.admin.medias.create_ajax_form_init';
-    
+
     /**
      * @Event("Softspring\Component\CrudlController\Event\GetResponseFormEvent")
      */

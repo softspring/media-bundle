@@ -11,7 +11,6 @@ use Softspring\MediaBundle\Helper\TypeChecker;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\SfsMediaEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class MediaListener implements EventSubscriberInterface
