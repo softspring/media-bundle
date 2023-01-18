@@ -24,8 +24,7 @@ services:
     sfs_media.admin.media.controller:
         class: Softspring\Component\CrudlController\Controller\CrudlController
         public: true
-        calls:
-            - { method: setContainer, arguments: ['@service_container'] }
+        tags: ['controller.service_arguments']
         arguments:
             $manager: '@Softspring\MediaBundle\EntityManager\MediaManagerInterface'
             $eventDispatcher: '@event_dispatcher'
