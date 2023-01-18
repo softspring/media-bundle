@@ -79,3 +79,20 @@ services:
                     initialize_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_READ_INITIALIZE
                     view_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_READ_VIEW
                     view: '%sfs_media.admin.medias.read_view%'
+                search_type:
+                    filter_form: '@Softspring\MediaBundle\Form\MediaTypeSearchFilterForm'
+                    view: '@@SfsMedia/admin/media/search_type.html.twig'
+                    view_page: '@@SfsMedia/admin/media/search_type.html.twig'
+                    filter_event_name: 'sfs_media.search_filter.filter_event'
+                    view_event_name: 'sfs_media.search_filter.list_view'
+                create_ajax:
+                    form: '@Softspring\MediaBundle\Form\Admin\MediaCreateFormInterface'
+                    is_granted: 'ROLE_SFS_MEDIA_ADMIN_MEDIAS_CREATE'
+                    initialize_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_INITIALIZE
+                    form_prepare_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_FORM_PREPARE
+                    form_init_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_FORM_INIT
+                    form_valid_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_FORM_VALID
+                    success_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_SUCCESS
+                    form_invalid_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_FORM_INVALID
+                    view_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_VIEW
+                    view: '@@SfsMedia/admin/media/create_ajax.html.twig'

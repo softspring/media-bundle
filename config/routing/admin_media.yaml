@@ -6,25 +6,13 @@ sfs_media_admin_medias_search_type:
     controller: sfs_media.admin.media.controller::list
     path: /search-form-type/{valid_types}
     defaults:
-        config:
-            filter_form: 'Softspring\MediaBundle\Form\MediaTypeSearchFilterForm'
-            view: '@SfsMedia/admin/media/search_type.html.twig'
-            view_page: '@SfsMedia/admin/media/search_type.html.twig'
-            filter_event_name: 'sfs_media.search_filter.filter_event'
+        configKey: search_type
 
 sfs_media_admin_medias_create_ajax:
     controller: sfs_media.admin.media.controller::create
     path: /create/{type}
     defaults:
-        config:
-            initialize_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_INITIALIZE
-            form_prepare_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_FORM_PREPARE
-            form_init_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_FORM_INIT
-            form_valid_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_FORM_VALID
-            success_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_SUCCESS
-            form_invalid_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_FORM_INVALID
-            view_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_VIEW
-            view: '@SfsMedia/admin/media/create_ajax.html.twig'
+        configKey: create_ajax
 
 sfs_media_admin_medias_create:
     controller: sfs_media.admin.media.controller::create

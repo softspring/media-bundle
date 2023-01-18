@@ -12,6 +12,7 @@ use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\SfsMediaEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class MediaListener implements EventSubscriberInterface
 {
@@ -29,12 +30,18 @@ class MediaListener implements EventSubscriberInterface
     {
         return [
             SfsMediaEvents::ADMIN_MEDIAS_LIST_VIEW => 'onListViewAddTypes',
+            'sfs_media.search_filter.list_view' => 'onListViewAddTypes',
+
             SfsMediaEvents::ADMIN_MEDIAS_CREATE_INITIALIZE => 'onCreateInitializeAddType',
             SfsMediaEvents::ADMIN_MEDIAS_CREATE_FORM_PREPARE => 'onCreateFormPrepare',
-            SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_FORM_PREPARE => 'onCreateFormPrepare',
             SfsMediaEvents::ADMIN_MEDIAS_CREATE_VIEW => 'onCreateViewAddTypeConfig',
-            SfsMediaEvents::ADMIN_MEDIAS_READ_VIEW => 'onReadViewAddTypeConfig',
+
+            SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_INITIALIZE => 'onCreateInitializeAddType',
+            SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_FORM_PREPARE => 'onCreateFormPrepare',
+            SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_VIEW => 'onCreateViewAddTypeConfig',
             SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_SUCCESS => 'onAjaxCreateSuccess',
+
+            SfsMediaEvents::ADMIN_MEDIAS_READ_VIEW => 'onReadViewAddTypeConfig',
         ];
     }
 
@@ -75,6 +82,6 @@ class MediaListener implements EventSubscriberInterface
 
     public function onAjaxCreateSuccess(GetResponseEntityEvent $event): void
     {
-        $event->setResponse(new JsonResponse([]));
+        $event->setResponse(new Response('', Response::HTTP_CREATED));
     }
 }
