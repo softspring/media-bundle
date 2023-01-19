@@ -1,0 +1,30 @@
+{% trans_default_domain 'sfs_media_admin' %}
+
+{% form_theme form '@SfsMedia/media_form_theme.html.twig' %}
+
+<div class="container-fluid bg-white p-4">
+    {{ form_start(form) }}
+
+    <div class="row">
+        <div class="col">
+            {{ form_row(form.name) }}
+        </div>
+        <div class="col">
+            {{ form_row(form.description) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {{ form_row(form._original) }}
+            <div id="media_create_form__original_preview" class="img-fluid"></div>
+        </div>
+    </div>
+
+    {{ form_rest(form) }}
+
+    <div class="d-flex justify-content-end align-items-center">
+        <a href="{{ app.request.query.get('back', '#') }}" class="btn btn-outline-secondary ms-3">{{ 'admin_medias.create.actions.cancel.button'|trans }}</a>
+        <button class="btn btn-primary ms-3" type="submit">{{ 'admin_medias.create.actions.create.button'|trans }}</button>
+    </div>
+    {{ form_end(form) }}
+</div>

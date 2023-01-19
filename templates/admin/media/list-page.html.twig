@@ -17,7 +17,7 @@
                                 {{ media|sfs_media_render_image(['_thumbnail'], {'class':'img-fluid w-auto mx-auto', 'style':' max-height: 200px;'}) }}
                             </div>
                         {% endif %}
-                        <p class="card-title mb-0"><small><strong>{{ media.name }}</strong></small></p>
+                        <p class="card-title mb-0 text-truncate px-2" title="{{ media.name }}"><small><strong>{{ media.name }}</strong></small></p>
                         <span class="small">
                             {{ media_types[media.type].name }}
 
