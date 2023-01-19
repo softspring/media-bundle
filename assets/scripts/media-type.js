@@ -1,4 +1,4 @@
-var mediaTypeModal = document.getElementById('mediaTypeModal')
+const mediaTypeModal = document.getElementById('mediaTypeModal')
 
 if (mediaTypeModal) {
 
@@ -12,8 +12,8 @@ if (mediaTypeModal) {
         mediaTypeModal.clickedButton = event.relatedTarget
         const mediaInput = document.getElementById(mediaTypeModal.clickedButton.dataset.mediaTypeField);
 
-        var mediaTypeModalBody = mediaTypeModal.querySelector('.modal-body');
-        var mediaTypeModalFooter = mediaTypeModal.querySelector('.modal-footer');
+        const mediaTypeModalBody = mediaTypeModal.querySelector('.modal-body');
+        const mediaTypeModalFooter = mediaTypeModal.querySelector('.modal-footer');
         mediaTypeModal.querySelector('[data-media-type-select]').classList.add('disabled');
 
         mediaTypeModalFooter.style.setProperty('display', 'none');
@@ -23,7 +23,7 @@ if (mediaTypeModal) {
             '</div></div>';
 
         // get valid types
-        var mediaTypes = mediaInput.getAttribute('data-media-type-types')
+        const mediaTypes = mediaInput.getAttribute('data-media-type-types')
 
         modalSearchUrl = mediaTypeModal.clickedButton.dataset.searchUrl; // + '?page=1&rpp=&order=&text=&' + mediaTypes.split(',').map((v) => 'valid_types%5B%5D=' + v).join('&');
         loadSearchPage(modalSearchUrl);
@@ -33,10 +33,10 @@ if (mediaTypeModal) {
      * Load modal page with media list
      */
     function loadSearchPage(url) {
-        var mediaTypeModalBody = mediaTypeModal.querySelector('.modal-body');
-        var mediaTypeModalFooter = mediaTypeModal.querySelector('.modal-footer');
+        const mediaTypeModalBody = mediaTypeModal.querySelector('.modal-body');
+        const mediaTypeModalFooter = mediaTypeModal.querySelector('.modal-footer');
 
-        var http_request = new XMLHttpRequest();
+        const http_request = new XMLHttpRequest();
         http_request.onreadystatechange = function () {
             if (http_request.readyState === 4) {
                 mediaTypeModalBody.innerHTML = http_request.response;
@@ -44,7 +44,7 @@ if (mediaTypeModal) {
 
                 mediaTypeModal.querySelector('[data-media-type-select]').classList.add('disabled');
 
-                var searchForm = mediaTypeModalBody.querySelector('form');
+                const searchForm = mediaTypeModalBody.querySelector('form');
                 searchForm.onsubmit = function (event) {
                     event.preventDefault();
 
@@ -67,16 +67,16 @@ if (mediaTypeModal) {
             return;
         }
 
-        var createFormUrl = event.target.dataset.mediaModalCreateHref;
+        const createFormUrl = event.target.dataset.mediaModalCreateHref;
 
         loadCreateForm(createFormUrl);
     });
 
     function loadCreateForm(createFormUrl) {
-        var mediaTypeModalBody = mediaTypeModal.querySelector('.modal-body');
-        var mediaTypeModalFooter = mediaTypeModal.querySelector('.modal-footer');
+        const mediaTypeModalBody = mediaTypeModal.querySelector('.modal-body');
+        const mediaTypeModalFooter = mediaTypeModal.querySelector('.modal-footer');
 
-        var http_request = new XMLHttpRequest();
+        const http_request = new XMLHttpRequest();
         http_request.onreadystatechange = function () {
             if (http_request.readyState === 4) {
                 mediaTypeModalBody.innerHTML = http_request.response;
@@ -89,10 +89,10 @@ if (mediaTypeModal) {
     }
 
     function configureCreateForm(createFormUrl) {
-        var mediaTypeModalBody = mediaTypeModal.querySelector('.modal-body');
-        var mediaTypeModalFooter = mediaTypeModal.querySelector('.modal-footer');
+        const mediaTypeModalBody = mediaTypeModal.querySelector('.modal-body');
+        const mediaTypeModalFooter = mediaTypeModal.querySelector('.modal-footer');
 
-        var createForm = mediaTypeModalBody.querySelector('form');
+        const createForm = mediaTypeModalBody.querySelector('form');
         createForm.onsubmit = function (event) {
             event.preventDefault();
             let formData = new FormData(createForm);
@@ -121,7 +121,7 @@ if (mediaTypeModal) {
      * Click on modal media, to be selected
      */
     document.addEventListener('click', function (event) {
-        var media = null;
+        let media = null;
         if (!event.target || !event.target.hasAttribute('data-media-type')) {
             for (i = 0; i < event.composedPath().length; i++) {
                 if (event.composedPath()[i] instanceof Element && event.composedPath()[i].matches('[data-media-type]')) {
@@ -214,9 +214,9 @@ if (mediaTypeModal) {
 
         mediaInput.value = '';
         document.getElementById(event.target.dataset.mediaTypeField + '_text').innerHTML = '';
-        var widget = document.getElementById(event.target.dataset.mediaTypeWidget);
+        const widget = document.getElementById(event.target.dataset.mediaTypeWidget);
 
-        var thumbnail = widget.querySelector('[data-media-type-thumbnail]');
+        const thumbnail = widget.querySelector('[data-media-type-thumbnail]');
         if (thumbnail) {
             thumbnail.innerHTML = '';
         }
@@ -244,8 +244,8 @@ document.addEventListener('change', function (event) {
     const originalPreview = document.getElementById('media_create_form__original_preview');
 
     if (originalPreview && event.target.files.length > 0){
-        var src = URL.createObjectURL(event.target.files[0]);
-        var preview = document.createElement('img');
+        const src = URL.createObjectURL(event.target.files[0]);
+        const preview = document.createElement('img');
         preview.src = src;
         preview.classList.add('img-fluid');
 
