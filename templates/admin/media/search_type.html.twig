@@ -23,7 +23,7 @@
             </div>
             {% else %}
                 {% set type = filterForm.vars.valid_types[0] %}
-                <a data-media-modal-create-href="{{ url('sfs_media_admin_medias_create_ajax', {'type':type}) }}" class="btn btn-primary" type="button" id="dropdownCreateMedia" data-bs-toggle="dropdown" aria-expanded="false">
+                <a data-media-modal-create-href="{{ url('sfs_media_admin_medias_create_ajax', {'type':type}) }}" class="btn btn-primary">
                     {{ 'admin_medias.list.actions.create.link'|trans }}
                 </a>
             {% endif %}
@@ -59,7 +59,7 @@
                             <div class="bi bi-play-btn h1 my-auto text-white"></div>
                         </div>
                         {% endif %}
-                        <p class="card-title mb-0"><small><strong>{{ media.name }}</strong></small></p>
+                        <p class="card-title mb-0 text-truncate px-2" title="{{ media.name }}"><small><strong>{{ media.name }}</strong></small></p>
                         <span class="small">
                             {{ media_types[media.type].name }}
 
