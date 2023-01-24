@@ -147,20 +147,43 @@ if (mediaTypeModal) {
     });
 
     /**
-     * Click on modal Select button, to commit selection
+     * Double click on modal media, to commit selection
      */
-    document.addEventListener('click', function (event) {
-        if (!event.target || !event.target.hasAttribute('data-media-type-select')) return;
-        const selectedMedia = mediaTypeModal.querySelector('.sfs-media-selected');
-        if (!selectedMedia) {
-            return;
+    document.addEventListener('dblclick', function (event) {
+        let media = null;
+        if (!event.target || !event.target.hasAttribute('data-media-type')) {
+            for (i = 0; i < event.composedPath().length; i++) {
+                if (event.composedPath()[i] instanceof Element && event.composedPath()[i].matches('[data-media-type]')) {
+                    media = event.composedPath()[i];
+                    break;
+                }
+            }
+
+            if (!media) {
+                return;
+            }
+        } else {
+            media = event.target;
         }
 
+        selectMedia(media);
+    });
+
+    function selectMedia(selectedMedia)
+    {
         const mediaInput = document.getElementById(mediaTypeModal.clickedButton.dataset.mediaTypeField);
+        const mediaInputWidget = document.getElementById(mediaTypeModal.clickedButton.dataset.mediaTypeField+'_widget');
+        const versionSelector = document.querySelector('[data-media-type-select-version][data-media-type-field='+mediaInput.id+']');
+        let versionSelect;
+
+        if (versionSelector) {
+            versionSelect = versionSelector.nextElementSibling;
+            versionSelect.innerHTML = '';
+        }
 
         // clean previews data versions
         for (let key in mediaInput.dataset) {
-            if (!key.match(/^mediaVersion/i)) {
+            if (!key.match(/^(mediaImage|mediaVideo|mediaPicture)/i)) {
                 continue;
             }
             delete mediaInput.dataset[key];
@@ -171,10 +194,34 @@ if (mediaTypeModal) {
         mediaInput.dataset.mediaType = selectedMedia.dataset.mediaType;
         // propagate data version
         for (let key in selectedMedia.dataset) {
-            if (!key.match(/^mediaVersion/i)) {
+            if (!key.match(/^(mediaImage|mediaVideo|mediaPicture)/i)) {
                 continue;
             }
             mediaInput.dataset[key] = selectedMedia.dataset[key];
+
+            if (versionSelector) {
+                if (key.match(/^mediaImage/i)) {
+                    let versionValue = key.replace(/^mediaImage\-?/i, '');
+                    versionValue = versionValue.charAt(0).toLowerCase() + versionValue.slice(1);
+                    versionSelect.insertAdjacentHTML('beforeend', '<li><a class="dropdown-item" data-media-version-value="image#'+versionValue+'" href="#">'+versionValue+'</a></li>');
+                }
+                if (key.match(/^mediaVideo/i)) {
+                    let versionValue = key.replace(/^mediaVideo\-?/i, '');
+                    versionValue = versionValue.charAt(0).toLowerCase() + versionValue.slice(1);
+                    versionSelect.insertAdjacentHTML('beforeend', '<li><a class="dropdown-item" data-media-version-value="video#'+versionValue+'" href="#">'+versionValue+'</a></li>');
+                }
+                if (key.match(/^mediaPicture/i)) {
+                    let versionValue = key.replace(/^mediaPicture\-?/i, '');
+                    versionValue = versionValue.charAt(0).toLowerCase() + versionValue.slice(1);
+                    versionSelect.insertAdjacentHTML('beforeend', '<li><a class="dropdown-item" data-media-version-value="picture#'+versionValue+'" href="#">'+versionValue+'</a></li>');
+                }
+            }
+        }
+
+        if (versionSelector) {
+            // select first (or default) version (li > a)
+            let firstOption = versionSelect.children[0].children[0];
+            firstOption.click();
         }
 
         // show media name
@@ -184,8 +231,8 @@ if (mediaTypeModal) {
         const widget = document.getElementById(mediaTypeModal.clickedButton.dataset.mediaTypeWidget);
         const thumbnail = widget.querySelector('[data-media-type-thumbnail]');
         if (thumbnail) {
-            if (mediaInput.dataset['mediaVersion-_thumbnail']) {
-                thumbnail.innerHTML = mediaInput.dataset['mediaVersion-_thumbnail'];
+            if (mediaInput.dataset['mediaImage-_thumbnail']) {
+                thumbnail.innerHTML = mediaInput.dataset['mediaImage-_thumbnail'];
             } else {
                 thumbnail.innerHTML = '';
             }
@@ -200,21 +247,57 @@ if (mediaTypeModal) {
         // hides modal
         window.bootstrap.Modal.getInstance(mediaTypeModal).hide();
 
+        mediaInputWidget.querySelector('[data-media-type-clean]').classList.remove('disabled');
+        let selectVersion = mediaInputWidget.querySelector('[data-media-type-select-version]');
+        selectVersion && selectVersion.classList.remove('disabled');
+
         // dispatches media selected event
         mediaInput.dispatchEvent(new Event('sfs_media.selected', {bubbles: true}));
+    }
+
+    /**
+     * Click on modal Select button, to commit selection
+     */
+    document.addEventListener('click', function (event) {
+        if (!event.target || !event.target.hasAttribute('data-media-type-select')) return;
+        const selectedMedia = mediaTypeModal.querySelector('.sfs-media-selected');
+        if (!selectedMedia) {
+            return;
+        }
+
+        selectMedia(selectedMedia);
     });
 
     /**
      * Click on form clean button, to unselect media
      */
     document.addEventListener('click', function (event) {
-        if (!event.target || !event.target.hasAttribute('data-media-type-clean')) return;
+        if (!event.target || !(event.target.hasAttribute('data-media-type-clean') || event.target.parentElement.hasAttribute('data-media-type-clean'))) return;
 
-        const mediaInput = document.getElementById(event.target.dataset.mediaTypeField);
+        let cleanButton;
+
+        if (event.target.hasAttribute('data-media-type-clean')) {
+            cleanButton = event.target;
+        } else { // event.target.parentElement.hasAttribute('data-media-type-clean')
+            cleanButton = event.target.parentElement;
+        }
+
+        const mediaInput = document.getElementById(cleanButton.dataset.mediaTypeField);
+        const mediaInputWidget = document.getElementById(cleanButton.dataset.mediaTypeField+'_widget');
+        const versionSelector = document.querySelector('[data-media-type-select-version][data-media-type-field='+mediaInput.id+']');
 
         mediaInput.value = '';
-        document.getElementById(event.target.dataset.mediaTypeField + '_text').innerHTML = '';
-        const widget = document.getElementById(event.target.dataset.mediaTypeWidget);
+        document.getElementById(cleanButton.dataset.mediaTypeField + '_text').innerHTML = '';
+
+        if (versionSelector) {
+            versionSelector.innerHTML = '';
+            versionSelector.nextElementSibling.innerHTML = '';
+            const mediaVersionInput = document.getElementById(versionSelector.dataset.mediaVersionTypeField);
+            mediaVersionInput.setAttribute('value', '');
+            mediaVersionInput.value = '';
+        }
+
+        const widget = document.getElementById(cleanButton.dataset.mediaTypeWidget);
 
         const thumbnail = widget.querySelector('[data-media-type-thumbnail]');
         if (thumbnail) {
@@ -223,14 +306,37 @@ if (mediaTypeModal) {
 
         // propagate data version
         for (let key in mediaInput.dataset) {
-            if (!key.match(/^mediaVersion/i)) {
+            if (!key.match(/^(mediaImage|mediaVideo|mediaPicture)/i)) {
                 continue;
             }
             delete mediaInput.dataset[key]
         }
 
+        mediaInputWidget.querySelector('[data-media-type-clean]').classList.add('disabled');
+        let selectVersion = mediaInputWidget.querySelector('[data-media-type-select-version]');
+        selectVersion && selectVersion.classList.add('disabled');
+
         // dispatches media unselected event
         mediaInput.dispatchEvent(new Event('sfs_media.unselected', {bubbles: true}));
+
+    });
+
+    /**
+     * Click on form select version button
+     */
+    document.addEventListener('click', function (event) {
+        if (!event.target || !event.target.hasAttribute('data-media-version-value')) return;
+        const selectedOption = event.target;
+
+        const versionSelector = selectedOption.closest('ul').previousElementSibling;
+        versionSelector.innerText = selectedOption.innerText;
+
+        const mediaVersionInput = document.getElementById(versionSelector.dataset.mediaVersionTypeField);
+        mediaVersionInput.setAttribute('value', selectedOption.mediaVersionValue);
+        mediaVersionInput.value = selectedOption.dataset.mediaVersionValue;
+
+        // dispatches media version selected event
+        mediaVersionInput.dispatchEvent(new Event('sfs_media.select_version', {bubbles: true}));
     });
 }
 

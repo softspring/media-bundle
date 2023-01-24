@@ -44,10 +44,13 @@
                          data-media-type="{{ media.type }}"
                         {% for version in media.versions %}
                             {% if media.isImage %}
-                                data-media-version-{{ version.version }}="{{ media|sfs_media_render_image([version.version], {'class':'img-fluid'})|e }}"
+                                data-media-image-{{ version.version }}="{{ media|sfs_media_render_image([version.version], {'class':'img-fluid'})|e }}"
                             {% elseif media.isVideo %}
-                                data-media-version-{{ version.version }}="{{ media|sfs_media_render_video([version.version], {'class':'img-fluid'})|e }}"
+                                data-media-video-{{ version.version }}="{{ media|sfs_media_render_video([version.version], {'class':'img-fluid'})|e }}"
                             {% endif %}
+                        {% endfor %}
+                        {% for picture,config in sfs_media_type_config(media)['pictures']|default([]) %}
+                            data-media-picture-{{ picture }}="{{ media|sfs_media_render_picture(picture)|e }}"
                         {% endfor %}
                     >
                         {% if media.isImage %}
