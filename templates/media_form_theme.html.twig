@@ -1,13 +1,13 @@
 {% trans_default_domain 'sfs_media_admin' %}
 
-{% block media_version_row %}
+{% block media_version_upload_row %}
     <div class="row">
         <div class="col-3">{{ form_label(form) }}</div>
         <div class="col">{{ form_widget(form) }}</div>
     </div>
-{% endblock media_version_row %}
+{% endblock media_version_upload_row %}
 
-{% block media_version_widget %}
+{% block media_version_upload_widget %}
     {{ form_widget(form.upload) }}
     {{ form_errors(form.upload) }}
     <p class="py-2 small">
@@ -25,7 +25,7 @@
             {% endfor %}
         </em>
     </p>
-{% endblock media_version_widget %}
+{% endblock media_version_upload_widget %}
 
 {% block media_modal_row %}
     {{ form_label(form) }}
@@ -54,13 +54,87 @@
             ><i class="bi bi-trash"></i></button>
             <button type="button" class="btn px-3 btn-primary" {{ modalOpenAttributes|raw }}><i class="bi bi-images"></i></button>
         </div>
+        {{- block('media_modal_hidden_widget') -}}
+    </div>
+{% endblock %}
 
-        {% if data %}
-            {% for version in data.versions %}
-                {% set attr = attr|merge({('data-media-version-'~version.version): data|sfs_media_render_image([version.version], {'class':'img-fluid'})}) %}
+{% block media_modal_hidden_widget %}
+    {% if form.vars.data %}
+        {% for version in form.vars.data.versions %}
+            {% if form.vars.data.isImage() %}
+                {% set attr = attr|merge({('data-media-image-'~version.version): form.vars.data|sfs_media_render_image([version.version], {'class':'img-fluid'})}) %}
+            {% elseif form.vars.data.isVideo() %}
+                {% set attr = attr|merge({('data-media-video-'~version.version): form.vars.data|sfs_media_render_video([version.version], {'class':'img-fluid'})}) %}
+            {% endif %}
+            {% for picture,config in sfs_media_type_config(form.vars.data)['pictures']|default([]) %}
+                {% set attr = attr|merge({('data-media-picture-'~picture): form.vars.data|sfs_media_render_picture(picture)}) %}
             {% endfor %}
+        {% endfor %}
+    {% endif %}
+
+    {% with {'attr': attr} %}
+        {{ block('hidden_widget') }}
+    {% endwith %}
+{% endblock %}
+
+{% block media_version_modal_row %}
+    {{ form_label(form) }}
+    {{ form_widget(form) }}
+{% endblock %}
+
+{% block media_version_modal_widget %}
+    {% set modalOpenAttributes = 'data-search-url="'~form.media.vars.modal_search_url~'" data-bs-toggle="modal" data-bs-target="#mediaTypeModal" data-media-type-field="'~form.media.vars.id~'" data-media-type-widget="'~form.media.vars.id~'_widget"' %}
+
+    <div id="{{ form.media.vars.id }}_widget" class="media-widget">
+        {% if form.media.vars.show_thumbnail %}
+            <div data-media-type-thumbnail class="mb-2" {{ modalOpenAttributes|raw }} role="button">
+                {% if form.media.vars.data %}
+                    {{ form.media.vars.data|sfs_media_render_image(['_thumbnail'], {'class':'img-fluid'}) }}
+                {% else %}
+                    <img src="https://dummyimage.com/300x100/cfcfcf/205872.jpg&text=Select+media" class="img-fluid" />
+                {% endif %}
+            </div>
         {% endif %}
 
-        {{ form_widget(form, {'attr':attr}) }}{# renders hidden field #}
+        <div class="input-group">
+            <div class="form-control text-truncate" id="{{ form.media.vars.id }}_text" {{ modalOpenAttributes|raw }} role="button">{% if form.media.vars.data %}{{ form.media.vars.data.name }}{% endif %}</div>
+
+            {% set selectedVersion = '' %}
+            {% if form.version.vars.data %}
+                {% set selectedVersion = form.version.vars.data %}
+            {% elseif form.media.vars.data and form.media.vars.data.versions|length %}
+                {% set selectedVersion = form.media.vars.data.versions|first %}
+                {% set selectedVersion = selectedVersion.version %}
+            {% endif %}
+            <button class="btn btn-outline-primary dropdown-toggle px-3" type="button" data-bs-toggle="dropdown" data-media-type-select-version
+                    data-media-type-field="{{ form.media.vars.id }}"
+                    data-media-type-widget="{{ form.media.vars.id }}_widget"
+                    data-media-version-type-field="{{ form.version.vars.id }}"
+                    data-media-version-type-widget="{{ form.version.vars.id }}_widget"
+                    aria-expanded="false">{{ selectedVersion|split('#', 2)[1]|default(selectedVersion) }}</button>
+            <ul class="dropdown-menu">
+                {% for mediaVersion in form.media.vars.data.versions|default([]) %}
+                    {% if form.media.vars.data.isImage() %}
+                        <li><a class="dropdown-item" data-media-version-value="image#{{ mediaVersion.version }}" href="#">{{ mediaVersion.version }}</a></li>
+                    {% elseif form.media.vars.data.isVideo() %}
+                        <li><a class="dropdown-item" data-media-version-value="video#{{ mediaVersion.version }}" href="#">{{ mediaVersion.version }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if form.media.vars.data %}
+                    {% for picture,config in sfs_media_type_config(form.media.vars.data)['pictures']|default([]) %}
+                        <li><a class="dropdown-item" data-media-version-value="picture#{{ picture }}" href="#">{{ picture }}</a></li>
+                    {% endfor %}
+                {% endif %}
+            </ul>
+
+            <button type="button" class="btn px-3 btn-secondary" data-media-type-clean
+                    data-media-type-field="{{ form.media.vars.id }}"
+                    data-media-type-widget="{{ form.media.vars.id }}_widget"
+            ><i class="bi bi-trash"></i></button>
+            <button type="button" class="btn px-3 btn-primary" {{ modalOpenAttributes|raw }}><i class="bi bi-images"></i></button>
+        </div>
+
+        {{ form_widget(form.media, {'attr': attr + {'data-media-version-type-field': form.version.vars.id }}) }}
+        {{ form_widget(form.version, {'attr': {'data-media-type-field': form.media.vars.id }}) }}
     </div>
 {% endblock %}

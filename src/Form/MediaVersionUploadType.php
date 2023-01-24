@@ -22,7 +22,7 @@ class MediaVersionUploadType extends AbstractType
 
     public function getBlockPrefix(): string
     {
-        return 'media_version';
+        return 'media_version_upload';
     }
 
     public function configureOptions(OptionsResolver $resolver)

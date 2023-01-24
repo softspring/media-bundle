@@ -34,6 +34,29 @@ class MediaRenderer
         }
     }
 
+    public function render(?MediaInterface $media, ?string $versionString, array $attr = []): string
+    {
+        if (!$media || !$versionString) {
+            return '';
+        }
+
+        [$versionType, $versionName] = explode('#', $versionString, 2);
+
+        switch ($versionType) {
+            case 'image':
+                return $this->renderImage($media, $versionName, $attr);
+
+            case 'video':
+                return $this->renderVideo($media, $versionName, $attr);
+
+            case 'picture':
+                return $this->renderPicture($media, $versionName, $attr);
+
+            default:
+                throw new \Exception('Invalid $versionString, valid names are (image|video|picture)#<versionName>');
+        }
+    }
+
     public function renderVideo(MediaInterface $media, $version, array $attr = []): string
     {
         if (is_array($version)) {

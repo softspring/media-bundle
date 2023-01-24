@@ -4,6 +4,7 @@ namespace Softspring\MediaBundle\Form;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Softspring\MediaBundle\Model\MediaInterface;
+use Softspring\MediaBundle\Type\MediaTypesCollection;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -17,11 +18,13 @@ class MediaModalType extends AbstractType
 {
     protected EntityManagerInterface $em;
     protected RouterInterface $router;
+    protected MediaTypesCollection $mediaTypesCollection;
 
-    public function __construct(EntityManagerInterface $em, RouterInterface $router)
+    public function __construct(EntityManagerInterface $em, RouterInterface $router, MediaTypesCollection $mediaTypesCollection)
     {
         $this->em = $em;
         $this->router = $router;
+        $this->mediaTypesCollection = $mediaTypesCollection;
     }
 
     public function getBlockPrefix(): string
@@ -39,13 +42,15 @@ class MediaModalType extends AbstractType
         $resolver->setDefaults([
             'class' => MediaInterface::class,
             'required' => false,
-            'media_types' => [],
+            'media_types' => null,
             'media_attr' => [],
             'image_attr' => [],
             'video_attr' => [],
             'picture_attr' => [],
             'show_thumbnail' => false,
         ]);
+
+        $resolver->setAllowedTypes('media_types', ['null', 'array']);
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -59,6 +64,26 @@ class MediaModalType extends AbstractType
 
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
+        if (null === $options['media_types']) {
+            foreach ($this->mediaTypesCollection->getTypes() as $type => $typeConfig) {
+                if ('image' == $typeConfig['type']) {
+                    $options['media_types'][$type]['image'] = array_keys($typeConfig['versions']);
+                } elseif ('video' == $typeConfig['type']) {
+                    $options['media_types'][$type]['video'] = array_keys($typeConfig['versions']);
+                }
+                if (!empty($typeConfig['pictures'])) {
+                    $options['media_types'][$type]['picture'] = array_keys($typeConfig['pictures']);
+                }
+            }
+        } else {
+            foreach ($options['media_types'] as $type => $typeConfig) {
+                foreach ($typeConfig as $t => $v) {
+                    $options['media_types'][$type][$t] = is_string($v) ? [$v] : $v;
+                }
+            }
+        }
+
+        $view->vars['media_types'] = $options['media_types'];
         $view->vars['show_thumbnail'] = $options['show_thumbnail'];
         $view->vars['image_attr'] = $options['media_attr'] + $options['image_attr'];
         $view->vars['video_attr'] = $options['media_attr'] + $options['video_attr'];
