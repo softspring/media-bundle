@@ -6,10 +6,10 @@ use Softspring\Component\CrudlController\Event\FormPrepareEvent;
 use Softspring\Component\CrudlController\Event\GetResponseEntityEvent;
 use Softspring\Component\Events\ViewEvent;
 use Softspring\MediaBundle\EntityManager\MediaManagerInterface;
-use Softspring\MediaBundle\EntityManager\MediaTypeManagerInterface;
 use Softspring\MediaBundle\Helper\TypeChecker;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\SfsMediaEvents;
+use Softspring\MediaBundle\Type\MediaTypesCollection;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -17,12 +17,12 @@ class MediaListener implements EventSubscriberInterface
 {
     protected MediaManagerInterface $mediaManager;
 
-    protected MediaTypeManagerInterface $mediaTypesManager;
+    protected MediaTypesCollection $mediaTypesCollection;
 
-    public function __construct(MediaManagerInterface $mediaManager, MediaTypeManagerInterface $mediaTypesManager)
+    public function __construct(MediaManagerInterface $mediaManager, MediaTypesCollection $mediaTypesCollection)
     {
         $this->mediaManager = $mediaManager;
-        $this->mediaTypesManager = $mediaTypesManager;
+        $this->mediaTypesCollection = $mediaTypesCollection;
     }
 
     public static function getSubscribedEvents(): array
@@ -46,7 +46,7 @@ class MediaListener implements EventSubscriberInterface
 
     public function onListViewAddTypes(ViewEvent $event): void
     {
-        $event->getData()['media_types'] = $this->mediaTypesManager->getTypes();
+        $event->getData()['media_types'] = $this->mediaTypesCollection->getTypes();
     }
 
     public function onCreateInitializeAddType(GetResponseEntityEvent $event): void
@@ -66,14 +66,14 @@ class MediaListener implements EventSubscriberInterface
 
     public function onCreateViewAddTypeConfig(ViewEvent $event): void
     {
-        $event->getData()['type_config'] = $this->mediaTypesManager->getType($event->getRequest()->attributes->get('type'));
+        $event->getData()['type_config'] = $this->mediaTypesCollection->getType($event->getRequest()->attributes->get('type'));
     }
 
     public function onReadViewAddTypeConfig(ViewEvent $event): void
     {
         /** @var MediaInterface $media */
         $media = $event->getData()['media'];
-        $typeConfig = $this->mediaTypesManager->getType($media->getType());
+        $typeConfig = $this->mediaTypesCollection->getType($media->getType());
 
         $event->getData()['checkVersions'] = TypeChecker::checkMedia($media, $typeConfig);
         $event->getData()['type_config'] = $typeConfig;

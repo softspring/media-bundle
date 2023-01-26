@@ -3,8 +3,8 @@
 namespace Softspring\MediaBundle\Form;
 
 use Softspring\MediaBundle\EntityManager\MediaManagerInterface;
-use Softspring\MediaBundle\EntityManager\MediaTypeManagerInterface;
 use Softspring\MediaBundle\Model\MediaInterface;
+use Softspring\MediaBundle\Type\MediaTypesCollection;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Event\SubmitEvent;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -13,13 +13,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MediaTypeUploadType extends AbstractType
 {
-    protected MediaTypeManagerInterface $mediaTypeManager;
+    protected MediaTypesCollection $mediaTypesCollection;
 
     protected MediaManagerInterface $mediaManager;
 
-    public function __construct(MediaTypeManagerInterface $mediaTypeManager, MediaManagerInterface $mediaManager)
+    public function __construct(MediaTypesCollection $mediaTypesCollection, MediaManagerInterface $mediaManager)
     {
-        $this->mediaTypeManager = $mediaTypeManager;
+        $this->mediaTypesCollection = $mediaTypesCollection;
         $this->mediaManager = $mediaManager;
     }
 
@@ -36,7 +36,7 @@ class MediaTypeUploadType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $typeDefinition = $this->mediaTypeManager->getType($options['media_type']);
+        $typeDefinition = $this->mediaTypesCollection->getType($options['media_type']);
 
         $builder->add('name');
         $builder->add('description');

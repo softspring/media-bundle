@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Softspring\Component\CrudlController\Manager\CrudlEntityManagerTrait;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
+use Softspring\MediaBundle\Type\MediaTypesCollection;
 
 class MediaManager implements MediaManagerInterface
 {
@@ -13,14 +14,14 @@ class MediaManager implements MediaManagerInterface
 
     protected EntityManagerInterface $em;
 
-    protected MediaTypeManagerInterface $mediaTypeManager;
+    protected MediaTypesCollection $mediaTypesCollection;
 
     protected MediaVersionManagerInterface $mediaVersionManager;
 
-    public function __construct(EntityManagerInterface $em, MediaTypeManagerInterface $mediaTypeManager, MediaVersionManagerInterface $mediaVersionManager)
+    public function __construct(EntityManagerInterface $em, MediaTypesCollection $mediaTypesCollection, MediaVersionManagerInterface $mediaVersionManager)
     {
         $this->em = $em;
-        $this->mediaTypeManager = $mediaTypeManager;
+        $this->mediaTypesCollection = $mediaTypesCollection;
         $this->mediaVersionManager = $mediaVersionManager;
     }
 
@@ -31,7 +32,7 @@ class MediaManager implements MediaManagerInterface
 
     public function createEntityForType(string $type, ?MediaInterface $media = null): MediaInterface
     {
-        $typeDefinition = $this->mediaTypeManager->getType($type);
+        $typeDefinition = $this->mediaTypesCollection->getType($type);
 
         if (!$media) {
             $media = $this->createEntity();
@@ -50,7 +51,7 @@ class MediaManager implements MediaManagerInterface
 
     public function generateVersionEntities(MediaInterface $media): void
     {
-        $typeDefinition = $this->mediaTypeManager->getType($media->getType());
+        $typeDefinition = $this->mediaTypesCollection->getType($media->getType());
 
         if (!$media->getVersion('_original')) {
             $originalVersion = $this->mediaVersionManager->createEntity();
@@ -67,7 +68,7 @@ class MediaManager implements MediaManagerInterface
 
     public function generateVersionEntity(MediaInterface $media, string $versionKey): MediaVersionInterface
     {
-        $versionOptions = $this->mediaTypeManager->getTypes()[$media->getType()]['versions'][$versionKey];
+        $versionOptions = $this->mediaTypesCollection->getTypes()[$media->getType()]['versions'][$versionKey];
         $originalVersion = $media->getVersion('_original');
         $version = $this->mediaVersionManager->createEntity();
         $version->setVersion($versionKey);
