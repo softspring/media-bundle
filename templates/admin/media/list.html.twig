@@ -47,4 +47,5 @@
     {% endif %}
 
     {% include '@SfsMedia/admin/media/list-page.html.twig' %}
+    {% include '@SfsComponents/paginator/pager.html.twig' with {'collection': entities} %}
 {% endblock content %}
