@@ -7,6 +7,7 @@ admin_medias:
             create.link: "New media"
         filter_form:
             name.label: "File name"
+            type.label: "Media type"
 
     create:
         meta.title: "%type%"
