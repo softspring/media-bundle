@@ -4,8 +4,8 @@ namespace Softspring\MediaBundle\Form;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Softspring\Component\DoctrinePaginator\Form\PaginatorForm;
-use Softspring\MediaBundle\EntityManager\MediaTypeManagerInterface;
 use Softspring\MediaBundle\Model\MediaInterface;
+use Softspring\MediaBundle\Type\MediaTypesCollection;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -17,14 +17,14 @@ use Symfony\Component\Routing\RouterInterface;
 
 class MediaTypeSearchFilterForm extends PaginatorForm
 {
-    protected MediaTypeManagerInterface $typeManager;
+    protected MediaTypesCollection $mediaTypesCollection;
     protected RouterInterface $router;
     protected RequestStack $requestStack;
 
-    public function __construct(MediaTypeManagerInterface $typeManager, RouterInterface $router, RequestStack $requestStack, EntityManagerInterface $em)
+    public function __construct(MediaTypesCollection $mediaTypesCollection, RouterInterface $router, RequestStack $requestStack, EntityManagerInterface $em)
     {
         parent::__construct($em);
-        $this->typeManager = $typeManager;
+        $this->mediaTypesCollection = $mediaTypesCollection;
         $this->router = $router;
         $this->requestStack = $requestStack;
     }
@@ -57,7 +57,7 @@ class MediaTypeSearchFilterForm extends PaginatorForm
         ]);
 
         $validTypes = $options['valid_types'];
-        $filteredTypes = array_intersect_key($this->typeManager->getTypes(), array_flip($validTypes));
+        $filteredTypes = array_intersect_key($this->mediaTypesCollection->getTypes(), array_flip($validTypes));
 
         if (count($filteredTypes) > 1) {
             $builder->add('type', ChoiceType::class, [
