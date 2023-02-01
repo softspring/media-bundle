@@ -34,6 +34,20 @@ class MediaRenderer
         }
     }
 
+    public function renderMediaOrArray($mediaObjectOrArray, $versionStringOrAttr = null, $attr = null): string
+    {
+        if (is_array($mediaObjectOrArray)) {
+            return $this->renderMediaArray($mediaObjectOrArray, is_array($versionStringOrAttr) ? $versionStringOrAttr : (is_array($attr) ? $attr : []));
+        }
+
+        return $this->render($mediaObjectOrArray, $versionStringOrAttr, $attr);
+    }
+
+    public function renderMediaArray(array $mediaArray, array $attr = []): string
+    {
+        return $this->render($mediaArray['media'] ?? null, $mediaArray['version'] ?? null, $attr);
+    }
+
     public function render(?MediaInterface $media, ?string $versionString, array $attr = []): string
     {
         if (!$media || !$versionString) {

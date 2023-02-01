@@ -27,7 +27,7 @@ class RenderMediaExtension extends AbstractExtension
             new TwigFilter('sfs_media_render_video_set', [$this->mediaRenderer, 'renderVideoWithSources'], ['is_safe' => ['html']]),
             new TwigFilter('sfs_media_render_image', [$this->mediaRenderer, 'renderImage'], ['is_safe' => ['html']]),
             new TwigFilter('sfs_media_render_picture', [$this->mediaRenderer, 'renderPicture'], ['is_safe' => ['html']]),
-            new TwigFilter('sfs_media_render', [$this->mediaRenderer, 'render'], ['is_safe' => ['html']]),
+            new TwigFilter('sfs_media_render', [$this->mediaRenderer, 'renderMediaOrArray'], ['is_safe' => ['html']]),
             new TwigFilter('sfs_media_image_url', [$this->mediaRenderer, 'imageUrl']),
             new TwigFilter('sfs_media_type_config', [$this, 'getMediaTypeConfig']),
         ];
