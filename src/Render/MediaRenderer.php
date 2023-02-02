@@ -40,7 +40,7 @@ class MediaRenderer
             return $this->renderMediaArray($mediaObjectOrArray, is_array($versionStringOrAttr) ? $versionStringOrAttr : (is_array($attr) ? $attr : []));
         }
 
-        return $this->render($mediaObjectOrArray, $versionStringOrAttr, $attr?:[]);
+        return $this->render($mediaObjectOrArray, $versionStringOrAttr, $attr ?: []);
     }
 
     public function renderMediaArray(array $mediaArray, array $attr = []): string
