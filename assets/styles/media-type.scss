@@ -4,3 +4,10 @@
   @extend .bg-primary !optional;
   @extend .text-white !optional;
 }
+.modal-media {
+  .modal-footer {
+    position: sticky;
+    bottom: 0;
+    background: white;
+  }
+}
