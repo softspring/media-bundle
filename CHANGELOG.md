@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.0.6](https://github.com/softspring/media-bundle/releases/tag/v5.0.6)
+
+*Nothing has changed since last v5.0.5 version*
+
 ## [v5.0.5](https://github.com/softspring/media-bundle/releases/tag/v5.0.5)
 
 ### Upgrading
