@@ -34,7 +34,7 @@ class ImagineProcessor implements ProcessorInterface
             return false;
         }
 
-        if (!in_array($version->getOptions()['type'], ['jpeg', 'png', 'gif', 'webp'])) {
+        if (!in_array($version->getOptions()['type'], ['jpeg', 'png', 'gif', 'webp', 'keep'])) {
             // target type can not be other than an image
             return false;
         }
@@ -72,7 +72,12 @@ class ImagineProcessor implements ProcessorInterface
         // https://imagine.readthedocs.io/en/stable/usage/introduction.html#save-medias
         $validOptions = array_flip(['png_compression_level', 'webp_quality', 'flatten', 'jpeg_quality', 'resolution-units', 'resolution-x', 'resolution-y', 'resampling-filter']);
         $saveOptions = array_intersect_key($options, $validOptions);
-        $saveOptions['format'] = $options['type'];
+
+        if ($options['type'] == 'keep') {
+            $saveOptions['format'] = $version->getUpload()->getExtension();
+        } else {
+            $saveOptions['format'] = $options['type'];
+        }
 
         // change format if needed
         $fileName = $version->getUpload()->getRealPath();

@@ -210,7 +210,7 @@ class Configuration implements ConfigurationInterface
                 ->normalizeKeys(false)
                 ->children()
                     ->append($this->getUploadRequirementsNode())
-                    ->enumNode('type')->values(['jpeg', 'png', 'webp'])->end()
+                    ->enumNode('type')->values(['jpeg', 'png', 'webp', 'keep'])->end()
                     ->integerNode('scale_width')->end()
                     ->integerNode('scale_height')->end()
                     ->integerNode('png_compression_level')->end()
@@ -312,7 +312,7 @@ class Configuration implements ConfigurationInterface
             if ('image' === $config['type']) {
                 foreach ($config['versions'] as $version => $versionConfig) {
                     if (!isset($versionConfig['upload_requirements'])) {
-                        empty($versionConfig['type']) && $types[$type]['versions'][$version]['type'] = 'jpeg'; // default jpeg
+                        empty($versionConfig['type']) && $types[$type]['versions'][$version]['type'] = 'keep'; // default keep
                         empty($versionConfig['resampling-filter']) && $types[$type]['versions'][$version]['resampling-filter'] = ImageInterface::FILTER_LANCZOS;
                         empty($versionConfig['resolution-units']) && $types[$type]['versions'][$version]['resolution-units'] = ImageInterface::RESOLUTION_PIXELSPERINCH;
                     }
