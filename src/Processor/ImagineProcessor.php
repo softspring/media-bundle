@@ -73,7 +73,7 @@ class ImagineProcessor implements ProcessorInterface
         $validOptions = array_flip(['png_compression_level', 'webp_quality', 'flatten', 'jpeg_quality', 'resolution-units', 'resolution-x', 'resolution-y', 'resampling-filter']);
         $saveOptions = array_intersect_key($options, $validOptions);
 
-        if ($options['type'] == 'keep') {
+        if ('keep' == $options['type']) {
             $saveOptions['format'] = $version->getUpload()->getExtension();
         } else {
             $saveOptions['format'] = $options['type'];
