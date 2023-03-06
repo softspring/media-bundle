@@ -34,6 +34,10 @@ class MediaManager implements MediaManagerInterface
     {
         $typeDefinition = $this->mediaTypesCollection->getType($type);
 
+        if (empty($typeDefinition)) {
+            throw new \Exception(sprintf('Invalid %s media type', $type));
+        }
+
         if (!$media) {
             $media = $this->createEntity();
         }
