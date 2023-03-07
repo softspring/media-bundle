@@ -2,6 +2,8 @@
 
 namespace Softspring\MediaBundle\Type;
 
+use Softspring\MediaBundle\Exception\InvalidTypeException;
+
 class MediaTypesCollection
 {
     protected array $types = [];
@@ -21,8 +23,15 @@ class MediaTypesCollection
         return $this->types;
     }
 
-    public function getType(string $type): ?array
+    /**
+     * @throws InvalidTypeException
+     */
+    public function getType(string $type): array
     {
-        return $this->types[$type] ?? null;
+        if (!isset($this->types[$type])) {
+            throw new InvalidTypeException($type);
+        }
+
+        return $this->types[$type];
     }
 }
