@@ -1,18 +1,48 @@
 {% trans_default_domain 'sfs_media_admin' %}
 {% extends '@SfsMedia/admin_layout.html.twig' %}
-{% block title %}{{ 'admin_medias.update.meta.title'|trans }}{% endblock %}
+{% block title %}{{ 'admin_medias.update.meta.title'|trans({'%type%':type_config.name}) }}{% endblock %}
+
+{% form_theme form
+    'bootstrap_5_layout.html.twig'
+    '@SfsMedia/forms/media_type_theme.html.twig'
+%}
+
+{% block breadcrums_content %}
+    {{ parent() }}
+    <li class="breadcrumb-item"><a href="{{ url('sfs_media_admin_medias_list') }}">{{ 'admin_medias.list.breadcrumb'|trans }}</a></li>
+    <li class="breadcrumb-item active" aria-current="content">{{ 'admin_medias.update.breadcrumb'|trans({'%type%':type_config.name}) }}</li>
+{% endblock breadcrums_content %}
 
 {% block content %}
     <div class="d-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3">Update media</h1>
+        <h1 class="h3">{{ 'admin_medias.update.title'|trans({'%type%':type_config.name}) }}</h1>
     </div>
-    {{ form_start(form) }}
-        {{ form_widget(form) }}
+
+    <div class="container-fluid bg-white p-4">
+        {{ form_start(form) }}
+
+        <div class="row">
+            <div class="col">
+                {{ form_row(form.name) }}
+            </div>
+            <div class="col">
+                {{ form_row(form.description) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{ form_row(form._original) }}
+                <div id="media_update_form__original_preview" class="img-fluid"></div>
+            </div>
+        </div>
+
         {{ form_rest(form) }}
+
         <div class="d-flex justify-content-end align-items-center">
             <a href="{{ url('sfs_media_admin_medias_list') }}" class="btn btn-outline-secondary ms-3">{{ 'admin_medias.update.actions.cancel.button'|trans }}</a>
             <a href="{{ url('sfs_media_admin_medias_delete', {'media':media.id}) }}" class="btn btn-danger ms-3">{{ 'admin_medias.update.actions.delete.button'|trans }}</a>
-            <input type="submit" value="{{ 'admin_medias.update.actions.update.button'|trans }}" class="btn btn-primary ms-3" />
+            <button class="btn btn-primary ms-3" type="submit">{{ 'admin_medias.update.actions.update.button'|trans }}</button>
         </div>
-    {{ form_end(form) }}
+        {{ form_end(form) }}
+    </div>
 {% endblock content %}
