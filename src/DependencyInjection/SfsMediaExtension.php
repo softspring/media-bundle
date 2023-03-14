@@ -69,7 +69,7 @@ class SfsMediaExtension extends Extension implements PrependExtensionInterface
                 'sfs_media_bundle' => [
                     'version' => $version,
                     'version_branch' => str_ends_with($version, '-dev') ? str_replace('.x-dev', '', $version) : false,
-                ]
+                ],
             ],
         ]);
     }
