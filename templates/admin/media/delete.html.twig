@@ -2,6 +2,17 @@
 {% extends '@SfsMedia/admin_layout.html.twig' %}
 {% block title %}{{ 'admin_medias.delete.meta.title'|trans }}{% endblock %}
 
+{% form_theme form
+    'bootstrap_5_layout.html.twig'
+    '@SfsMedia/forms/media_type_theme.html.twig'
+%}
+
+{% block breadcrums_content %}
+    {{ parent() }}
+    <li class="breadcrumb-item"><a href="{{ url('sfs_media_admin_medias_list') }}">{{ 'admin_medias.list.breadcrumb'|trans }}</a></li>
+    <li class="breadcrumb-item active" aria-current="content">{{ 'admin_medias.delete.breadcrumb'|trans({'%type%':type_config.name}) }}</li>
+{% endblock breadcrums_content %}
+
 {% block content %}
     {{ form_start(form) }}
         {{ form_widget(form) }}

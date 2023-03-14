@@ -2,7 +2,10 @@
 {% extends '@SfsMedia/admin_layout.html.twig' %}
 {% block title %}{{ 'admin_medias.create.meta.title'|trans({'%type%':type_config.name}) }}{% endblock %}
 
-{% form_theme form '@SfsMedia/media_form_theme.html.twig' %}
+{% form_theme form
+    'bootstrap_5_layout.html.twig'
+    '@SfsMedia/forms/media_type_theme.html.twig'
+%}
 
 {% block breadcrums_content %}
     {{ parent() }}
@@ -14,7 +17,6 @@
     <div class="d-flex align-items-center justify-content-between mb-4">
         <h1 class="h3">{{ 'admin_medias.create.title'|trans({'%type%':type_config.name}) }}</h1>
     </div>
-
 
     <div class="container-fluid bg-white p-4">
         {{ form_start(form) }}
