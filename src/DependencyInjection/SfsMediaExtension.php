@@ -2,6 +2,7 @@
 
 namespace Softspring\MediaBundle\DependencyInjection;
 
+use Composer\InstalledVersions;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
 use Symfony\Component\Config\Definition\Processor;
@@ -58,5 +59,18 @@ class SfsMediaExtension extends Extension implements PrependExtensionInterface
         ];
 
         $container->prependExtensionConfig('doctrine', $doctrineConfig);
+
+        $version = InstalledVersions::getVersion('softspring/media-bundle');
+        if (str_ends_with($version, '-dev')) {
+            $version = InstalledVersions::getPrettyVersion('softspring/media-bundle');
+        }
+        $container->prependExtensionConfig('twig', [
+            'globals' => [
+                'sfs_media_bundle' => [
+                    'version' => $version,
+                    'version_branch' => str_ends_with($version, '-dev') ? str_replace('.x-dev', '', $version) : false,
+                ]
+            ],
+        ]);
     }
 }
