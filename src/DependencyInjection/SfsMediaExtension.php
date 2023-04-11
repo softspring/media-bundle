@@ -19,7 +19,7 @@ class SfsMediaExtension extends Extension implements PrependExtensionInterface
         $processor = new Processor();
         $configuration = new Configuration();
         $config = $processor->processConfiguration($configuration, $configs);
-        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../../config/services'));
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../../config/services'));
 
         // set config parameters
         $container->setParameter('sfs_media.entity_manager_name', $config['entity_manager']);
@@ -73,10 +73,11 @@ class SfsMediaExtension extends Extension implements PrependExtensionInterface
             ],
         ]);
 
+        $doctrineConfig = $container->getExtensionConfig('doctrine_migrations');
         $container->prependExtensionConfig('doctrine_migrations', [
-            'migrations_paths' => [
+            'migrations_paths' => array_merge(array_pop($doctrineConfig)['migrations_paths'] ?? [], [
                 'Softspring\MediaBundle\Migrations' => '@SfsMediaBundle/src/Migrations',
-            ],
+            ]),
         ]);
     }
 }
