@@ -72,5 +72,12 @@ class SfsMediaExtension extends Extension implements PrependExtensionInterface
                 ],
             ],
         ]);
+
+        $doctrineConfig = $container->getExtensionConfig('doctrine_migrations');
+        $container->prependExtensionConfig('doctrine_migrations', [
+            'migrations_paths' => array_merge(array_pop($doctrineConfig)['migrations_paths'] ?? [], [
+                'Softspring\MediaBundle\Migrations' => '@SfsMediaBundle/src/Migrations',
+            ]),
+        ]);
     }
 }

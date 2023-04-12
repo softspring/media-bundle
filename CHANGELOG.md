@@ -1,5 +1,11 @@
 # CHANGELOG
 
+On update to 5.1 versions, run migrations.
+
+Skip existing migrations if already created:
+
+    bin/console doctrine:migrations:version "Softspring\MediaBundle\Migrations\Version20230301000000" --add --no-interaction
+
 ## [v5.0.5](https://github.com/softspring/media-bundle/releases/tag/v5.0.5)
 
 ### Upgrading
