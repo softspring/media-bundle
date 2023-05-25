@@ -107,14 +107,18 @@
     </div>
 
     {% if type_config.pictures|length %}
+        {% for picture_id, config in type_config.pictures %}
         <div class="container p-4">
             <div class="row">
                 <div class="col">
-                    <h6>HTML</h6>
-                    <pre><code>{{ media|sfs_media_render_picture|replace({'>':">\n"})|e('html') }}</code></pre>
+                    <h3>Picture tag: {{ picture_id }}</h3>
+                    <pre><code>&#123;&#123; media|sfs_media_render_picture('{{ picture_id }}') &#125;&#125;
+
+{{ media|sfs_media_render_picture(picture_id)|replace({'>':">\n"})|e('html') }}</code></pre>
                 </div>
             </div>
         </div>
+        {% endfor %}
     {% endif %}
 
     {% if type_config.video_sources|length %}
