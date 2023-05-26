@@ -30,7 +30,7 @@ class MediaManager implements MediaManagerInterface
         return MediaInterface::class;
     }
 
-    public function createEntityForType(string $type, ?MediaInterface $media = null): MediaInterface
+    public function createEntityForType(string $type, MediaInterface $media = null): MediaInterface
     {
         $typeDefinition = $this->mediaTypesCollection->getType($type);
 
