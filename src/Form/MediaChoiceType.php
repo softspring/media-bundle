@@ -44,7 +44,7 @@ class MediaChoiceType extends AbstractType
             'choice_label' => function (MediaInterface $media) {
                 return $media->getName();
             },
-            'choice_filter' => function (?MediaInterface $media = null) {
+            'choice_filter' => function (MediaInterface $media = null) {
                 return true;
             },
         ]);
@@ -59,7 +59,7 @@ class MediaChoiceType extends AbstractType
         });
 
         $resolver->setDefault('choice_attr', function (Options $options) {
-            return function (?MediaInterface $media = null) use ($options) {
+            return function (MediaInterface $media = null) use ($options) {
                 if (empty($options['attr']['data-media-preview-input'])) {
                     return [];
                 }
