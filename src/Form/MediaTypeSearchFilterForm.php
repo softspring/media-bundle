@@ -36,6 +36,8 @@ class MediaTypeSearchFilterForm extends PaginatorForm
         $resolver->setDefaults([
             'class' => MediaInterface::class,
             'valid_types' => null,
+            'rpp_valid_values' => [12],
+            'rpp_default_value' => 12,
         ]);
         $resolver->setAllowedTypes('valid_types', ['array', 'null']);
 

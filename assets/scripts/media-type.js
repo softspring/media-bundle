@@ -56,6 +56,11 @@ if (mediaTypeModal) {
 
                     loadSearchPage(searchForm.action + '?' + asString);
                 }
+
+                document.querySelectorAll('.modal-media .page-link').forEach(function(link) {
+                    link.dataset.pageHref = link.href;
+                    link.setAttribute('href', '#');
+                });
             }
         };
         http_request.open('GET', url, true);
@@ -70,6 +75,18 @@ if (mediaTypeModal) {
         const createFormUrl = event.target.dataset.mediaModalCreateHref;
 
         loadCreateForm(createFormUrl);
+    });
+
+    document.addEventListener('click', function (event) {
+        if (!event.target.matches('.modal-media .page-link')) {
+            return;
+        }
+
+        loadSearchPage(event.target.dataset.pageHref);
+
+        event.preventDefault();
+
+        return false;
     });
 
     function loadCreateForm(createFormUrl) {
