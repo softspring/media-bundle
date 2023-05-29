@@ -7,6 +7,7 @@ sfs_media_admin_medias_search_type:
     path: /search-form-type/{valid_types}
     defaults:
         configKey: search_type
+        valid_types: ''
 
 sfs_media_admin_medias_create_ajax:
     controller: sfs_media.admin.media.controller::create
