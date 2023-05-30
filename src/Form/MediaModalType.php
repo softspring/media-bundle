@@ -83,6 +83,10 @@ class MediaModalType extends AbstractType
             }
         }
 
+        if (empty($options['media_types'])) {
+            $options['media_types'] = [];
+        }
+
         $view->vars['media_types'] = $options['media_types'];
         $view->vars['show_thumbnail'] = $options['show_thumbnail'];
         $view->vars['image_attr'] = $options['media_attr'] + $options['image_attr'];
