@@ -18,6 +18,7 @@
         "softspring/doctrine-query-filters": "^5.0",
         "softspring/doctrine-target-entity-resolver": "^5.0",
         "softspring/events": "^5.0",
+        "softspring/permissions-bundle": "^5.1",
         "symfony/config": "^5.4|^6.0",
         "symfony/dependency-injection": "^5.4|^6.0",
         "symfony/form": "^5.4|^6.0",
