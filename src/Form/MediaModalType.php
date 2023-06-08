@@ -37,7 +37,7 @@ class MediaModalType extends AbstractType
         return HiddenType::class;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'class' => MediaInterface::class,
@@ -53,16 +53,19 @@ class MediaModalType extends AbstractType
         $resolver->setAllowedTypes('media_types', ['null', 'array']);
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->addModelTransformer(new CallbackTransformer(function ($value) {
+        $transformer = new CallbackTransformer(function ($value) {
             return $value;
         }, function ($value) {
             return is_string($value) ? $this->em->getRepository(MediaInterface::class)->findOneById($value) : $value;
-        }));
+        });
+
+        $builder->addModelTransformer($transformer);
+        $builder->addViewTransformer($transformer);
     }
 
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         if (null === $options['media_types']) {
             foreach ($this->mediaTypesCollection->getTypes() as $type => $typeConfig) {
