@@ -90,8 +90,12 @@ class MediaRenderer
         }
     }
 
-    public function renderImage(MediaInterface $media, $version, array $attr = []): string
+    public function renderImage(?MediaInterface $media, $version, array $attr = []): string
     {
+        if (!$media) {
+            return '';
+        }
+
         if (is_array($version)) {
             foreach ($version as $singleVersion) {
                 if ($html = $this->renderImage($media, $singleVersion, $attr)) {
@@ -109,8 +113,12 @@ class MediaRenderer
         }
     }
 
-    public function renderPicture(MediaInterface $media, string $picture = '_default', array $pictureAttr = [], array $imgAttr = []): string
+    public function renderPicture(?MediaInterface $media, string $picture = '_default', array $pictureAttr = [], array $imgAttr = []): string
     {
+        if (!$media) {
+            return '';
+        }
+
         $config = $this->mediaTypesCollection->getType($media->getType());
 
         if (!isset($config['pictures'][$picture])) {
