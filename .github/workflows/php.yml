@@ -60,7 +60,7 @@ jobs:
                 run: ./vendor/bin/phpstan analyse
 
             -   name: phpunit-coverage-badge
-                uses: timkrase/phpunit-coverage-badge@v1.2.0
+                uses: timkrase/phpunit-coverage-badge@v1.2.1
                 with:
                     push_badge: true
                     coverage_badge_path: .github/badges/coverage.svg
