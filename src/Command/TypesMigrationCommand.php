@@ -13,8 +13,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class TypesMigrationCommand extends Command
 {
-    protected static $defaultName = 'sfs:media:types-migration';
-
     protected MediaManagerInterface $mediaManager;
     protected MediaVersionManagerInterface $mediaVersionManager;
     protected MediaTypesCollection $mediaTypesCollection;
@@ -25,6 +23,11 @@ class TypesMigrationCommand extends Command
         $this->mediaManager = $mediaManager;
         $this->mediaVersionManager = $mediaVersionManager;
         $this->mediaTypesCollection = $mediaTypesCollection;
+    }
+
+    protected function configure(): void
+    {
+        $this->setName('sfs:media:types-migration');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

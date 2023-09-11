@@ -14,7 +14,7 @@ class ResolveDoctrineTargetEntityPass extends AbstractResolveDoctrineTargetEntit
         return $container->getParameter('sfs_media.entity_manager_name');
     }
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $this->setTargetEntityFromParameter('sfs_media.media.class', MediaInterface::class, $container, true);
         $this->setTargetEntityFromParameter('sfs_media.version.class', MediaVersionInterface::class, $container, true);

@@ -14,7 +14,7 @@ class MediaVersionModalType extends AbstractType
         return 'media_version_modal';
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'required' => false,
@@ -29,7 +29,7 @@ class MediaVersionModalType extends AbstractType
         $resolver->setAllowedTypes('media_types', ['null', 'array']);
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('media', MediaModalType::class, [
             'required' => $options['required'],

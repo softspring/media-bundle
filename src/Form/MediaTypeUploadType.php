@@ -23,7 +23,7 @@ class MediaTypeUploadType extends AbstractType
         $this->mediaManager = $mediaManager;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => $this->mediaManager->getEntityClass(),
@@ -34,7 +34,7 @@ class MediaTypeUploadType extends AbstractType
         $resolver->setAllowedTypes('media_type', 'string');
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $typeDefinition = $this->mediaTypesCollection->getType($options['media_type']);
 
