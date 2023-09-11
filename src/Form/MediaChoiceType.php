@@ -29,7 +29,7 @@ class MediaChoiceType extends AbstractType
         return EntityType::class;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'class' => MediaInterface::class,
@@ -85,7 +85,7 @@ class MediaChoiceType extends AbstractType
         });
     }
 
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['image_attr'] = $options['media_attr'] + $options['image_attr'];
         $view->vars['video_attr'] = $options['media_attr'] + $options['video_attr'];

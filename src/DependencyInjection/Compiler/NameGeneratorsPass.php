@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class NameGeneratorsPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $nameGenerators = $container->getDefinition(NameGenerators::class);
 

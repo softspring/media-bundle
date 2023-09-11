@@ -15,7 +15,7 @@ abstract class AbstractMediaForm extends AbstractType
         return MediaTypeUploadType::class;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'translation_domain' => 'sfs_media_admin',

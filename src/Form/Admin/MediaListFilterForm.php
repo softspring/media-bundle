@@ -21,7 +21,7 @@ class MediaListFilterForm extends PaginatorForm implements MediaListFilterFormIn
         $this->mediaTypesCollection = $mediaTypesCollection;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
 
@@ -37,7 +37,7 @@ class MediaListFilterForm extends PaginatorForm implements MediaListFilterFormIn
         ]);
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         parent::buildForm($builder, $options);
 
