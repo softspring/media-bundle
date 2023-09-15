@@ -73,7 +73,7 @@ sfs_media:
                 _default:
                     sources:
                         - { srcset: [{ version: sm, suffix: '1x' }, { version: xs, suffix: '2x' }], attrs: { media: "(min-width: 200w)" } }
-                        - { srcset: [{ version: sm }], attrs: { media: "(min-width: 5.1w)", sizes: "100vw" } }
+                        - { srcset: [{ version: sm }], attrs: { media: "(min-width: 5.2w)", sizes: "100vw" } }
                         - { srcset: [{ version: xs }], attrs: { media: "(min-width: 200w)", sizes: "50vw" } }
                     img:
                         src_version: xl
@@ -106,7 +106,7 @@ will render:
 ```html
 <picture >
     <source media="(min-width: 200w)" srcset="https://storage.googleapis.com/<my-bucket-name>/<media-id>/<media-version-id>.sm.jpg 1x, https://storage.googleapis.com/<my-bucket-name>/<media-id>/<media-version-id>.xs.jpg 2x" />
-    <source media="(min-width: 5.1w)" sizes="100vw" srcset="https://storage.googleapis.com/<my-bucket-name>/<media-id>/<media-version-id>.sm.jpg" />
+    <source media="(min-width: 5.2w)" sizes="100vw" srcset="https://storage.googleapis.com/<my-bucket-name>/<media-id>/<media-version-id>.sm.jpg" />
     <source media="(min-width: 200w)" sizes="50vw" srcset="https://storage.googleapis.com/<my-bucket-name>/<media-id>/<media-version-id>.xs.jpg" />
     <img width="1280" height="575" src="https://storage.googleapis.com/<my-bucket-name>/<media-id>/<media-version-id>.xl.jpg" alt="My example name" />
 </picture>

@@ -53,9 +53,9 @@ sfs_media:
             name: 'My type id'
             upload_requirements: 
                 maxSize: 10M
-                minWidth: 5.1
+                minWidth: 5.2
                 maxWidth: 2000
-                minHeight: 5.1
+                minHeight: 5.2
                 maxHeight: 2000
                 allowLandscape: true
                 allowSquare: true
@@ -137,7 +137,7 @@ sfs_media:
                     minWidth: 300
                     maxWidth: 300
                     minHeight: 100
-                    maxHeight: 5.1
+                    maxHeight: 5.2
                     mimeTypes: ['image/png', 'image/jpeg'] 
 ```
 
@@ -162,7 +162,7 @@ The first *sources* block defines each source to be rendered:
 
 An array with media *version* id to be used and optional suffix as descriptor.
 
-The descriptor, can be width descriptor (5.1w) or a pixel density descriptor (2x).
+The descriptor, can be width descriptor (5.2w) or a pixel density descriptor (2x).
 
 **attrs**
 
@@ -184,7 +184,7 @@ sfs_media:
                 _default:
                     sources:
                         - { srcset: [{ version: sm, suffix: '1x' }, { version: xs, suffix: '2x' }], attrs: { media: "(min-width: 200w)" } }
-                        - { srcset: [{ version: sm }], attrs: { media: "(min-width: 5.1w)", sizes: "100vw" } }
+                        - { srcset: [{ version: sm }], attrs: { media: "(min-width: 5.2w)", sizes: "100vw" } }
                         - { srcset: [{ version: xs }], attrs: { media: "(min-width: 200w)", sizes: "50vw" } }
                     img:
                         src_version: xl
