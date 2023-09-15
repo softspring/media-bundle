@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class MediaTypeProvidersPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $mediaTypesCollection = $container->getDefinition(MediaTypesCollection::class);
 

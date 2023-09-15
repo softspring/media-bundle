@@ -16,14 +16,14 @@ class TypeRequirementsType extends AbstractType
         return 'type_requirements';
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'label_format' => 'type_requirements_type.%name%.label',
         ]);
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('minWidth', IntegerType::class);
 
