@@ -13,7 +13,7 @@
 #   Unused parameters, methods, properties
 # More details at https://phpmd.org/
 
-name: PHPMD
+name: Code Quality
 
 on:
   push:
