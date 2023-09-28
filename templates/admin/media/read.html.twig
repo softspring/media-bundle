@@ -82,7 +82,12 @@
                     <h4>{{ version.version }}</h4>
                     <div>
                         {% if media.isVideo %}
-                            {{ media|sfs_media_render_video(version.version, {'class':'img-'~version.version, 'controls': ''}) }}
+                            {% if version.fileMimeType starts with 'image/' %}
+                                {# can be a poster #}
+                                {{ media|sfs_media_render_image(version.version, {'class':'img-'~version.version}) }}
+                            {% else %}
+                                {{ media|sfs_media_render_video(version.version, {'class':'img-'~version.version}) }}
+                            {% endif %}
                         {% elseif media.isImage %}
                             {{ media|sfs_media_render_image(version.version, {'class':'img-'~version.version}) }}
                         {% endif %}
@@ -121,15 +126,19 @@
         {% endfor %}
     {% endif %}
 
-    {% if type_config.video_sources|length %}
-        <div class="container p-4">
-            <div class="row">
-                <div class="col">
-                    <h6>HTML</h6>
-                    <pre><code>{{ media|sfs_media_render_video_set|replace({'>':">\n"})|e('html') }}</code></pre>
+    {% if type_config.video_sets|length %}
+        {% for video_set_id, config in type_config.video_sets %}
+            <div class="container p-4">
+                <div class="row">
+                    <div class="col">
+                        <h3>Video sources set: {{ video_set_id }}</h3>
+                        <pre><code>&#123;&#123; media|sfs_media_render_video_set('{{ video_set_id }}') &#125;&#125;
+
+{{ media|sfs_media_render_video_set(video_set_id)|replace({'>':">\n"})|e('html') }}</code></pre>
+                    </div>
                 </div>
             </div>
-        </div>
+        {% endfor %}
     {% endif %}
 
 

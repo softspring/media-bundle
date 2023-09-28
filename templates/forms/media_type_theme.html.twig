@@ -69,6 +69,9 @@
             {% for picture,config in sfs_media_type_config(form.vars.data)['pictures']|default([]) %}
                 {% set attr = attr|merge({('data-media-picture-'~picture): form.vars.data|sfs_media_render_picture(picture)}) %}
             {% endfor %}
+            {% for video_set,config in sfs_media_type_config(form.vars.data)['video_sets']|default([]) %}
+                {% set attr = attr|merge({('data-media-video-set-'~video_set): form.vars.data|sfs_media_render_video_set(video_set)}) %}
+            {% endfor %}
         {% endfor %}
     {% endif %}
 
@@ -123,6 +126,9 @@
                 {% if form.media.vars.data %}
                     {% for picture,config in sfs_media_type_config(form.media.vars.data)['pictures']|default([]) %}
                         <li><a class="dropdown-item" data-media-version-value="picture#{{ picture }}" href="#">{{ picture }}</a></li>
+                    {% endfor %}
+                    {% for video_set,config in sfs_media_type_config(form.media.vars.data)['video_sets']|default([]) %}
+                        <li><a class="dropdown-item" data-media-version-value="videoSet#{{ video_set }}" href="#">{{ video_set }}</a></li>
                     {% endfor %}
                 {% endif %}
             </ul>
