@@ -77,6 +77,9 @@ class MediaModalType extends AbstractType
                 if (!empty($typeConfig['pictures'])) {
                     $options['media_types'][$type]['picture'] = array_keys($typeConfig['pictures']);
                 }
+                if (!empty($typeConfig['video_sets'])) {
+                    $options['media_types'][$type]['video_sets'] = array_keys($typeConfig['video_sets']);
+                }
             }
         } else {
             foreach ($options['media_types'] as $type => $typeConfig) {

@@ -55,6 +55,9 @@
                         {% for picture,config in sfs_media_type_config(media)['pictures']|default([]) %}
                             data-media-picture-{{ picture }}="{{ media|sfs_media_render_picture(picture)|e }}"
                         {% endfor %}
+                        {% for video_set,config in sfs_media_type_config(media)['video_sets']|default([]) %}
+                            data-media-video-set-{{ video_set }}="{{ media|sfs_media_render_video_set(video_set)|e }}"
+                        {% endfor %}
                     >
                         {% if media.isImage %}
                         <div style="min-height:200px; max-height: 200px; width: auto; display: flex; align-items: center;" class="card-img-top bg-light overflow-hidden">

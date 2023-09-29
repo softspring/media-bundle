@@ -200,7 +200,7 @@ if (mediaTypeModal) {
 
         // clean previews data versions
         for (let key in mediaInput.dataset) {
-            if (!key.match(/^(mediaImage|mediaVideo|mediaPicture)/i)) {
+            if (!key.match(/^(mediaImage|mediaVideo|mediaPicture|mediaVideoSet)/i)) {
                 continue;
             }
             delete mediaInput.dataset[key];
@@ -211,7 +211,7 @@ if (mediaTypeModal) {
         mediaInput.dataset.mediaType = selectedMedia.dataset.mediaType;
         // propagate data version
         for (let key in selectedMedia.dataset) {
-            if (!key.match(/^(mediaImage|mediaVideo|mediaPicture)/i)) {
+            if (!key.match(/^(mediaImage|mediaVideo|mediaPicture|mediaVideoSet)/i)) {
                 continue;
             }
             mediaInput.dataset[key] = selectedMedia.dataset[key];
@@ -221,13 +221,15 @@ if (mediaTypeModal) {
                     let versionValue = key.replace(/^mediaImage\-?/i, '');
                     versionValue = versionValue.charAt(0).toLowerCase() + versionValue.slice(1);
                     versionSelect.insertAdjacentHTML('beforeend', '<li><a class="dropdown-item" data-media-version-value="image#'+versionValue+'" href="#">'+versionValue+'</a></li>');
-                }
-                if (key.match(/^mediaVideo/i)) {
+                } else if (key.match(/^mediaVideoSet/i)) {
+                    let versionValue = key.replace(/^mediaVideoSet\-?/i, '');
+                    versionValue = versionValue.charAt(0).toLowerCase() + versionValue.slice(1);
+                    versionSelect.insertAdjacentHTML('beforeend', '<li><a class="dropdown-item" data-media-version-value="videoSet#'+versionValue+'" href="#">'+versionValue+'</a></li>');
+                } else if (key.match(/^mediaVideo/i)) {
                     let versionValue = key.replace(/^mediaVideo\-?/i, '');
                     versionValue = versionValue.charAt(0).toLowerCase() + versionValue.slice(1);
                     versionSelect.insertAdjacentHTML('beforeend', '<li><a class="dropdown-item" data-media-version-value="video#'+versionValue+'" href="#">'+versionValue+'</a></li>');
-                }
-                if (key.match(/^mediaPicture/i)) {
+                } else if (key.match(/^mediaPicture/i)) {
                     let versionValue = key.replace(/^mediaPicture\-?/i, '');
                     versionValue = versionValue.charAt(0).toLowerCase() + versionValue.slice(1);
                     versionSelect.insertAdjacentHTML('beforeend', '<li><a class="dropdown-item" data-media-version-value="picture#'+versionValue+'" href="#">'+versionValue+'</a></li>');
@@ -323,7 +325,7 @@ if (mediaTypeModal) {
 
         // propagate data version
         for (let key in mediaInput.dataset) {
-            if (!key.match(/^(mediaImage|mediaVideo|mediaPicture)/i)) {
+            if (!key.match(/^(mediaImage|mediaVideo|mediaPicture|mediaVideoSet)/i)) {
                 continue;
             }
             delete mediaInput.dataset[key]
