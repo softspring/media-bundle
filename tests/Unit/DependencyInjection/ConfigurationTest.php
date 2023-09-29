@@ -153,7 +153,7 @@ class ConfigurationTest extends TestCase
                     ],
                     'pictures' => [
                     ],
-                    'video_sources' => [
+                    'video_sets' => [
                     ],
                 ],
             ],

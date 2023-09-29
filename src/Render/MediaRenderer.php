@@ -63,11 +63,14 @@ class MediaRenderer
             case 'video':
                 return $this->renderVideo($media, $versionName, $attr);
 
+            case 'videoSet':
+                return $this->renderVideoWithSources($media, $versionName, $attr);
+
             case 'picture':
                 return $this->renderPicture($media, $versionName, $attr);
 
             default:
-                throw new \Exception('Invalid $versionString, valid names are (image|video|picture)#<versionName>');
+                throw new \Exception('Invalid $versionString, valid names are (image|video|picture|videoSet)#<versionName>');
         }
     }
 
@@ -84,6 +87,11 @@ class MediaRenderer
         } else {
             if (!$mediaVersion = $media->getVersion($version)) {
                 return '';
+            }
+
+            // it could be the poster
+            if (str_starts_with($mediaVersion->getFileMimeType(), 'image/')) {
+                return $this->renderImgTag($mediaVersion, $attr);
             }
 
             return $this->renderVideoTag($mediaVersion, $attr);
@@ -142,7 +150,9 @@ class MediaRenderer
 
     protected function htmlAttributes(array $attributes): string
     {
-        array_walk($attributes, function (&$value, $attribute) { $value = "$attribute=\"$value\""; });
+        array_walk($attributes, function (&$value, $attribute) {
+            $value = "$attribute=\"$value\"";
+        });
 
         return implode(' ', $attributes);
     }
@@ -186,18 +196,19 @@ class MediaRenderer
     {
         $config = $this->mediaTypesCollection->getType($media->getType());
 
-        if (!isset($config['video_sources'][$video])) {
-            throw new \Exception('video_sources config is not set for '.$media->getType());
+        if (!isset($config['video_sets'][$video])) {
+            throw new \Exception('video_sets config is not set for '.$media->getType());
         }
 
-        if (isset($videoTagAttr['controls']) && false !== $videoTagAttr['controls']) {
-            $videoTagAttr['controls'] = '';
-        } else {
-            unset($videoTagAttr['controls']);
+        $attrs = array_merge($config['video_sets'][$video]['attrs'] ?? [], $videoTagAttr);
+
+        if (!empty($config['video_sets'][$video]['poster_version'])) {
+            $posterVersion = $media->getVersion($config['video_sets'][$video]['poster_version']);
+            $attrs['poster'] = $this->getFinalUrl($posterVersion);
         }
 
-        $html = '<video '.$this->htmlAttributes($videoTagAttr).'>';
-        foreach ($config['video_sources'][$video]['sources'] ?? [] as $source) {
+        $html = '<video '.$this->htmlAttributes($attrs).'>';
+        foreach ($config['video_sets'][$video]['sources'] ?? [] as $source) {
             $version = $media->getVersion($source['version']);
 
             if (!$version) {

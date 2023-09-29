@@ -158,7 +158,7 @@ class Configuration implements ConfigurationInterface
                             ->append($this->getUploadRequirementsNode())
                             ->append($this->getVersionsNode())
                             ->append($this->getPicturesNode())
-                            ->append($this->getVideoSourcessNode())
+                            ->append($this->getVideoSetssNode())
                         ->end()
                     ->end()
                 ->end()
@@ -270,12 +270,12 @@ class Configuration implements ConfigurationInterface
         return $node;
     }
 
-    public function getVideoSourcessNode(): NodeDefinition
+    public function getVideoSetssNode(): NodeDefinition
     {
-        $treeBuilder = new TreeBuilder('video_sources');
+        $treeBuilder = new TreeBuilder('video_sets');
 
         /** @var ArrayNodeDefinition $connectionNode */
-        $node = method_exists(TreeBuilder::class, 'getRootNode') ? $treeBuilder->getRootNode() : $treeBuilder->root('video_sources');
+        $node = method_exists(TreeBuilder::class, 'getRootNode') ? $treeBuilder->getRootNode() : $treeBuilder->root('video_sets');
 
         $node
             ->useAttributeAsKey('key')
@@ -290,6 +290,10 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                         ->end()
+                    ->end()
+                    ->scalarNode('poster_version')->end()
+                    ->arrayNode('attrs')
+                        ->scalarPrototype()->end()
                     ->end()
                 ->end()
             ->end()
