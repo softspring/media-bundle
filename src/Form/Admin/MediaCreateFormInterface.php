@@ -2,8 +2,8 @@
 
 namespace Softspring\MediaBundle\Form\Admin;
 
-use Softspring\Component\CrudlController\Form\EntityCreateFormInterface;
+use Symfony\Component\Form\FormTypeInterface;
 
-interface MediaCreateFormInterface extends EntityCreateFormInterface
+interface MediaCreateFormInterface extends FormTypeInterface
 {
 }
