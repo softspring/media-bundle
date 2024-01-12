@@ -2,8 +2,10 @@
 
 namespace Softspring\MediaBundle\EventListener\Admin;
 
+use Softspring\Component\CrudlController\Event\CreateEntityEvent;
 use Softspring\Component\CrudlController\Event\FormPrepareEvent;
 use Softspring\Component\CrudlController\Event\GetResponseEntityEvent;
+use Softspring\Component\CrudlController\Event\InitializeEvent;
 use Softspring\Component\Events\ViewEvent;
 use Softspring\MediaBundle\EntityManager\MediaManagerInterface;
 use Softspring\MediaBundle\Helper\TypeChecker;
@@ -31,11 +33,11 @@ class MediaListener implements EventSubscriberInterface
             SfsMediaEvents::ADMIN_MEDIAS_LIST_VIEW => 'onListViewAddTypes',
             'sfs_media.search_filter.list_view' => 'onListViewAddTypes',
 
-            SfsMediaEvents::ADMIN_MEDIAS_CREATE_INITIALIZE => 'onCreateInitializeAddType',
+            SfsMediaEvents::ADMIN_MEDIAS_CREATE_ENTITY => 'onCreateCreateEntity',
             SfsMediaEvents::ADMIN_MEDIAS_CREATE_FORM_PREPARE => 'onCreateFormPrepare',
             SfsMediaEvents::ADMIN_MEDIAS_CREATE_VIEW => 'onCreateViewAddTypeConfig',
 
-            SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_INITIALIZE => 'onCreateInitializeAddType',
+            SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_ENTITY => 'onCreateCreateEntity',
             SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_FORM_PREPARE => 'onCreateFormPrepare',
             SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_VIEW => 'onCreateViewAddTypeConfig',
             SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_SUCCESS => 'onAjaxCreateSuccess',
@@ -49,13 +51,11 @@ class MediaListener implements EventSubscriberInterface
         $event->getData()['media_types'] = $this->mediaTypesCollection->getTypes();
     }
 
-    public function onCreateInitializeAddType(GetResponseEntityEvent $event): void
+    public function onCreateCreateEntity(CreateEntityEvent $event): void
     {
         $type = $event->getRequest()->attributes->get('type');
-
-        /** @var MediaInterface $media */
-        $media = $event->getEntity();
-        $this->mediaManager->createEntityForType($type, $media);
+        $media = $this->mediaManager->createEntityForType($type);
+        $event->setEntity($media);
     }
 
     public function onCreateFormPrepare(FormPrepareEvent $event): void
