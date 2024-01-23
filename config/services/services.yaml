@@ -55,3 +55,7 @@ services:
     Softspring\MediaBundle\EntityListener\MediaListener:
         tags:
             - { name: 'doctrine.orm.entity_listener', event: 'preFlush', entity: 'Softspring\MediaBundle\Model\Media',  priority: 10 }
+
+    Softspring\MediaBundle\Security\Voter\DeprecatedPermissionVoter:
+        tags:
+            - { name: security.voter, priority: 1000 }
