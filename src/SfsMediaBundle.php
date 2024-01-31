@@ -17,7 +17,7 @@ class SfsMediaBundle extends Bundle
         return \dirname(__DIR__);
     }
 
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 
@@ -35,7 +35,7 @@ class SfsMediaBundle extends Bundle
     /**
      * @param string|bool $enablingParameter
      */
-    private function addRegisterMappingsPass(ContainerBuilder $container, array $mappings, $enablingParameter = false)
+    private function addRegisterMappingsPass(ContainerBuilder $container, array $mappings, $enablingParameter = false): void
     {
         $container->addCompilerPass(DoctrineOrmMappingsPass::createXmlMappingDriver($mappings, ['sfs_media.entity_manager_name'], $enablingParameter));
     }
