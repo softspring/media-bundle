@@ -5,7 +5,6 @@ namespace Softspring\MediaBundle\EventListener\Admin;
 use Softspring\Component\CrudlController\Event\CreateEntityEvent;
 use Softspring\Component\CrudlController\Event\FormPrepareEvent;
 use Softspring\Component\CrudlController\Event\GetResponseEntityEvent;
-use Softspring\Component\CrudlController\Event\InitializeEvent;
 use Softspring\Component\Events\ViewEvent;
 use Softspring\MediaBundle\EntityManager\MediaManagerInterface;
 use Softspring\MediaBundle\Helper\TypeChecker;
