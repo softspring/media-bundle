@@ -1,6 +1,11 @@
-const mediaTypeModal = document.getElementById('mediaTypeModal')
+import {Modal} from 'bootstrap';
 
-if (mediaTypeModal) {
+window.addEventListener('load', (event) => {
+    const mediaTypeModal = document.getElementById('mediaTypeModal')
+
+    if (!mediaTypeModal) {
+        return;
+    }
 
     let modalSearchUrl = '';
 
@@ -57,7 +62,7 @@ if (mediaTypeModal) {
                     loadSearchPage(searchForm.action + '?' + asString);
                 }
 
-                document.querySelectorAll('.modal-media .page-link').forEach(function(link) {
+                document.querySelectorAll('.modal-media .page-link').forEach(function (link) {
                     link.dataset.pageHref = link.href;
                     link.setAttribute('href', '#');
                 });
@@ -140,7 +145,7 @@ if (mediaTypeModal) {
     document.addEventListener('click', function (event) {
         let media = null;
         if (!event.target || !event.target.hasAttribute('data-media-type')) {
-            for (i = 0; i < event.composedPath().length; i++) {
+            for (let i = 0; i < event.composedPath().length; i++) {
                 if (event.composedPath()[i] instanceof Element && event.composedPath()[i].matches('[data-media-type]')) {
                     media = event.composedPath()[i];
                     break;
@@ -169,7 +174,7 @@ if (mediaTypeModal) {
     document.addEventListener('dblclick', function (event) {
         let media = null;
         if (!event.target || !event.target.hasAttribute('data-media-type')) {
-            for (i = 0; i < event.composedPath().length; i++) {
+            for (let i = 0; i < event.composedPath().length; i++) {
                 if (event.composedPath()[i] instanceof Element && event.composedPath()[i].matches('[data-media-type]')) {
                     media = event.composedPath()[i];
                     break;
@@ -186,11 +191,10 @@ if (mediaTypeModal) {
         selectMedia(media);
     });
 
-    function selectMedia(selectedMedia)
-    {
+    function selectMedia(selectedMedia) {
         const mediaInput = document.getElementById(mediaTypeModal.clickedButton.dataset.mediaTypeField);
-        const mediaInputWidget = document.getElementById(mediaTypeModal.clickedButton.dataset.mediaTypeField+'_widget');
-        const versionSelector = document.querySelector('[data-media-type-select-version][data-media-type-field='+mediaInput.id+']');
+        const mediaInputWidget = document.getElementById(mediaTypeModal.clickedButton.dataset.mediaTypeField + '_widget');
+        const versionSelector = document.querySelector('[data-media-type-select-version][data-media-type-field=' + mediaInput.id + ']');
         let versionSelect;
 
         if (versionSelector) {
@@ -220,19 +224,19 @@ if (mediaTypeModal) {
                 if (key.match(/^mediaImage/i)) {
                     let versionValue = key.replace(/^mediaImage\-?/i, '');
                     versionValue = versionValue.charAt(0).toLowerCase() + versionValue.slice(1);
-                    versionSelect.insertAdjacentHTML('beforeend', '<li><a class="dropdown-item" data-media-version-value="image#'+versionValue+'" href="#">'+versionValue+'</a></li>');
+                    versionSelect.insertAdjacentHTML('beforeend', '<li><a class="dropdown-item" data-media-version-value="image#' + versionValue + '" href="#">' + versionValue + '</a></li>');
                 } else if (key.match(/^mediaVideoSet/i)) {
                     let versionValue = key.replace(/^mediaVideoSet\-?/i, '');
                     versionValue = versionValue.charAt(0).toLowerCase() + versionValue.slice(1);
-                    versionSelect.insertAdjacentHTML('beforeend', '<li><a class="dropdown-item" data-media-version-value="videoSet#'+versionValue+'" href="#">'+versionValue+'</a></li>');
+                    versionSelect.insertAdjacentHTML('beforeend', '<li><a class="dropdown-item" data-media-version-value="videoSet#' + versionValue + '" href="#">' + versionValue + '</a></li>');
                 } else if (key.match(/^mediaVideo/i)) {
                     let versionValue = key.replace(/^mediaVideo\-?/i, '');
                     versionValue = versionValue.charAt(0).toLowerCase() + versionValue.slice(1);
-                    versionSelect.insertAdjacentHTML('beforeend', '<li><a class="dropdown-item" data-media-version-value="video#'+versionValue+'" href="#">'+versionValue+'</a></li>');
+                    versionSelect.insertAdjacentHTML('beforeend', '<li><a class="dropdown-item" data-media-version-value="video#' + versionValue + '" href="#">' + versionValue + '</a></li>');
                 } else if (key.match(/^mediaPicture/i)) {
                     let versionValue = key.replace(/^mediaPicture\-?/i, '');
                     versionValue = versionValue.charAt(0).toLowerCase() + versionValue.slice(1);
-                    versionSelect.insertAdjacentHTML('beforeend', '<li><a class="dropdown-item" data-media-version-value="picture#'+versionValue+'" href="#">'+versionValue+'</a></li>');
+                    versionSelect.insertAdjacentHTML('beforeend', '<li><a class="dropdown-item" data-media-version-value="picture#' + versionValue + '" href="#">' + versionValue + '</a></li>');
                 }
             }
         }
@@ -257,14 +261,8 @@ if (mediaTypeModal) {
             }
         }
 
-        if (window.bootstrap === undefined) {
-            console.error('media-type modal script requires window.bootstrap defined. You can define it with:\n\n' +
-                'import * as bootstrap from \'bootstrap\';\n' +
-                'window.bootstrap = bootstrap;')
-        }
-
         // hides modal
-        window.bootstrap.Modal.getInstance(mediaTypeModal).hide();
+        Modal.getInstance(mediaTypeModal).hide();
 
         mediaInputWidget.querySelector('[data-media-type-clean]').classList.remove('disabled');
         let selectVersion = mediaInputWidget.querySelector('[data-media-type-select-version]');
@@ -302,8 +300,8 @@ if (mediaTypeModal) {
         }
 
         const mediaInput = document.getElementById(cleanButton.dataset.mediaTypeField);
-        const mediaInputWidget = document.getElementById(cleanButton.dataset.mediaTypeField+'_widget');
-        const versionSelector = document.querySelector('[data-media-type-select-version][data-media-type-field='+mediaInput.id+']');
+        const mediaInputWidget = document.getElementById(cleanButton.dataset.mediaTypeField + '_widget');
+        const versionSelector = document.querySelector('[data-media-type-select-version][data-media-type-field=' + mediaInput.id + ']');
 
         mediaInput.value = '';
         document.getElementById(cleanButton.dataset.mediaTypeField + '_text').innerHTML = '';
@@ -357,24 +355,25 @@ if (mediaTypeModal) {
         // dispatches media version selected event
         mediaVersionInput.dispatchEvent(new Event('sfs_media.select_version', {bubbles: true}));
     });
-}
 
-document.addEventListener('change', function (event) {
-    if (!event.target.matches('#media_create_form__original_upload')) {
-        return;
-    }
 
-    document.getElementById('media_create_form_name').value = event.target.files[0].name;
+    document.addEventListener('change', function (event) {
+        if (!event.target.matches('#media_create_form__original_upload')) {
+            return;
+        }
 
-    const originalPreview = document.getElementById('media_create_form__original_preview');
+        document.getElementById('media_create_form_name').value = event.target.files[0].name;
 
-    if (originalPreview && event.target.files.length > 0){
-        const src = URL.createObjectURL(event.target.files[0]);
-        const preview = document.createElement('img');
-        preview.src = src;
-        preview.classList.add('img-fluid');
+        const originalPreview = document.getElementById('media_create_form__original_preview');
 
-        originalPreview.innerHTML = '';
-        originalPreview.appendChild(preview);
-    }
-})
+        if (originalPreview && event.target.files.length > 0) {
+            const src = URL.createObjectURL(event.target.files[0]);
+            const preview = document.createElement('img');
+            preview.src = src;
+            preview.classList.add('img-fluid');
+
+            originalPreview.innerHTML = '';
+            originalPreview.appendChild(preview);
+        }
+    })
+});
