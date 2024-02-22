@@ -4,30 +4,6 @@ namespace Softspring\MediaBundle;
 
 class SfsMediaEvents
 {
-    public const ADMIN_TYPES_LIST_INITIALIZE = 'sfs_media.admin.types.list_initialize';
-    public const ADMIN_TYPES_LIST_VIEW = 'sfs_media.admin.types.list_view';
-
-    public const ADMIN_TYPES_CREATE_INITIALIZE = 'sfs_media.admin.types.create_initialize';
-    public const ADMIN_TYPES_CREATE_FORM_VALID = 'sfs_media.admin.types.create_form_valid';
-    public const ADMIN_TYPES_CREATE_SUCCESS = 'sfs_media.admin.types.create_success';
-    public const ADMIN_TYPES_CREATE_FORM_INVALID = 'sfs_media.admin.types.create_form_invalid';
-    public const ADMIN_TYPES_CREATE_VIEW = 'sfs_media.admin.types.create_view';
-
-    public const ADMIN_TYPES_UPDATE_INITIALIZE = 'sfs_media.admin.types.update_initialize';
-    public const ADMIN_TYPES_UPDATE_FORM_VALID = 'sfs_media.admin.types.update_form_valid';
-    public const ADMIN_TYPES_UPDATE_SUCCESS = 'sfs_media.admin.types.update_success';
-    public const ADMIN_TYPES_UPDATE_FORM_INVALID = 'sfs_media.admin.types.update_form_invalid';
-    public const ADMIN_TYPES_UPDATE_VIEW = 'sfs_media.admin.types.update_view';
-
-    public const ADMIN_TYPES_DELETE_INITIALIZE = 'sfs_media.admin.types.delete_initialize';
-    public const ADMIN_TYPES_DELETE_FORM_VALID = 'sfs_media.admin.types.delete_form_valid';
-    public const ADMIN_TYPES_DELETE_SUCCESS = 'sfs_media.admin.types.delete_success';
-    public const ADMIN_TYPES_DELETE_FORM_INVALID = 'sfs_media.admin.types.delete_form_invalid';
-    public const ADMIN_TYPES_DELETE_VIEW = 'sfs_media.admin.types.delete_view';
-
-    public const ADMIN_TYPES_READ_INITIALIZE = 'sfs_media.admin.types.read_initialize';
-    public const ADMIN_TYPES_READ_VIEW = 'sfs_media.admin.types.read_view';
-
     // MEDIA LIST EVENTS
     public const ADMIN_MEDIAS_LIST_INITIALIZE = 'sfs_media.admin.medias.list_initialize';
     public const ADMIN_MEDIAS_LIST_FILTER_FORM_PREPARE = 'sfs_media.admin.medias.filter_form_prepare';
@@ -94,4 +70,20 @@ class SfsMediaEvents
     public const ADMIN_MEDIAS_READ_FOUND = 'sfs_media.admin.medias.read_found';
     public const ADMIN_MEDIAS_READ_VIEW = 'sfs_media.admin.medias.read_view';
     public const ADMIN_MEDIAS_READ_EXCEPTION = 'sfs_media.admin.medias.read_exception';
+    // MEDIA MIGRATE EVENTS
+    public const ADMIN_MEDIAS_MIGRATE_INITIALIZE = 'sfs_media.admin.medias.migrate_initialize';
+    public const ADMIN_MEDIAS_MIGRATE_LOAD_ENTITY = 'sfs_media.admin.medias.migrate_load_entity';
+    public const ADMIN_MEDIAS_MIGRATE_NOT_FOUND = 'sfs_media.admin.medias.migrate_not_found';
+    public const ADMIN_MEDIAS_MIGRATE_FOUND = 'sfs_media.admin.medias.migrate_found';
+    public const ADMIN_MEDIAS_MIGRATE_APPLY = 'sfs_media.admin.medias.migrate_apply';
+    public const ADMIN_MEDIAS_MIGRATE_SUCCESS = 'sfs_media.admin.medias.migrate_success';
+    public const ADMIN_MEDIAS_MIGRATE_FAILURE = 'sfs_media.admin.medias.migrate_failure';
+    public const ADMIN_MEDIAS_MIGRATE_EXCEPTION = 'sfs_media.admin.medias.migrate_exception';
+    // MEDIA SEARCH TYPE EVENTS
+    public const ADMIN_MEDIAS_SEARCH_TYPE_INITIALIZE = 'sfs_media.admin.medias.search_type_initialize';
+    public const ADMIN_MEDIAS_SEARCH_TYPE_FILTER_FORM_PREPARE = 'sfs_media.admin.medias.search_type_filter_form_prepare';
+    public const ADMIN_MEDIAS_SEARCH_TYPE_FILTER_FORM_INIT = 'sfs_media.admin.medias.search_type_filter_form_init';
+    public const ADMIN_MEDIAS_SEARCH_TYPE_FILTER = 'sfs_media.admin.medias.search_type_filter';
+    public const ADMIN_MEDIAS_SEARCH_TYPE_VIEW = 'sfs_media.admin.medias.search_type_view';
+    public const ADMIN_MEDIAS_SEARCH_TYPE_EXCEPTION = 'sfs_media.admin.medias.search_type_exception';
 }

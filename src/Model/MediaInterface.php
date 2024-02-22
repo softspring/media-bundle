@@ -34,7 +34,7 @@ interface MediaInterface
     public function setDescription(?string $description): void;
 
     /**
-     * @return Collection|MediaVersionInterface[]
+     * @return Collection<MediaVersionInterface>
      */
     public function getVersions(): Collection;
 

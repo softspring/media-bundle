@@ -4,9 +4,13 @@ namespace Softspring\MediaBundle\EntityManager;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Softspring\Component\CrudlController\Manager\CrudlEntityManagerTrait;
+use Softspring\MediaBundle\Exception\InvalidTypeException;
+use Softspring\MediaBundle\Exception\MigrateMediaException;
+use Softspring\MediaBundle\Helper\TypeChecker;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
 use Softspring\MediaBundle\Type\MediaTypesCollection;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class MediaManager implements MediaManagerInterface
 {
@@ -81,5 +85,76 @@ class MediaManager implements MediaManagerInterface
         $media->addVersion($version);
 
         return $version;
+    }
+
+    /**
+     * @throws MigrateMediaException
+     * @throws InvalidTypeException
+     */
+    public function migrate(MediaInterface $media, OutputInterface $output = null): void
+    {
+        $typeConfig = $this->mediaTypesCollection->getType($media->getType());
+
+        $checkVersions = TypeChecker::checkMedia($media, $typeConfig);
+
+        foreach ($checkVersions['ok'] as $versionId) {
+            if ('_original' !== $versionId) {
+                $output && $output->writeln(sprintf(' - version "%s" is <fg=green>OK</>', $versionId));
+            }
+        }
+
+        foreach ($checkVersions['new'] as $versionId) {
+            $output && $output->write(sprintf(' - version "%s" is new in config, needs to be created: ', $versionId));
+            try {
+                $version = $this->generateVersionEntity($media, $versionId);
+                $this->mediaVersionManager->saveEntity($version);
+                $output && $output->writeln('<fg=green>CREATED</>');
+            } catch (\Exception $e) {
+                $message = sprintf('Error creating version %s', $versionId);
+                if ($output) {
+                    $output->writeln("<error>$message</error>");
+                    $output->writeln($e->getMessage());
+                } else {
+                    throw new MigrateMediaException($message, 0, $e);
+                }
+            }
+        }
+
+        foreach ($checkVersions['changed'] as $versionId => $changes) {
+            $changedOptionsString = implode(', ', array_map(fn ($v) => $v['string'], $changes));
+            $output && $output->write(sprintf(' - version "%s" needs to be recreated (%s): ', $versionId, $changedOptionsString));
+            try {
+                $media->removeVersion($oldVersion = $media->getVersion($versionId));
+                $this->mediaVersionManager->deleteEntity($oldVersion);
+                $version = $this->generateVersionEntity($media, $versionId);
+                $this->mediaVersionManager->saveEntity($version);
+                $output && $output->writeln('<fg=green>RECREATED</>');
+            } catch (\Exception $e) {
+                $message = sprintf('Error updating version %s', $versionId);
+                if ($output) {
+                    $output->writeln("<error>$message</error>");
+                    $output->writeln($e->getMessage());
+                } else {
+                    throw new MigrateMediaException($message, 0, $e);
+                }
+            }
+        }
+
+        foreach ($checkVersions['delete'] as $versionId) {
+            $output && $output->write(sprintf(' - version "%s" to be deleted from database (has been deleted from config) ', $versionId));
+            try {
+                $media->removeVersion($version = $media->getVersion($versionId));
+                $this->mediaVersionManager->deleteEntity($version);
+                $output && $output->writeln('<fg=green>DELETED</>');
+            } catch (\Exception $e) {
+                $message = sprintf('Error deleting version %s', $versionId);
+                if ($output) {
+                    $output->writeln("<error>$message</error>");
+                    $output->writeln($e->getMessage());
+                } else {
+                    throw new MigrateMediaException($message, 0, $e);
+                }
+            }
+        }
     }
 }

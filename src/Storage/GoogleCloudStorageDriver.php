@@ -58,4 +58,13 @@ class GoogleCloudStorageDriver implements StorageDriverInterface
             $object->downloadToFile($destPath);
         }
     }
+
+    public function url(string $fileName): string
+    {
+        if (str_starts_with($fileName, 'gs://')) {
+            return 'https://storage.googleapis.com/'.substr($fileName, 5);
+        }
+
+        return $fileName;
+    }
 }

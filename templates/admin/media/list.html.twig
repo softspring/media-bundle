@@ -65,7 +65,11 @@
             {% include '@SfsMedia/admin/media/list-page.html.twig' %}
             {% include '@SfsComponents/paginator/pager.html.twig' with {'collection': entities} %}
         {% else %}
-            UPLOAD FIRST MEDIA
+            <div class="p-5 m-5">
+                <p class="text-center text-muted">
+                    Upload first media
+                </p>
+            </div>
         {% endif %}
     {% endif %}
 {% endblock content %}

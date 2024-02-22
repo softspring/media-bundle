@@ -3,6 +3,7 @@
 namespace Softspring\MediaBundle\Form;
 
 use Softspring\MediaBundle\EntityManager\MediaManagerInterface;
+use Softspring\MediaBundle\Exception\InvalidTypeException;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Type\MediaTypesCollection;
 use Symfony\Component\Form\AbstractType;
@@ -28,12 +29,16 @@ class MediaTypeUploadType extends AbstractType
         $resolver->setDefaults([
             'data_class' => $this->mediaManager->getEntityClass(),
             'media_type' => null,
+            'required_uploads' => true,
         ]);
 
         $resolver->setRequired('media_type');
         $resolver->setAllowedTypes('media_type', 'string');
     }
 
+    /**
+     * @throws InvalidTypeException
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $typeDefinition = $this->mediaTypesCollection->getType($options['media_type']);
@@ -42,8 +47,9 @@ class MediaTypeUploadType extends AbstractType
         $builder->add('description');
 
         $builder->add('_original', MediaVersionUploadType::class, [
-            'property_path' => 'versions[_original]',
+            'property_path' => 'version__original',
             'upload_requirements' => $typeDefinition['upload_requirements'],
+            'required_upload' => $options['required_uploads'],
         ]);
 
         foreach ($typeDefinition['versions'] as $key => $config) {
@@ -51,8 +57,9 @@ class MediaTypeUploadType extends AbstractType
                 continue;
             }
             $builder->add($key, MediaVersionUploadType::class, [
-                'property_path' => "versions[$key]",
+                'property_path' => "version_$key)",
                 'upload_requirements' => $config['upload_requirements'],
+                'required_upload' => $options['required_uploads'],
             ]);
         }
 

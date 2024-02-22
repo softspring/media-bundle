@@ -47,6 +47,12 @@ class Configuration implements ConfigurationInterface
                 })
                 ->thenInvalid('google_cloud_storage config block is required when driver is google_cloud_storage.')
             ->end()
+            ->validate()
+                ->ifTrue(function ($config) {
+                    return 'filesystem' === $config['driver'] && empty($config['filesystem']);
+                })
+                ->thenInvalid('filesystem config block is required when driver is filesystem.')
+            ->end()
 
             ->children()
                 ->scalarNode('entity_manager')
@@ -55,12 +61,19 @@ class Configuration implements ConfigurationInterface
 
                 ->enumNode('driver')
                     ->defaultValue('google_cloud_storage')
-                    ->values(['google_cloud_storage'])
+                    ->values(['filesystem', 'google_cloud_storage'])
                 ->end()
 
                 ->arrayNode('google_cloud_storage')
                     ->children()
                         ->scalarNode('bucket')->isRequired()->end()
+                    ->end()
+                ->end()
+
+                ->arrayNode('filesystem')
+                    ->children()
+                        ->scalarNode('path')->isRequired()->end()
+                        ->scalarNode('url')->isRequired()->end()
                     ->end()
                 ->end()
 

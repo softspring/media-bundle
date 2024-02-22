@@ -5,6 +5,7 @@ namespace Softspring\MediaBundle\EntityManager;
 use Softspring\Component\CrudlController\Manager\CrudlEntityManagerInterface;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 interface MediaManagerInterface extends CrudlEntityManagerInterface
 {
@@ -13,6 +14,8 @@ interface MediaManagerInterface extends CrudlEntityManagerInterface
     public function generateVersionEntities(MediaInterface $media): void;
 
     public function generateVersionEntity(MediaInterface $media, string $versionKey): MediaVersionInterface;
+
+    public function migrate(MediaInterface $media, OutputInterface $output = null): void;
 
     /**
      * @return MediaInterface

@@ -2,6 +2,7 @@
 
 namespace Softspring\MediaBundle\Processor;
 
+use Softspring\MediaBundle\Exception\InvalidTypeException;
 use Softspring\MediaBundle\Media\NameGenerators;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
 use Softspring\MediaBundle\Storage\StorageDriverInterface;
@@ -30,6 +31,9 @@ class StoreFileProcessor implements ProcessorInterface
         return true; // save all files if they have an upload file
     }
 
+    /**
+     * @throws InvalidTypeException
+     */
     public function process(MediaVersionInterface $version): void
     {
         if (!$upload = $version->getUpload()) {
@@ -52,7 +56,7 @@ class StoreFileProcessor implements ProcessorInterface
 
         if (!$version->isKeepTmpFile()) {
             // cleanup tmp image
-            unlink($version->getUpload()->getRealPath());
+            @unlink($version->getUpload()->getRealPath());
         }
 
         $version->setUpload(null);

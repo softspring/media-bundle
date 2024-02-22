@@ -1,0 +1,11 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+        bind:
+            $path: '%sfs_media.storage.filesystem.path%'
+            $url: '%sfs_media.storage.filesystem.url%'
+
+    Softspring\MediaBundle\Storage\StorageDriverInterface:
+        class: Softspring\MediaBundle\Storage\FilesystemStorageDriver

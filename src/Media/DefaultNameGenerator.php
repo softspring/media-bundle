@@ -11,7 +11,7 @@ class DefaultNameGenerator implements NameGeneratorInterface
     {
         if ('_original' === $version) {
             $versionName = '';
-        } elseif ('_' == substr($version, 0, 1)) {
+        } elseif (str_starts_with($version, '_')) {
             $versionName = substr($version, 1);
         } else {
             $versionName = $version;

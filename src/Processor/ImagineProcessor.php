@@ -15,6 +15,9 @@ class ImagineProcessor implements ProcessorInterface
         return 0;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function supports(MediaVersionInterface $version): bool
     {
         if ('_original' === $version->getVersion()) {

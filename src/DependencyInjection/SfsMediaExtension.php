@@ -14,6 +14,9 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class SfsMediaExtension extends Extension implements PrependExtensionInterface
 {
+    /**
+     * @throws \Exception
+     */
     public function load(array $configs, ContainerBuilder $container): void
     {
         $processor = new Processor();
@@ -41,6 +44,12 @@ class SfsMediaExtension extends Extension implements PrependExtensionInterface
         if ('google_cloud_storage' === $config['driver']) {
             $container->setParameter('sfs_media.storage.google_cloud_storage.bucket', $config['google_cloud_storage']['bucket']);
             $loader->load('drivers/google_cloud_storage.yaml');
+        }
+
+        if ('filesystem' === $config['driver']) {
+            $container->setParameter('sfs_media.storage.filesystem.path', $config['filesystem']['path']);
+            $container->setParameter('sfs_media.storage.filesystem.url', $config['filesystem']['url']);
+            $loader->load('drivers/filesystem.yaml');
         }
     }
 

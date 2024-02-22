@@ -11,4 +11,6 @@ interface StorageDriverInterface
     public function remove(string $fileName): void;
 
     public function download(string $fileName, string $destPath): void;
+
+    public function url(string $fileName): string;
 }

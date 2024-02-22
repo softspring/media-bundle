@@ -40,6 +40,9 @@ services:
     Softspring\MediaBundle\Render\:
         resource: '../../src/Render/*'
 
+    Softspring\MediaBundle\Request\:
+        resource: '../../src/Request/*'
+
     Softspring\MediaBundle\Twig\Extension\:
         resource: '../../src/Twig/Extension/*'
         tags: ['twig.extension']
@@ -50,11 +53,15 @@ services:
     Softspring\MediaBundle\EntityListener\MediaVersionListener:
         tags:
             - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'Softspring\MediaBundle\Model\MediaVersion' }
+            - { name: 'doctrine.orm.entity_listener', event: 'preUpdate', entity: 'Softspring\MediaBundle\Model\MediaVersion' }
             - { name: 'doctrine.orm.entity_listener', event: 'preRemove', entity: 'Softspring\MediaBundle\Model\MediaVersion' }
+            - { name: 'doctrine.event_listener', event: 'onFlush' }
 
     Softspring\MediaBundle\EntityListener\MediaListener:
         tags:
             - { name: 'doctrine.orm.entity_listener', event: 'preFlush', entity: 'Softspring\MediaBundle\Model\Media',  priority: 10 }
+            - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'Softspring\MediaBundle\Model\Media',  priority: 10 }
+            - { name: 'doctrine.orm.entity_listener', event: 'preUpdate', entity: 'Softspring\MediaBundle\Model\Media',  priority: 10 }
 
     Softspring\MediaBundle\Security\Voter\DeprecatedPermissionVoter:
         tags:

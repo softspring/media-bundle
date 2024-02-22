@@ -116,6 +116,9 @@
                     data-media-version-type-widget="{{ form.version.vars.id }}_widget"
                     aria-expanded="false">{{ selectedVersion|split('#', 2)[1]|default(selectedVersion) }}</button>
             <ul class="dropdown-menu">
+                {% if form.media.vars.data.versions|default([])|length %}
+                    <li><h6 class="dropdown-header">Media element</h6></li>
+                {% endif %}
                 {% for mediaVersion in form.media.vars.data.versions|default([]) %}
                     {% if form.media.vars.data.isImage() %}
                         <li><a class="dropdown-item" data-media-version-value="image#{{ mediaVersion.version }}" href="#">{{ mediaVersion.version }}</a></li>
@@ -124,9 +127,16 @@
                     {% endif %}
                 {% endfor %}
                 {% if form.media.vars.data %}
+                    {% if sfs_media_type_config(form.media.vars.data)['pictures']|default([])|length %}
+                        <li><h6 class="dropdown-header">Picture element</h6></li>
+                    {% endif %}
                     {% for picture,config in sfs_media_type_config(form.media.vars.data)['pictures']|default([]) %}
                         <li><a class="dropdown-item" data-media-version-value="picture#{{ picture }}" href="#">{{ picture }}</a></li>
                     {% endfor %}
+
+                    {% if sfs_media_type_config(form.media.vars.data)['video_sets']|default([])|length %}
+                        <li><h6 class="dropdown-header">Video sets</h6></li>
+                    {% endif %}
                     {% for video_set,config in sfs_media_type_config(form.media.vars.data)['video_sets']|default([]) %}
                         <li><a class="dropdown-item" data-media-version-value="videoSet#{{ video_set }}" href="#">{{ video_set }}</a></li>
                     {% endfor %}

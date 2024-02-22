@@ -7,6 +7,7 @@ use Softspring\MediaBundle\Entity\Media;
 use Softspring\MediaBundle\Entity\MediaVersion;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Render\MediaRenderer;
+use Softspring\MediaBundle\Storage\FilesystemStorageDriver;
 use Softspring\MediaBundle\Type\ConfigMediaTypeProvider;
 use Softspring\MediaBundle\Type\MediaTypesCollection;
 
@@ -50,7 +51,8 @@ class MediaRendererTest extends TestCase
 
     public function testRenderImages()
     {
-        $renderer = new MediaRenderer(new MediaTypesCollection([new ConfigMediaTypeProvider(self::TYPES)]));
+        $storageDriver = new FilesystemStorageDriver('path', 'url');
+        $renderer = new MediaRenderer(new MediaTypesCollection([new ConfigMediaTypeProvider(self::TYPES)]), $storageDriver);
 
         $media = new Media();
         $media->setMediaType(MediaInterface::MEDIA_TYPE_IMAGE);
@@ -82,20 +84,21 @@ class MediaRendererTest extends TestCase
         $this->assertEquals($expectedLImg, $renderer->renderImage($media, ['bad', 'l'], ['class' => 'img-fluid']));
 
         $versionS = new MediaVersion('s', $media);
-        $versionS->setUrl('gs://bucket/image.s.jpeg');
+        $versionS->setUrl('image.s.jpeg');
         $versionS->setWidth(800);
         $versionS->setHeight(600);
 
-        $expectedLImg = '<img width="800" height="600" class="img-fluid" src="https://storage.googleapis.com/bucket/image.s.jpeg" alt="" />';
+        $expectedLImg = '<img width="800" height="600" class="img-fluid" src="image.s.jpeg" alt="" />';
         $this->assertEquals($expectedLImg, $renderer->renderImage($media, 's', ['class' => 'img-fluid']));
 
-        $expectedPicture = '<picture class="img-fluid"><source media="(min-width: 200w)" srcset="https://example.com/image.l.jpeg 1x, https://example.com/image.xl.jpeg 2x" /><source media="(min-width: 200w)" srcset="https://storage.googleapis.com/bucket/image.s.jpeg" /><img width="1800" height="1600" data-example="1" src="https://example.com/image.xl.jpeg" alt="" /></picture>';
+        $expectedPicture = '<picture class="img-fluid"><source media="(min-width: 200w)" srcset="https://example.com/image.l.jpeg 1x, https://example.com/image.xl.jpeg 2x" /><source media="(min-width: 200w)" srcset="image.s.jpeg" /><img width="1800" height="1600" data-example="1" src="https://example.com/image.xl.jpeg" alt="" /></picture>';
         $this->assertEquals($expectedPicture, $renderer->renderPicture($media, '_default', ['class' => 'img-fluid'], ['data-example' => true]));
     }
 
     public function testPictureException()
     {
-        $renderer = new MediaRenderer(new MediaTypesCollection([new ConfigMediaTypeProvider(self::TYPES)]));
+        $storageDriver = new FilesystemStorageDriver('path', 'url');
+        $renderer = new MediaRenderer(new MediaTypesCollection([new ConfigMediaTypeProvider(self::TYPES)]), $storageDriver);
 
         $media = new Media();
         $media->setMediaType(MediaInterface::MEDIA_TYPE_IMAGE);

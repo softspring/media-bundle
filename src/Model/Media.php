@@ -76,7 +76,7 @@ abstract class Media implements MediaInterface
 
     public function getCreatedAt(): ?\DateTime
     {
-        return $this->createdAt ? \DateTime::createFromFormat('U', "{$this->createdAt}") : null;
+        return $this->createdAt ? \DateTime::createFromFormat('U', "$this->createdAt") : null;
     }
 
     public function markCreatedAtNow(): void
@@ -87,6 +87,15 @@ abstract class Media implements MediaInterface
     public function getVersions(): Collection
     {
         return $this->versions;
+    }
+
+    public function __get($id): ?MediaVersionInterface
+    {
+        if (!str_starts_with($id, 'version_')) {
+            throw new \InvalidArgumentException("Property $id not found");
+        }
+
+        return $this->getVersion(substr($id, 8));
     }
 
     public function addVersion(MediaVersionInterface $version): void

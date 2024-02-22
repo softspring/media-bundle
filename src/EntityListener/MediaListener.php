@@ -3,6 +3,8 @@
 namespace Softspring\MediaBundle\EntityListener;
 
 use Doctrine\ORM\Event\PreFlushEventArgs;
+use Doctrine\ORM\Event\PrePersistEventArgs;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Softspring\MediaBundle\EntityManager\MediaManagerInterface;
 use Softspring\MediaBundle\Model\MediaInterface;
 
@@ -15,9 +17,17 @@ class MediaListener
         $this->mediaManager = $mediaManager;
     }
 
-    public function preFlush(MediaInterface $media, PreFlushEventArgs $eventArgs)
+    public function preFlush(MediaInterface $media, PreFlushEventArgs $eventArgs): void
+    {
+        $this->mediaManager->generateVersionEntities($media);
+    }
+
+    public function prePersist(MediaInterface $media, PrePersistEventArgs $eventArgs): void
     {
         $media->markCreatedAtNow();
-        $this->mediaManager->generateVersionEntities($media);
+    }
+
+    public function preUpdate(MediaInterface $media, PreUpdateEventArgs $eventArgs): void
+    {
     }
 }

@@ -21,7 +21,38 @@ admin_medias:
         meta.title: "%name%"
         title: "%name%"
         breadcrumb: "Details"
+        actions:
+            update.button: "Update media"
+            delete.button: "Delete media"
+            migrate.button: "Migrate configuration"
 
+    delete:
+        meta.title: "%name%"
+        title: "%name%"
+        breadcrumb: "Delete media"
+        message: "Are you sure you want to delete this media?"
+        actions:
+            delete.button: "Delete media"
+            cancel.button: "Cancel"
+        success_flash: "Media deleted successfully"
+        failure_flash: "Media deletion failed.<br/><small>%exception%</small><br/><small>%previous%</small>"
+        exception_flash: "Media deletion failed.<br/><small>%exception%</small><br/><small>%previous%</small>"
+
+    update:
+        meta.title: "%name%"
+        title: "%name%"
+        breadcrumb: "Update media"
+        actions:
+            update.button: "Save changes"
+            cancel.button: "Cancel"
+        success_flash: "Media updated successfully"
+        failure_flash: "Media update failed.<br/><small>%exception%</small><br/><small>%previous%</small>"
+        exception_flash: "Media update failed.<br/><small>%exception%</small><br/><small>%previous%</small>"
+
+    migrate:
+        success_flash: "Media migrated successfully"
+        failure_flash: "Media migration failed.<br/><small>%exception%</small><br/><small>%previous%</small>"
+        exception_flash: "Media migration failed.<br/><small>%exception%</small><br/><small>%previous%</small>"
 
     form:
         name.label: "Name"

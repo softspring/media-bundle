@@ -27,6 +27,12 @@ sfs_media_admin_medias_delete:
     controller: sfs_media.admin.media.controller::delete
     path: /{media}/delete
 
+sfs_media_admin_medias_migrate:
+    controller: sfs_media.admin.media.controller::apply
+    path: /{media}/migrate
+    defaults:
+        configKey: migrate
+
 sfs_media_admin_medias_read:
     controller: sfs_media.admin.media.controller::read
     path: /{media}

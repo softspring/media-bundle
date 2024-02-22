@@ -27,7 +27,7 @@ class ProcessorProvider
         return array_filter($this->processors, fn (ProcessorInterface $processor) => $processor->supports($version));
     }
 
-    public function applyProcessors(MediaVersionInterface $version)
+    public function applyProcessors(MediaVersionInterface $version): void
     {
         foreach ($this->getProcessors($version) as $processor) {
             $processor->process($version);

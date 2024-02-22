@@ -30,6 +30,7 @@ class MediaVersionUploadType extends AbstractType
         $resolver->setDefaults([
             'data_class' => $this->mediaVersionManager->getEntityClass(),
             'upload_requirements' => null,
+            'required_upload' => true,
         ]);
 
         $resolver->setAllowedTypes('upload_requirements', 'array');
@@ -38,7 +39,7 @@ class MediaVersionUploadType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('upload', FileType::class, [
-            'required' => true,
+            'required' => $options['required_upload'],
             'constraints' => new Image($options['upload_requirements']),
         ]);
     }

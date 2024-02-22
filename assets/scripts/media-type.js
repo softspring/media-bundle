@@ -220,6 +220,8 @@ window.addEventListener('load', (event) => {
             }
             mediaInput.dataset[key] = selectedMedia.dataset[key];
 
+            // TODO show dropdown-headers
+
             if (versionSelector) {
                 if (key.match(/^mediaImage/i)) {
                     let versionValue = key.replace(/^mediaImage\-?/i, '');

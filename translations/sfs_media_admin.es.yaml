@@ -21,7 +21,10 @@ admin_medias:
         meta.title: "%name%"
         title: "%name%"
         breadcrumb: "Detalles"
-
+        actions:
+            update.button: "Editar media"
+            delete.button: "Borrar media"
+            migrate.button: "Migrar configuración"
 
     form:
         name.label: "Nombre de la archivo"

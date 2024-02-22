@@ -1,6 +1,6 @@
 {% trans_default_domain 'sfs_media_admin' %}
 {% extends '@SfsMedia/admin_layout.html.twig' %}
-{% block title %}{{ 'admin_medias.delete.meta.title'|trans }}{% endblock %}
+{% block title %}{{ 'admin_medias.delete.meta.title'|trans({'%name%': media.name}) }}{% endblock %}
 
 {% form_theme form
     'bootstrap_5_layout.html.twig'
@@ -10,16 +10,29 @@
 {% block breadcrums_content %}
     {{ parent() }}
     <li class="breadcrumb-item"><a href="{{ url('sfs_media_admin_medias_list') }}">{{ 'admin_medias.list.breadcrumb'|trans }}</a></li>
-    <li class="breadcrumb-item active" aria-current="content">{{ 'admin_medias.delete.breadcrumb'|trans({'%type%':type_config.name}) }}</li>
+    <li class="breadcrumb-item"><a href="{{ url('sfs_media_admin_medias_read', {'media': media}) }}">{{ 'admin_medias.read.breadcrumb'|trans({'%name%': media.name}) }}</a></li>
+    <li class="breadcrumb-item active" aria-current="content">{{ 'admin_medias.delete.breadcrumb'|trans({'%type%':type_config.name, '%name%': media.name}) }}</li>
 {% endblock breadcrums_content %}
 
 {% block content %}
-    {{ form_start(form) }}
-        {{ form_widget(form) }}
-        {{ form_rest(form) }}
-        <div class="d-flex justify-content-end align-items-center">
-            <a href="{{ url('sfs_media_admin_medias_list') }}" class="btn btn-outline-secondary ms-3">{{ 'admin_medias.delete.actions.cancel.button'|trans }}</a>
-            <input type="submit" value="{{ 'admin_medias.delete.actions.delete.button'|trans }}" class="btn btn-danger ms-3" />
-        </div>
-    {{ form_end(form) }}
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3">{{ 'admin_medias.delete.title'|trans({'%type%':type_config.name, '%name%': media.name}) }}</h1>
+    </div>
+
+    <div class="container-fluid bg-white p-4">
+        {{ form_start(form) }}
+            {{ form_errors(form) }}
+
+            <div class="alert alert-danger">
+                {{ 'admin_medias.delete.message'|trans({'%type%':type_config.name, '%name%': media.name}) }}
+            </div>
+
+            {{ form_widget(form) }}
+            {{ form_rest(form) }}
+            <div class="d-flex justify-content-end align-items-center">
+                <a href="{{ url('sfs_media_admin_medias_list') }}" class="btn btn-outline-secondary ms-3">{{ 'admin_medias.delete.actions.cancel.button'|trans }}</a>
+                <input type="submit" value="{{ 'admin_medias.delete.actions.delete.button'|trans }}" class="btn btn-danger ms-3" />
+            </div>
+        {{ form_end(form) }}
+    </div>
 {% endblock content %}

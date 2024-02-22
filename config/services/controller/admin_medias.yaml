@@ -109,8 +109,12 @@ services:
                     filter_form: 'Softspring\MediaBundle\Form\MediaTypeSearchFilterForm'
                     view: '@@SfsMedia/admin/media/search_type.html.twig'
                     view_page: '@@SfsMedia/admin/media/search_type.html.twig'
-                    filter_event_name: 'sfs_media.search_filter.filter_event'
-                    view_event_name: 'sfs_media.search_filter.list_view'
+                    initialize_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_SEARCH_TYPE_INITIALIZE
+                    filter_form_prepare_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_SEARCH_TYPE_FILTER_FORM_PREPARE
+                    filter_form_init_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_SEARCH_TYPE_FILTER_FORM_INIT
+                    filter_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_SEARCH_TYPE_FILTER
+                    view_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_SEARCH_TYPE_VIEW
+                    exception_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_SEARCH_TYPE_EXCEPTION
                 create_ajax:
                     form: '@Softspring\MediaBundle\Form\Admin\MediaCreateFormInterface'
                     is_granted: 'PERMISSION_SFS_MEDIA_ADMIN_MEDIAS_CREATE'
@@ -126,3 +130,14 @@ services:
                     view_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_VIEW
                     exception_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_EXCEPTION
                     view: '@@SfsMedia/admin/media/create_ajax.html.twig'
+                migrate:
+                    param_converter_key: 'id'
+                    is_granted: 'PERMISSION_SFS_MEDIA_ADMIN_MEDIAS_MIGRATE'
+                    initialize_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_MIGRATE_INITIALIZE
+                    load_entity_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_MIGRATE_LOAD_ENTITY
+                    not_found_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_MIGRATE_NOT_FOUND
+                    found_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_MIGRATE_FOUND
+                    apply_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_MIGRATE_APPLY
+                    success_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_MIGRATE_SUCCESS
+                    failure_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_MIGRATE_FAILURE
+                    exception_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_MIGRATE_EXCEPTION

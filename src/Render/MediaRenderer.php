@@ -2,17 +2,16 @@
 
 namespace Softspring\MediaBundle\Render;
 
+use Softspring\MediaBundle\Exception\InvalidTypeException;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
+use Softspring\MediaBundle\Storage\StorageDriverInterface;
 use Softspring\MediaBundle\Type\MediaTypesCollection;
 
 class MediaRenderer
 {
-    protected MediaTypesCollection $mediaTypesCollection;
-
-    public function __construct(MediaTypesCollection $mediaTypesCollection)
+    public function __construct(protected MediaTypesCollection $mediaTypesCollection, protected StorageDriverInterface $storageDriver)
     {
-        $this->mediaTypesCollection = $mediaTypesCollection;
     }
 
     public function imageUrl(MediaInterface $media, $version, array $attr = []): ?string
@@ -34,6 +33,9 @@ class MediaRenderer
         }
     }
 
+    /**
+     * @throws \Exception
+     */
     public function renderMediaOrArray($mediaObjectOrArray, $versionStringOrAttr = null, $attr = null): string
     {
         if (is_array($mediaObjectOrArray)) {
@@ -43,11 +45,17 @@ class MediaRenderer
         return $this->render($mediaObjectOrArray, $versionStringOrAttr, $attr ?: []);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function renderMediaArray(array $mediaArray, array $attr = []): string
     {
         return $this->render($mediaArray['media'] ?? null, $mediaArray['version'] ?? null, $attr);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function render(?MediaInterface $media, ?string $versionString, array $attr = []): string
     {
         if (!$media || !$versionString) {
@@ -56,22 +64,13 @@ class MediaRenderer
 
         [$versionType, $versionName] = explode('#', $versionString, 2);
 
-        switch ($versionType) {
-            case 'image':
-                return $this->renderImage($media, $versionName, $attr);
-
-            case 'video':
-                return $this->renderVideo($media, $versionName, $attr);
-
-            case 'videoSet':
-                return $this->renderVideoWithSources($media, $versionName, $attr);
-
-            case 'picture':
-                return $this->renderPicture($media, $versionName, $attr);
-
-            default:
-                throw new \Exception('Invalid $versionString, valid names are (image|video|picture|videoSet)#<versionName>');
-        }
+        return match ($versionType) {
+            'image' => $this->renderImage($media, $versionName, $attr),
+            'video' => $this->renderVideo($media, $versionName, $attr),
+            'videoSet' => $this->renderVideoWithSources($media, $versionName, $attr),
+            'picture' => $this->renderPicture($media, $versionName, $attr),
+            default => throw new \Exception('Invalid $versionString, valid names are (image|video|picture|videoSet)#<versionName>'),
+        };
     }
 
     public function renderVideo(MediaInterface $media, $version, array $attr = []): string
@@ -121,6 +120,10 @@ class MediaRenderer
         }
     }
 
+    /**
+     * @throws InvalidTypeException
+     * @throws \Exception
+     */
     public function renderPicture(?MediaInterface $media, string $picture = '_default', array $pictureAttr = [], array $imgAttr = []): string
     {
         if (!$media) {
@@ -192,6 +195,10 @@ class MediaRenderer
         return '<video '.$this->htmlAttributes($attributes).' />';
     }
 
+    /**
+     * @throws InvalidTypeException
+     * @throws \Exception
+     */
     public function renderVideoWithSources(MediaInterface $media, string $video = '_default', array $videoTagAttr = []): string
     {
         $config = $this->mediaTypesCollection->getType($media->getType());
@@ -231,10 +238,6 @@ class MediaRenderer
             return null;
         }
 
-        if ('gs://' == substr($version->getUrl(), 0, 5)) {
-            return 'https://storage.googleapis.com/'.substr($version->getUrl(), 5);
-        }
-
-        return $version->getUrl();
+        return $this->storageDriver->url($version->getUrl());
     }
 }
