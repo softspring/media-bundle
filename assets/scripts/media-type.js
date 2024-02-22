@@ -106,7 +106,7 @@ window.addEventListener('load', (event) => {
                 configureCreateForm(createFormUrl)
             }
         };
-        http_request.open('GET', event.target.dataset.mediaModalCreateHref, true);
+        http_request.open('GET', createFormUrl, true);
         http_request.send();
     }
 
