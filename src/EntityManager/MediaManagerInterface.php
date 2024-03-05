@@ -9,13 +9,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 interface MediaManagerInterface extends CrudlEntityManagerInterface
 {
-    public function createEntityForType(string $type, MediaInterface $media = null): MediaInterface;
+    public function createEntityForType(string $type, ?MediaInterface $media = null): MediaInterface;
 
     public function generateVersionEntities(MediaInterface $media): void;
 
     public function generateVersionEntity(MediaInterface $media, string $versionKey): MediaVersionInterface;
 
-    public function migrate(MediaInterface $media, OutputInterface $output = null): void;
+    public function migrate(MediaInterface $media, ?OutputInterface $output = null): void;
 
     /**
      * @return MediaInterface

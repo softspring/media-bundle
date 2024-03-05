@@ -319,7 +319,7 @@ class Configuration implements ConfigurationInterface
      * Update config types, this can not be done in processors because it would be not used to compare with database versions.
      * Also, can not be set in configuration as default values, because is exclusive for some types.
      */
-    public static function fixConfigTypes(array $types = null): ?array
+    public static function fixConfigTypes(?array $types = null): ?array
     {
         if (null === $types) {
             return null;

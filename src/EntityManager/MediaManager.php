@@ -34,7 +34,7 @@ class MediaManager implements MediaManagerInterface
         return MediaInterface::class;
     }
 
-    public function createEntityForType(string $type, MediaInterface $media = null): MediaInterface
+    public function createEntityForType(string $type, ?MediaInterface $media = null): MediaInterface
     {
         $typeDefinition = $this->mediaTypesCollection->getType($type);
 
@@ -91,7 +91,7 @@ class MediaManager implements MediaManagerInterface
      * @throws MigrateMediaException
      * @throws InvalidTypeException
      */
-    public function migrate(MediaInterface $media, OutputInterface $output = null): void
+    public function migrate(MediaInterface $media, ?OutputInterface $output = null): void
     {
         $typeConfig = $this->mediaTypesCollection->getType($media->getType());
 

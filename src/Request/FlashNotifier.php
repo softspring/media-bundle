@@ -18,7 +18,7 @@ class FlashNotifier
         $this->requestStack->getSession()->getFlashBag()->add($type, $message);
     }
 
-    public function addTrans(string $type, string $message, array $parameters = [], string $domain = null, string $locale = null): void
+    public function addTrans(string $type, string $message, array $parameters = [], ?string $domain = null, ?string $locale = null): void
     {
         $this->add($type, $this->translator->trans($message, $parameters, $domain, $locale));
     }

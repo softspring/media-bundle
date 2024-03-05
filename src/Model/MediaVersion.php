@@ -36,7 +36,7 @@ abstract class MediaVersion implements MediaVersionInterface
      */
     protected ?MediaVersionInterface $originalVersion = null;
 
-    public function __construct(string $version = null, MediaInterface $media = null)
+    public function __construct(?string $version = null, ?MediaInterface $media = null)
     {
         $this->setVersion($version);
         if ($media instanceof MediaInterface) {
