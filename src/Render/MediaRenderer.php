@@ -2,6 +2,7 @@
 
 namespace Softspring\MediaBundle\Render;
 
+use Exception;
 use Softspring\MediaBundle\Exception\InvalidTypeException;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
@@ -34,7 +35,7 @@ class MediaRenderer
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function renderMediaOrArray($mediaObjectOrArray, $versionStringOrAttr = null, $attr = null): string
     {
@@ -46,7 +47,7 @@ class MediaRenderer
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function renderMediaArray(array $mediaArray, array $attr = []): string
     {
@@ -54,7 +55,7 @@ class MediaRenderer
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function render(?MediaInterface $media, ?string $versionString, array $attr = []): string
     {
@@ -69,7 +70,7 @@ class MediaRenderer
             'video' => $this->renderVideo($media, $versionName, $attr),
             'videoSet' => $this->renderVideoWithSources($media, $versionName, $attr),
             'picture' => $this->renderPicture($media, $versionName, $attr),
-            default => throw new \Exception('Invalid $versionString, valid names are (image|video|picture|videoSet)#<versionName>'),
+            default => throw new Exception('Invalid $versionString, valid names are (image|video|picture|videoSet)#<versionName>'),
         };
     }
 
@@ -122,7 +123,7 @@ class MediaRenderer
 
     /**
      * @throws InvalidTypeException
-     * @throws \Exception
+     * @throws Exception
      */
     public function renderPicture(?MediaInterface $media, string $picture = '_default', array $pictureAttr = [], array $imgAttr = []): string
     {
@@ -133,7 +134,7 @@ class MediaRenderer
         $config = $this->mediaTypesCollection->getType($media->getType());
 
         if (!isset($config['pictures'][$picture])) {
-            throw new \Exception('picture config is not set for '.$media->getType());
+            throw new Exception('picture config is not set for '.$media->getType());
         }
 
         $html = '<picture '.$this->htmlAttributes($pictureAttr).'>';
@@ -197,14 +198,14 @@ class MediaRenderer
 
     /**
      * @throws InvalidTypeException
-     * @throws \Exception
+     * @throws Exception
      */
     public function renderVideoWithSources(MediaInterface $media, string $video = '_default', array $videoTagAttr = []): string
     {
         $config = $this->mediaTypesCollection->getType($media->getType());
 
         if (!isset($config['video_sets'][$video])) {
-            throw new \Exception('video_sets config is not set for '.$media->getType());
+            throw new Exception('video_sets config is not set for '.$media->getType());
         }
 
         $attrs = array_merge($config['video_sets'][$video]['attrs'] ?? [], $videoTagAttr);

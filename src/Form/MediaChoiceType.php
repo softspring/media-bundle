@@ -4,6 +4,7 @@ namespace Softspring\MediaBundle\Form;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Exception;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Render\MediaRenderer;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -76,7 +77,7 @@ class MediaChoiceType extends AbstractType
                     } elseif ('picture' == $mode) {
                         $attrs['data-media-preview-picture'] = $this->mediaRenderer->renderPicture($media, $version, $options['media_attr'] + $options['picture_attr']);
                     } else {
-                        throw new \Exception("Bad $mode mode for media_type. Only 'image', 'video' and 'picture' are allowed");
+                        throw new Exception("Bad $mode mode for media_type. Only 'image', 'video' and 'picture' are allowed");
                     }
                 }
 

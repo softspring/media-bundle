@@ -3,6 +3,7 @@
 namespace Softspring\MediaBundle\Processor;
 
 use Softspring\MediaBundle\Model\MediaVersionInterface;
+use Traversable;
 
 class ProcessorProvider
 {
@@ -16,7 +17,7 @@ class ProcessorProvider
      */
     public function __construct(iterable $processors)
     {
-        $this->processors = $processors instanceof \Traversable ? iterator_to_array($processors) : $processors;
+        $this->processors = $processors instanceof Traversable ? iterator_to_array($processors) : $processors;
     }
 
     /**

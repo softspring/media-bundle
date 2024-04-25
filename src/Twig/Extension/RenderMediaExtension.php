@@ -2,6 +2,7 @@
 
 namespace Softspring\MediaBundle\Twig\Extension;
 
+use Exception;
 use Softspring\MediaBundle\Exception\InvalidTypeException;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Render\MediaRenderer;
@@ -43,7 +44,7 @@ class RenderMediaExtension extends AbstractExtension
 
     /**
      * @throws InvalidTypeException
-     * @throws \Exception
+     * @throws Exception
      */
     public function getMediaTypeConfig($typeOrMedia): ?array
     {
@@ -55,6 +56,6 @@ class RenderMediaExtension extends AbstractExtension
             return $this->mediaTypesCollection->getType($typeOrMedia->getType());
         }
 
-        throw new \Exception('sfs_media_type_config parameter can be a string or a MediaInterface');
+        throw new Exception('sfs_media_type_config parameter can be a string or a MediaInterface');
     }
 }

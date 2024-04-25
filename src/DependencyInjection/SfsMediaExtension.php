@@ -3,6 +3,7 @@
 namespace Softspring\MediaBundle\DependencyInjection;
 
 use Composer\InstalledVersions;
+use Exception;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
 use Symfony\Component\Config\Definition\Processor;
@@ -15,7 +16,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 class SfsMediaExtension extends Extension implements PrependExtensionInterface
 {
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function load(array $configs, ContainerBuilder $container): void
     {

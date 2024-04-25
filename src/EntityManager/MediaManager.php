@@ -3,6 +3,7 @@
 namespace Softspring\MediaBundle\EntityManager;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Softspring\Component\CrudlController\Manager\CrudlEntityManagerTrait;
 use Softspring\MediaBundle\Exception\InvalidTypeException;
 use Softspring\MediaBundle\Exception\MigrateMediaException;
@@ -39,7 +40,7 @@ class MediaManager implements MediaManagerInterface
         $typeDefinition = $this->mediaTypesCollection->getType($type);
 
         if (empty($typeDefinition)) {
-            throw new \Exception(sprintf('Invalid %s media type', $type));
+            throw new Exception(sprintf('Invalid %s media type', $type));
         }
 
         if (!$media) {
@@ -109,7 +110,7 @@ class MediaManager implements MediaManagerInterface
                 $version = $this->generateVersionEntity($media, $versionId);
                 $this->mediaVersionManager->saveEntity($version);
                 $output && $output->writeln('<fg=green>CREATED</>');
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $message = sprintf('Error creating version %s', $versionId);
                 if ($output) {
                     $output->writeln("<error>$message</error>");
@@ -129,7 +130,7 @@ class MediaManager implements MediaManagerInterface
                 $version = $this->generateVersionEntity($media, $versionId);
                 $this->mediaVersionManager->saveEntity($version);
                 $output && $output->writeln('<fg=green>RECREATED</>');
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $message = sprintf('Error updating version %s', $versionId);
                 if ($output) {
                     $output->writeln("<error>$message</error>");
@@ -146,7 +147,7 @@ class MediaManager implements MediaManagerInterface
                 $media->removeVersion($version = $media->getVersion($versionId));
                 $this->mediaVersionManager->deleteEntity($version);
                 $output && $output->writeln('<fg=green>DELETED</>');
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $message = sprintf('Error deleting version %s', $versionId);
                 if ($output) {
                     $output->writeln("<error>$message</error>");

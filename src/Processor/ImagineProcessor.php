@@ -2,6 +2,7 @@
 
 namespace Softspring\MediaBundle\Processor;
 
+use Exception;
 use Imagine\Gd\Imagine;
 use Imagine\Image\Box;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
@@ -16,7 +17,7 @@ class ImagineProcessor implements ProcessorInterface
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function supports(MediaVersionInterface $version): bool
     {
@@ -25,11 +26,11 @@ class ImagineProcessor implements ProcessorInterface
         }
 
         if (!$version->getOriginalVersion()) {
-            throw new \Exception('Processor support method requires version original version is initialized');
+            throw new Exception('Processor support method requires version original version is initialized');
         }
 
         if (!$version->getOptions()) {
-            throw new \Exception('Processor support method requires version options are initialized');
+            throw new Exception('Processor support method requires version options are initialized');
         }
 
         if (!in_array($version->getOriginalVersion()->getFileMimeType(), ['image/jpeg', 'image/png', 'image/gif', 'image/webp'])) {

@@ -2,6 +2,7 @@
 
 namespace Softspring\MediaBundle\Model;
 
+use DateTime;
 use Symfony\Component\HttpFoundation\File\File;
 
 interface MediaVersionInterface
@@ -42,9 +43,9 @@ interface MediaVersionInterface
 
     public function setFileMimeType(?string $fileMimeType): void;
 
-    public function getUploadedAt(): ?\DateTime;
+    public function getUploadedAt(): ?DateTime;
 
-    public function getGeneratedAt(): ?\DateTime;
+    public function getGeneratedAt(): ?DateTime;
 
     public function getOptions(): ?array;
 

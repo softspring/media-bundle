@@ -2,6 +2,7 @@
 
 namespace Softspring\MediaBundle\Model;
 
+use DateTime;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -136,14 +137,14 @@ abstract class MediaVersion implements MediaVersionInterface
         $this->fileMimeType = $fileMimeType;
     }
 
-    public function getUploadedAt(): ?\DateTime
+    public function getUploadedAt(): ?DateTime
     {
-        return $this->uploadedAt ? \DateTime::createFromFormat('U', "{$this->uploadedAt}") : null;
+        return $this->uploadedAt ? DateTime::createFromFormat('U', "{$this->uploadedAt}") : null;
     }
 
-    public function getGeneratedAt(): ?\DateTime
+    public function getGeneratedAt(): ?DateTime
     {
-        return $this->generatedAt ? \DateTime::createFromFormat('U', "{$this->generatedAt}") : null;
+        return $this->generatedAt ? DateTime::createFromFormat('U', "{$this->generatedAt}") : null;
     }
 
     public function getOptions(): ?array

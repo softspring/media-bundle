@@ -2,8 +2,10 @@
 
 namespace Softspring\MediaBundle\Model;
 
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use InvalidArgumentException;
 
 abstract class Media implements MediaInterface
 {
@@ -74,9 +76,9 @@ abstract class Media implements MediaInterface
         $this->description = $description;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
-        return $this->createdAt ? \DateTime::createFromFormat('U', "$this->createdAt") : null;
+        return $this->createdAt ? DateTime::createFromFormat('U', "$this->createdAt") : null;
     }
 
     public function markCreatedAtNow(): void
@@ -92,7 +94,7 @@ abstract class Media implements MediaInterface
     public function __get($id): ?MediaVersionInterface
     {
         if (!str_starts_with($id, 'version_')) {
-            throw new \InvalidArgumentException("Property $id not found");
+            throw new InvalidArgumentException("Property $id not found");
         }
 
         return $this->getVersion(substr($id, 8));

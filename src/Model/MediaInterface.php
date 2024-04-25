@@ -2,6 +2,7 @@
 
 namespace Softspring\MediaBundle\Model;
 
+use DateTime;
 use Doctrine\Common\Collections\Collection;
 
 interface MediaInterface
@@ -44,7 +45,7 @@ interface MediaInterface
 
     public function getVersion(string $version): ?MediaVersionInterface;
 
-    public function getCreatedAt(): ?\DateTime;
+    public function getCreatedAt(): ?DateTime;
 
     public function markCreatedAtNow(): void;
 }

@@ -2,6 +2,8 @@
 
 namespace Softspring\MediaBundle\Exception;
 
-class MigrateMediaException extends \Exception
+use Exception;
+
+class MigrateMediaException extends Exception
 {
 }
