@@ -100,6 +100,15 @@ abstract class Media implements MediaInterface
         return $this->getVersion(substr($id, 8));
     }
 
+    public function __isset($id): bool
+    {
+        if (str_starts_with($id, 'version_')) {
+            return true;
+        }
+
+        return isset($this->$id);
+    }
+
     public function addVersion(MediaVersionInterface $version): void
     {
         if (empty($this->versions[$version->getVersion()])) {
