@@ -106,7 +106,7 @@ abstract class Media implements MediaInterface
             return true;
         }
 
-        return isset($this->$id);
+        return false;
     }
 
     public function addVersion(MediaVersionInterface $version): void
