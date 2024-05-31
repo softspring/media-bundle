@@ -1,7 +1,7 @@
 import {Modal} from 'bootstrap';
 
 window.addEventListener('load', (event) => {
-    const mediaTypeModal = document.getElementById('mediaTypeModal')
+    const mediaTypeModal = document.getElementById('mediaTypeModal');
 
     if (!mediaTypeModal) {
         return;
@@ -12,7 +12,7 @@ window.addEventListener('load', (event) => {
     /**
      * Open modal
      */
-    function loadMediaModelSelection(event) {
+    mediaTypeModal.addEventListener('show.bs.modal', function (event) {
         // Button that triggered the modal
         mediaTypeModal.clickedButton = event.relatedTarget
         const mediaInput = document.getElementById(mediaTypeModal.clickedButton.dataset.mediaTypeField);
@@ -32,10 +32,6 @@ window.addEventListener('load', (event) => {
 
         modalSearchUrl = mediaTypeModal.clickedButton.dataset.searchUrl; // + '?page=1&rpp=&order=&text=&' + mediaTypes.split(',').map((v) => 'valid_types%5B%5D=' + v).join('&');
         loadSearchPage(modalSearchUrl);
-    }
-
-    mediaTypeModal.addEventListener('show.bs.modal', function (event) {
-        loadMediaModelSelection(event);
     });
 
     /**
@@ -374,10 +370,19 @@ window.addEventListener('load', (event) => {
 
         if (originalPreview && event.target.files.length > 0) {
             const src = URL.createObjectURL(event.target.files[0]);
-            const preview = document.createElement('img');
-            preview.src = src;
-            preview.classList.add('img-fluid');
+            let preview = document.createElement('img');
+            //mime type contains 'video'
+            if (event.target.files[0].type.includes('video')) {
+                preview = document.createElement('video');
+                const source = document.createElement('source');
+                source.src = src;
+                source.type = event.target.files[0].type;
+                preview.append(source);
+            } else {
+                preview.src = src;
+            }
 
+            preview.classList.add('img-fluid');
             originalPreview.innerHTML = '';
             originalPreview.appendChild(preview);
         }
@@ -399,4 +404,12 @@ window.addEventListener('load', (event) => {
         mediaTypeSubmitBtn.prepend(spinner);
     });
 
+
+    /**
+     * Click on cancel create media button
+     */
+    document.addEventListener('click', function (event) {
+        if (!event.target || !event.target.hasAttribute('data-cancel-create-media')) return;
+        loadSearchPage(modalSearchUrl);
+    });
 });

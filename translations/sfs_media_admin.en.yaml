@@ -1,4 +1,11 @@
 admin_medias:
+    modal:
+        title: "Select media"
+        actions:
+            close: "Close"
+            select: "Select"
+        filter:
+            title: "Choose a media from the list or upload a new media"
     list:
         meta.title: "Medias"
         title: "Medias"
@@ -6,16 +13,22 @@ admin_medias:
         actions:
             create.link: "New media"
         filter_form:
-            name.label: "File name"
-            type.label: "Media type"
+            name:
+                label: "File name"
+                placeholder: "Enter file name"
+            type:
+                label: "Media type"
+                placeholder: "Select media type"
 
     create:
         meta.title: "%type%"
         title: "%type%"
-        breadcrumb: "New media"
+        breadcrumb: "Add new media"
+        form_title: "Add new media"
         actions:
             create.button: "Upload media"
             cancel.button: "Cancel"
+            upload.button: "Select main media"
 
     read:
         meta.title: "%name%"
