@@ -12,7 +12,7 @@ window.addEventListener('load', (event) => {
     /**
      * Open modal
      */
-    mediaTypeModal.addEventListener('show.bs.modal', function (event) {
+    function loadMediaModelSelection(event) {
         // Button that triggered the modal
         mediaTypeModal.clickedButton = event.relatedTarget
         const mediaInput = document.getElementById(mediaTypeModal.clickedButton.dataset.mediaTypeField);
@@ -32,6 +32,10 @@ window.addEventListener('load', (event) => {
 
         modalSearchUrl = mediaTypeModal.clickedButton.dataset.searchUrl; // + '?page=1&rpp=&order=&text=&' + mediaTypes.split(',').map((v) => 'valid_types%5B%5D=' + v).join('&');
         loadSearchPage(modalSearchUrl);
+    }
+
+    mediaTypeModal.addEventListener('show.bs.modal', function (event) {
+        loadMediaModelSelection(event);
     });
 
     /**
@@ -377,5 +381,22 @@ window.addEventListener('load', (event) => {
             originalPreview.innerHTML = '';
             originalPreview.appendChild(preview);
         }
-    })
+    });
+
+    /**
+     * Submit create media form
+     */
+    document.addEventListener('submit', function (event) {
+        if (!event.target || !event.target.hasAttribute('data-spinner-onsubmit')) return;
+
+        const mediaTypeSubmitBtn = event.target.querySelector('button[type="submit"]');
+        const spinner = document.createElement('span');
+        spinner.classList.add('spinner-border', 'spinner-border-sm');;
+        spinner.setAttribute('role', 'status');
+        spinner.setAttribute('aria-hidden', 'true');
+
+        mediaTypeSubmitBtn.disabled = true;
+        mediaTypeSubmitBtn.prepend(spinner);
+    });
+
 });

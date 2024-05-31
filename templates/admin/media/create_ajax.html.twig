@@ -3,7 +3,7 @@
 {% form_theme form '@SfsMedia/forms/media_type_theme.html.twig' 'bootstrap_5_layout.html.twig' %}
 
 <div class="container-fluid bg-white p-4">
-    {{ form_start(form) }}
+    {{ form_start(form,{'attr':{'data-spinner-onsubmit':''}}) }}
     {{ form_errors(form) }}
 
     <div class="row">
@@ -24,8 +24,10 @@
     {{ form_rest(form) }}
 
     <div class="d-flex justify-content-end align-items-center">
-        <a href="{{ app.request.query.get('back', '#') }}" class="btn btn-outline-secondary ms-3">{{ 'admin_medias.create.actions.cancel.button'|trans }}</a>
-        <button class="btn btn-primary ms-3" type="submit">{{ 'admin_medias.create.actions.create.button'|trans }}</button>
+        <button type="button" data-cancel-create-media class="btn btn-outline-secondary ms-3">{{ 'admin_medias.create.actions.cancel.button'|trans }}</button>
+        <button class="btn btn-primary ms-3" type="submit">
+            {{ 'admin_medias.create.actions.create.button'|trans }}
+        </button>
     </div>
     {{ form_end(form) }}
 </div>
