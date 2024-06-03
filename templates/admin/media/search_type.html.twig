@@ -72,7 +72,7 @@
                         </div>
                         {% endif %}
                         <p class="card-title lh-sm mb-0 text-truncate px-2" title="{{ media.name }}"><small><strong>{{ media.name }}</strong></small></p>
-                        <p class="small lh-1 mb-2">
+                        <p class="small text-truncate lh-1 mb-2" title="{{ media_types[media.type].name }}">
                                 {{ media_types[media.type].name }}
                             <br/>
                             {% if media.isVideo %}
