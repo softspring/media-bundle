@@ -38,6 +38,9 @@ class MediaTypeSearchFilterForm extends PaginatorForm
             'valid_types' => null,
             'rpp_valid_values' => [12],
             'rpp_default_value' => 12,
+            'order_valid_fields' => ['createdAt'],
+            'order_default_value' => 'createdAt',
+            'order_direction_default_value' => 'desc',
         ]);
         $resolver->setAllowedTypes('valid_types', ['array', 'null']);
 

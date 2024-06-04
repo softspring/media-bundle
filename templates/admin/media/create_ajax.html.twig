@@ -2,30 +2,39 @@
 
 {% form_theme form '@SfsMedia/forms/media_type_theme.html.twig' 'bootstrap_5_layout.html.twig' %}
 
-<div class="container-fluid bg-white p-4">
-    {{ form_start(form) }}
+<div class="container-fluid bg-white px-4">
+    <p class="h5 mb-3"><strong>{{ 'admin_medias.create.form_title'|trans }}</strong></p>
+    {{ form_start(form,{'attr':{'data-spinner-onsubmit':''}}) }}
     {{ form_errors(form) }}
-
     <div class="row">
-        <div class="col">
-            {{ form_row(form.name) }}
-        </div>
-        <div class="col">
-            {{ form_row(form.description) }}
-        </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            {{ form_row(form._original) }}
-            <div id="media_create_form__original_preview" class="img-fluid"></div>
-        </div>
-    </div>
+        <div class="col-12 col-lg-6">
 
-    {{ form_rest(form) }}
-
-    <div class="d-flex justify-content-end align-items-center">
-        <a href="{{ app.request.query.get('back', '#') }}" class="btn btn-outline-secondary ms-3">{{ 'admin_medias.create.actions.cancel.button'|trans }}</a>
-        <button class="btn btn-primary ms-3" type="submit">{{ 'admin_medias.create.actions.create.button'|trans }}</button>
+            <div class="row">
+                <div class="col-12 col-lg-6">
+                    {{ form_row(form.name) }}
+                </div>
+                <div class="col-12 col-lg-6">
+                    {{ form_row(form.description) }}
+                </div>
+                <div class="col-12">
+                    {{ form_row(form._original) }}
+                    {{ form_rest(form) }}
+                </div>
+                <div class="col-12 mb-3">
+                    <div class="d-flex justify-content-end align-items-center">
+                        <button type="button" data-cancel-create-media class="btn btn-outline-secondary ms-3">{{ 'admin_medias.create.actions.cancel.button'|trans }}</button>
+                        <button class="btn btn-primary ms-3" type="submit">
+                            {{ 'admin_medias.create.actions.create.button'|trans }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6 border-left bg-light p-3 d-flex align-items-center justify-content-center">
+            <div id="media_create_form__original_preview" class="img-fluid mb-3">
+                <label for="{{ form._original.vars.id }}_upload" class="btn btn-dark">{{ 'admin_medias.create.actions.upload.button'|trans }}</label>
+            </div>
+        </div>
     </div>
     {{ form_end(form) }}
 </div>

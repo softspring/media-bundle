@@ -1,15 +1,16 @@
+{% trans_default_domain 'sfs_media_admin' %}
 <div class="modal-media modal fade" id="mediaTypeModal" tabindex="-1" aria-labelledby="mediaTypeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="mediaTypeModalLabel">Select media</h5>
+                <h5 class="modal-title" id="mediaTypeModalLabel">{{ 'admin_medias.modal.title'|trans }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" data-media-type-select="">Select</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'admin_medias.modal.actions.close'|trans }}</button>
+                <button type="button" class="btn btn-primary" data-media-type-select="">{{ 'admin_medias.modal.actions.select'|trans }}</button>
             </div>
         </div>
     </div>
