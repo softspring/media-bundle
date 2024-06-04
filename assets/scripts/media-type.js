@@ -1,7 +1,7 @@
 import {Modal} from 'bootstrap';
 
 window.addEventListener('load', (event) => {
-    const mediaTypeModal = document.getElementById('mediaTypeModal')
+    const mediaTypeModal = document.getElementById('mediaTypeModal');
 
     if (!mediaTypeModal) {
         return;
@@ -370,12 +370,46 @@ window.addEventListener('load', (event) => {
 
         if (originalPreview && event.target.files.length > 0) {
             const src = URL.createObjectURL(event.target.files[0]);
-            const preview = document.createElement('img');
-            preview.src = src;
-            preview.classList.add('img-fluid');
+            let preview = document.createElement('img');
+            //mime type contains 'video'
+            if (event.target.files[0].type.includes('video')) {
+                preview = document.createElement('video');
+                const source = document.createElement('source');
+                source.src = src;
+                source.type = event.target.files[0].type;
+                preview.append(source);
+            } else {
+                preview.src = src;
+            }
 
+            preview.classList.add('img-fluid');
             originalPreview.innerHTML = '';
             originalPreview.appendChild(preview);
         }
-    })
+    });
+
+    /**
+     * Submit create media form
+     */
+    document.addEventListener('submit', function (event) {
+        if (!event.target || !event.target.hasAttribute('data-spinner-onsubmit')) return;
+
+        const mediaTypeSubmitBtn = event.target.querySelector('button[type="submit"]');
+        const spinner = document.createElement('span');
+        spinner.classList.add('spinner-border', 'spinner-border-sm');;
+        spinner.setAttribute('role', 'status');
+        spinner.setAttribute('aria-hidden', 'true');
+
+        mediaTypeSubmitBtn.disabled = true;
+        mediaTypeSubmitBtn.prepend(spinner);
+    });
+
+
+    /**
+     * Click on cancel create media button
+     */
+    document.addEventListener('click', function (event) {
+        if (!event.target || !event.target.hasAttribute('data-cancel-create-media')) return;
+        loadSearchPage(modalSearchUrl);
+    });
 });
