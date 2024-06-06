@@ -91,7 +91,11 @@ abstract class Media implements MediaInterface
         return $this->versions;
     }
 
-    public function __get($id): ?MediaVersionInterface
+    /**
+     * @return ?MediaVersionInterface
+     * @throws InvalidArgumentException
+     */
+    public function __get($id)
     {
         if (!str_starts_with($id, 'version_')) {
             throw new InvalidArgumentException("Property $id not found");
