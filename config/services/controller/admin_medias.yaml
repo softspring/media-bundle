@@ -67,6 +67,7 @@ services:
                     is_granted: 'PERMISSION_SFS_MEDIA_ADMIN_MEDIAS_DELETE'
                     param_converter_key: 'id'
                     initialize_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_DELETE_INITIALIZE
+                    form_prepare_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_DELETE_FORM_PREPARE
                     form_valid_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_DELETE_FORM_VALID
                     success_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_DELETE_SUCCESS
                     form_invalid_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_DELETE_FORM_INVALID

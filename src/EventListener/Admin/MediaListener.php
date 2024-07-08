@@ -35,6 +35,9 @@ class MediaListener implements EventSubscriberInterface
             SfsMediaEvents::ADMIN_MEDIAS_CREATE_FORM_PREPARE => 'onCreateFormPrepare',
             SfsMediaEvents::ADMIN_MEDIAS_CREATE_VIEW => 'onCreateViewAddTypeConfig',
 
+            SfsMediaEvents::ADMIN_MEDIAS_DELETE_FORM_PREPARE => 'onDeleteFormPrepare',
+            SfsMediaEvents::ADMIN_MEDIAS_DELETE_VIEW => 'onDeleteViewAddTypeConfig',
+
             SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_INITIALIZE => 'onCreateInitializeAddType',
             SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_FORM_PREPARE => 'onCreateFormPrepare',
             SfsMediaEvents::ADMIN_MEDIAS_CREATE_AJAX_VIEW => 'onCreateViewAddTypeConfig',
@@ -77,6 +80,19 @@ class MediaListener implements EventSubscriberInterface
 
         $event->getData()['checkVersions'] = TypeChecker::checkMedia($media, $typeConfig);
         $event->getData()['type_config'] = $typeConfig;
+    }
+
+    public function onDeleteFormPrepare(FormPrepareEvent $event): void
+    {
+        /** @var MediaInterface $entity */
+        $entity = $event->getEntity();
+        $type = $entity->getType();
+        $event->getRequest()->attributes->set('type', $type);
+    }
+
+    public function onDeleteViewAddTypeConfig(ViewEvent $event): void
+    {
+        $event->getData()['type_config'] = $this->mediaTypesCollection->getType($event->getRequest()->attributes->get('type'));
     }
 
     public function onAjaxCreateSuccess(GetResponseEntityEvent $event): void

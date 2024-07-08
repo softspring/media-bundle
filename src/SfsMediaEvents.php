@@ -220,6 +220,11 @@ class SfsMediaEvents
     public const ADMIN_MEDIAS_DELETE_INITIALIZE = 'sfs_media.admin.medias.delete_initialize';
 
     /**
+     * @Event("Softspring\Component\CrudlController\Event\FormPrepareEvent")
+     */
+    public const ADMIN_MEDIAS_DELETE_FORM_PREPARE = 'sfs_media.admin.medias.form_prepare';
+
+    /**
      * @Event("Softspring\Component\CrudlController\Event\GetResponseFormEvent")
      */
     public const ADMIN_MEDIAS_DELETE_FORM_VALID = 'sfs_media.admin.medias.delete_form_valid';

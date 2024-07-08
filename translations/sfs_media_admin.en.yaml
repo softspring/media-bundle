@@ -21,7 +21,19 @@ admin_medias:
         meta.title: "%name%"
         title: "%name%"
         breadcrumb: "Details"
+        actions:
+            delete:
+                button: "Delete"
 
+    delete:
+        meta:
+            title: "Delete media"
+        breadcrumb: "Delete"
+        actions:
+            cancel:
+                button: "Cancel"
+            delete:
+                button: "Delete"
 
     form:
         name.label: "Name"
