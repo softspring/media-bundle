@@ -21,7 +21,19 @@ admin_medias:
         meta.title: "%name%"
         title: "%name%"
         breadcrumb: "Detalles"
+        actions:
+            delete:
+                button: "Eliminar"
 
+    delete:
+        meta:
+            title: "Eliminar archivo"
+        breadcrumb: "Eliminar"
+        actions:
+            cancel:
+                button: "Cancelar"
+            delete:
+                button: "Eliminar"
 
     form:
         name.label: "Nombre de la archivo"

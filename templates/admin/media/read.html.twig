@@ -30,6 +30,14 @@
 
 
 {% block content %}
+    <div class="float-end">
+        {% if is_granted('PERMISSION_SFS_MEDIA_ADMIN_MEDIAS_DELETE', media) %}
+            <a href="{{ url('sfs_media_admin_medias_delete', {'media': media}) }}" class="btn btn-danger">{{ 'admin_medias.read.actions.delete.button'|trans }}</a>
+        {% else %}
+            <a class="btn btn-danger disabled">{{ 'admin_medias.read.actions.delete.button'|trans }}</a>
+        {% endif %}
+    </div>
+
     <h1 class="h3 mb-4">{{ 'admin_medias.read.title'|trans({'%name%': media.name }) }}</h1>
 
     {% if media.description %}
