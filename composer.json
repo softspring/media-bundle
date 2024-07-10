@@ -26,6 +26,7 @@
         "symfony/routing": "^5.4|^6.0|^7.0",
         "symfony/security-bundle": "^5.4|^6.0|^7.0",
         "symfony/translation": "^5.4|^6.0|^7.0",
+        "symfony/twig-bundle": "^5.4|^6.0|^7.0",
         "symfony/validator": "^5.4|^6.0|^7.0",
         "twig/twig": "^2.10|^3.4"
     },
