@@ -5,7 +5,7 @@
 ![License](https://img.shields.io/packagist/l/softspring/media-bundle?style=flat-square)
 ![PHP Version](https://img.shields.io/packagist/dependency-v/softspring/media-bundle/php?style=flat-square)
 ![Downloads](https://img.shields.io/packagist/dt/softspring/media-bundle?style=flat-square)
-[![CI](https://img.shields.io/github/actions/workflow/status/softspring/media-bundle/php.yml?branch=5.3&style=flat-square&label=CI)](https://github.com/softspring/media-bundle/actions/workflows/php.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/softspring/media-bundle/ci.yml?branch=5.3&style=flat-square&label=CI)](https://github.com/softspring/media-bundle/actions/workflows/ci.yml)
 ![Coverage](https://raw.githubusercontent.com/softspring/media-bundle/5.3/.github/badges/coverage.svg)
 
 ## Documentation
