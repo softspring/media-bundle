@@ -51,6 +51,9 @@ class SfsMediaExtension extends Extension implements PrependExtensionInterface
             $container->setParameter('sfs_media.storage.filesystem.path', $config['filesystem']['path']);
             $container->setParameter('sfs_media.storage.filesystem.url', $config['filesystem']['url']);
             $loader->load('drivers/filesystem.yaml');
+        } else {
+            $container->setParameter('sfs_media.storage.filesystem.path', null);
+            $container->setParameter('sfs_media.storage.filesystem.url', null);
         }
     }
 
