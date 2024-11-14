@@ -57,7 +57,7 @@ class MediaTypeUploadType extends AbstractType
                 continue;
             }
             $builder->add($key, MediaVersionUploadType::class, [
-                'property_path' => "version_$key)",
+                'property_path' => "version_$key",
                 'upload_requirements' => $config['upload_requirements'],
                 'required_upload' => $options['required_uploads'],
             ]);
