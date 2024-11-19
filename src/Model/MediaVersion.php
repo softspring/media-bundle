@@ -97,6 +97,21 @@ abstract class MediaVersion implements MediaVersionInterface
         $this->url = $url;
     }
 
+    public function getPublicUrl(): ?string
+    {
+        $url = $this->getUrl();
+
+        if (!$url) {
+            return null;
+        }
+
+        if (str_starts_with($url, 'gs://')) {
+            return 'https://storage.googleapis.com/'.substr($url, 5);
+        }
+
+        return $url;
+    }
+
     public function getWidth(): ?int
     {
         return $this->width;

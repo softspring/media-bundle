@@ -68,7 +68,7 @@ class MediaModalType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         if (null === $options['media_types']) {
-            foreach ($this->mediaTypesCollection->getTypes() as $type => $typeConfig) {
+            foreach ($this->mediaTypesCollection->getTypes(false) as $type => $typeConfig) {
                 if ('image' == $typeConfig['type']) {
                     $options['media_types'][$type]['image'] = array_keys($typeConfig['versions']);
                 } elseif ('video' == $typeConfig['type']) {

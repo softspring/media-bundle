@@ -11,6 +11,8 @@ abstract class Media implements MediaInterface
 {
     protected ?int $mediaType = null;
 
+    protected ?bool $private = null;
+
     protected ?string $type = null;
 
     protected ?string $name = null;
@@ -24,6 +26,16 @@ abstract class Media implements MediaInterface
     public function __construct()
     {
         $this->versions = new ArrayCollection();
+    }
+
+    public function getPrivate(): ?bool
+    {
+        return $this->private;
+    }
+
+    public function setPrivate(?bool $private): void
+    {
+        $this->private = $private;
     }
 
     public function getMediaType(): ?int
@@ -81,6 +93,11 @@ abstract class Media implements MediaInterface
         return $this->createdAt ? DateTime::createFromFormat('U', "$this->createdAt") : null;
     }
 
+    public function setCreatedAt(?int $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
+
     public function markCreatedAtNow(): void
     {
         $this->createdAt = (int) gmdate('U');
@@ -91,17 +108,50 @@ abstract class Media implements MediaInterface
         return $this->versions;
     }
 
+    public function setVersions(?Collection $versions): void
+    {
+        $this->versions = $versions;
+    }
+
     /**
      * @return ?MediaVersionInterface
      * @throws InvalidArgumentException
      */
     public function __get($id)
     {
+        if (method_exists($this, 'get'.$id)) {
+            return $this->{'get'.$id}();
+        }
+
         if (!str_starts_with($id, 'version_')) {
             throw new InvalidArgumentException("Property $id not found");
         }
 
         return $this->getVersion(substr($id, 8));
+    }
+
+    /**
+     * @return ?void
+     * @throws InvalidArgumentException
+     */
+    public function __set($id, $value)
+    {
+        if (method_exists($this, 'set'.$id)) {
+            $this->{'set'.$id}($value);
+
+            return;
+        }
+
+        if (!str_starts_with($id, 'version_')) {
+            throw new InvalidArgumentException("Property $id not found");
+        }
+
+        if (!$value instanceof MediaVersionInterface) {
+            throw new InvalidArgumentException("Property $id must be an instance of MediaVersionInterface");
+        }
+
+        $value->setVersion(substr($id, 8));
+        $this->addVersion($value);
     }
 
     public function __isset($id): bool

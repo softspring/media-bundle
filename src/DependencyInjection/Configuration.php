@@ -166,6 +166,7 @@ class Configuration implements ConfigurationInterface
                                 ->defaultValue('image')
                             ->end()
                             ->scalarNode('name')->end()
+                            ->booleanNode('private')->defaultFalse()->end()
                             ->scalarNode('description')->end()
                             ->scalarNode('generator')->defaultValue(DefaultNameGenerator::class)->end()
                             ->append($this->getUploadRequirementsNode())

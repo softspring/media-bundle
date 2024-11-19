@@ -62,7 +62,7 @@ class MediaTypeSearchFilterForm extends PaginatorForm
         ]);
 
         $validTypes = $options['valid_types'];
-        $filteredTypes = array_intersect_key($this->mediaTypesCollection->getTypes(), array_flip($validTypes));
+        $filteredTypes = array_intersect_key($this->mediaTypesCollection->getTypes(false), array_flip($validTypes));
 
         if (count($filteredTypes) > 1) {
             $builder->add('type', ChoiceType::class, [

@@ -155,6 +155,7 @@ class ConfigurationTest extends TestCase
                     ],
                     'video_sets' => [
                     ],
+                    'private' => false,
                 ],
             ],
         ];

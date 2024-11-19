@@ -48,7 +48,7 @@ class MediaListFilterForm extends PaginatorForm implements MediaListFilterFormIn
         $builder->add('type', ChoiceType::class, [
             'required' => false,
             'choice_translation_domain' => false,
-            'choices' => array_flip(array_map(fn ($v) => $v['name'], $this->mediaTypesCollection->getTypes())),
+            'choices' => array_flip(array_map(fn ($v) => $v['name'], $this->mediaTypesCollection->getTypes(false))),
             'multiple' => true,
             'property_path' => '[type__in]',
         ]);
