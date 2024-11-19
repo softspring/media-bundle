@@ -74,7 +74,9 @@ class MediaTypeUploadType extends AbstractType
                 return;
             }
 
+            $typeConfig = $this->mediaTypesCollection->getType($options['media_type']);
             $media->setType($options['media_type']);
+            $media->setPrivate($typeConfig['private'] ?? false);
         });
     }
 }

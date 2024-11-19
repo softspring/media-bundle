@@ -11,6 +11,8 @@ abstract class Media implements MediaInterface
 {
     protected ?int $mediaType = null;
 
+    protected ?bool $private = null;
+
     protected ?string $type = null;
 
     protected ?string $name = null;
@@ -24,6 +26,16 @@ abstract class Media implements MediaInterface
     public function __construct()
     {
         $this->versions = new ArrayCollection();
+    }
+
+    public function getPrivate(): ?bool
+    {
+        return $this->private;
+    }
+
+    public function setPrivate(?bool $private): void
+    {
+        $this->private = $private;
     }
 
     public function getMediaType(): ?int
@@ -81,6 +93,11 @@ abstract class Media implements MediaInterface
         return $this->createdAt ? DateTime::createFromFormat('U', "$this->createdAt") : null;
     }
 
+    public function setCreatedAt(?int $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
+
     public function markCreatedAtNow(): void
     {
         $this->createdAt = (int) gmdate('U');
@@ -121,6 +138,7 @@ abstract class Media implements MediaInterface
     {
         if (method_exists($this, 'set'.$id)) {
             $this->{'set'.$id}($value);
+
             return;
         }
 

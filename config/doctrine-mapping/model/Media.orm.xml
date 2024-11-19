@@ -12,6 +12,7 @@
         </field>
 
         <field name="type" column="type_key" type="string" length="50" nullable="false"/>
+        <field name="private" column="type_private" type="boolean" nullable="false"/>
 
         <field name="name" column="name" type="string" nullable="true"/>
 

@@ -18,6 +18,10 @@ interface MediaInterface
 
     public function setMediaType(?int $mediaType): void;
 
+    public function getPrivate(): ?bool;
+
+    public function setPrivate(?bool $private): void;
+
     public function isVideo(): bool;
 
     public function isImage(): bool;
