@@ -13,7 +13,7 @@
 
         <field name="type" column="type_key" type="string" length="50" nullable="false"/>
 
-        <field name="name" column="name" type="string" nullable="false"/>
+        <field name="name" column="name" type="string" nullable="true"/>
 
         <field name="description" column="description" type="string" nullable="true"/>
 

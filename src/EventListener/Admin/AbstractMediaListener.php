@@ -32,7 +32,7 @@ abstract class AbstractMediaListener implements EventSubscriberInterface
 
     public function onViewAddMediaTypes(ViewEvent $event): void
     {
-        $event->getData()['media_types'] = $this->mediaTypesCollection->getTypes();
+        $event->getData()['media_types'] = $this->mediaTypesCollection->getTypes(false);
     }
 
     public function onCreateEntityCreateWithType(CreateEntityEvent $event): void

@@ -18,8 +18,14 @@ class MediaTypesCollection
         }
     }
 
-    public function getTypes(): array
+    public function getTypes(?bool $private = null): array
     {
+        if (is_bool($private)) {
+            return array_filter($this->types, function ($type) use ($private) {
+                return $type['private'] === $private;
+            });
+        }
+
         return $this->types;
     }
 

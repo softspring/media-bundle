@@ -30,6 +30,8 @@ class MediaTypeUploadType extends AbstractType
             'data_class' => $this->mediaManager->getEntityClass(),
             'media_type' => null,
             'required_uploads' => true,
+            'allow_name_field' => true,
+            'allow_description_field' => true,
         ]);
 
         $resolver->setRequired('media_type');
@@ -43,8 +45,8 @@ class MediaTypeUploadType extends AbstractType
     {
         $typeDefinition = $this->mediaTypesCollection->getType($options['media_type']);
 
-        $builder->add('name');
-        $builder->add('description');
+        $options['allow_name_field'] && $builder->add('name');
+        $options['allow_description_field'] && $builder->add('description');
 
         $builder->add('_original', MediaVersionUploadType::class, [
             'property_path' => 'version__original',

@@ -27,6 +27,8 @@ interface MediaVersionInterface
 
     public function setUrl(?string $url): void;
 
+    public function getPublicUrl(): ?string;
+
     public function getWidth(): ?int;
 
     public function setWidth(?int $width): void;

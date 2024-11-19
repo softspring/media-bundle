@@ -91,17 +91,49 @@ abstract class Media implements MediaInterface
         return $this->versions;
     }
 
+    public function setVersions(?Collection $versions): void
+    {
+        $this->versions = $versions;
+    }
+
     /**
      * @return ?MediaVersionInterface
      * @throws InvalidArgumentException
      */
     public function __get($id)
     {
+        if (method_exists($this, 'get'.$id)) {
+            return $this->{'get'.$id}();
+        }
+
         if (!str_starts_with($id, 'version_')) {
             throw new InvalidArgumentException("Property $id not found");
         }
 
         return $this->getVersion(substr($id, 8));
+    }
+
+    /**
+     * @return ?void
+     * @throws InvalidArgumentException
+     */
+    public function __set($id, $value)
+    {
+        if (method_exists($this, 'set'.$id)) {
+            $this->{'set'.$id}($value);
+            return;
+        }
+
+        if (!str_starts_with($id, 'version_')) {
+            throw new InvalidArgumentException("Property $id not found");
+        }
+
+        if (!$value instanceof MediaVersionInterface) {
+            throw new InvalidArgumentException("Property $id must be an instance of MediaVersionInterface");
+        }
+
+        $value->setVersion(substr($id, 8));
+        $this->addVersion($value);
     }
 
     public function __isset($id): bool
