@@ -39,6 +39,34 @@ admin_medias:
             delete.button: "Borrar media"
             migrate.button: "Migrar configuración"
 
+    delete:
+        meta.title: "%name%"
+        title: "%name%"
+        breadcrumb: "Eliminar media"
+        message: "¿Estás seguro de que quieres eliminar este media?"
+        actions:
+            delete.button: "Eliminar media"
+            cancel.button: "Cancelar"
+        success_flash: "El media ha sido eliminado correctamente"
+        failure_flash: "La eliminación del media ha fallado.<br/><small>%exception%</small><br/><small>%previous%</small>"
+        exception_flash: "La eliminación del media ha fallado.<br/><small>%exception%</small><br/><small>%previous%</small>"
+
+    update:
+        meta.title: "%name%"
+        title: "%name%"
+        breadcrumb: "Editar media"
+        actions:
+            update.button: "Guardar cambios"
+            cancel.button: "Cancelar"
+        success_flash: "Media actualizado correctamente"
+        failure_flash: "El media no se ha podido actualizar.<br/><small>%exception%</small><br/><small>%previous%</small>"
+        exception_flash: "El media no se ha podido actualizar.<br/><small>%exception%</small><br/><small>%previous%</small>"
+
+    migrate:
+        success_flash: "Media migrado correctamente"
+        failure_flash: "Ha fallado la migración del media.<br/><small>%exception%</small><br/><small>%previous%</small>"
+        exception_flash: "Ha fallado la migración del media.<br/><small>%exception%</small><br/><small>%previous%</small>"
+
     form:
         name.label: "Nombre de la archivo"
         description.label: "Descripción"

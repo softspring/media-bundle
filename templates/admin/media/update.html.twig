@@ -1,6 +1,6 @@
 {% trans_default_domain 'sfs_media_admin' %}
 {% extends '@SfsMedia/admin_layout.html.twig' %}
-{% block title %}{{ 'admin_medias.update.meta.title'|trans({'%type%':type_config.name}) }}{% endblock %}
+{% block title %}{{ 'admin_medias.update.meta.title'|trans({'%type%':type_config.name, '%name%': media.name }) }}{% endblock %}
 
 {% form_theme form
     'bootstrap_5_layout.html.twig'
@@ -11,7 +11,7 @@
     {{ parent() }}
     <li class="breadcrumb-item"><a href="{{ url('sfs_media_admin_medias_list') }}">{{ 'admin_medias.list.breadcrumb'|trans }}</a></li>
     <li class="breadcrumb-item"><a href="{{ url('sfs_media_admin_medias_read', {'media': media}) }}">{{ 'admin_medias.read.breadcrumb'|trans }}</a></li>
-    <li class="breadcrumb-item active" aria-current="content">{{ 'admin_medias.update.breadcrumb'|trans({'%type%':type_config.name}) }}</li>
+    <li class="breadcrumb-item active" aria-current="content">{{ 'admin_medias.update.breadcrumb'|trans({'%type%':type_config.name, '%name%': media.name }) }}</li>
 {% endblock breadcrums_content %}
 
 {% block content %}
