@@ -2,8 +2,6 @@
 {% extends '@SfsMedia/admin_layout.html.twig' %}
 {% block title %}{{ 'admin_medias.list.meta.title'|trans }}{% endblock %}
 
-{% form_theme filterForm 'bootstrap_5_horizontal_layout.html.twig' %}
-
 {% block breadcrums_content %}
     {{ parent() }}
     <li class="breadcrumb-item active" aria-current="content">{{ 'admin_medias.list.breadcrumb'|trans }}</li>
@@ -28,7 +26,7 @@
         <div class="d-flex align-items-center justify-content-between mb-4">
             <h1 class="h3">{{ 'admin_medias.list.title'|trans }}</h1>
 
-            <div class="float-end">
+            <div class="d-flex flex-wrap justify-items-end alig-items-center">
                 {% if is_granted('PERMISSION_SFS_MEDIA_ADMIN_MEDIAS_CREATE') and media_types|length %}
                     <div class="dropdown">
                         <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownCreateMedia" data-bs-toggle="dropdown" aria-expanded="false">
@@ -44,14 +42,15 @@
             </div>
         </div>
 
-        {% if filterForm.vars.submitted or entities|length %}
-            <div class="mb-4">
+        <div class="container-fluid bg-white p-4">
+            {% if filterForm.vars.submitted or entities|length %}
+            <div class="mb-5">
                 {{ form_start(filterForm) }}
-                <div class="row">
-                    {% if filterForm.name is defined %}<div class="col">{{ form_row(filterForm.name, {'row_class':'form-floating'}) }}</div>{% endif %}
-                    {% if filterForm.type is defined %}<div class="col">{{ form_row(filterForm.type, {'row_class':'form-floating'}) }}</div>{% endif %}
-
-                    <div class="col">
+                <button class="btn btn-link px-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter"><i class="bi bi-filter h4 text-muted align-middle"></i> Filters</button>
+                <div class="row align-items-start border shadow-sm rounded p-3 collapse show" id="collapseFilter">
+                    {% if filterForm.name is defined %}<div class="col-12 col-md-6 col-lg-4">{{ form_row(filterForm.name) }}</div>{% endif %}
+                    {% if filterForm.type is defined %}<div class="col-12 col-md-6 col-lg-4">{{ form_row(filterForm.type) }}</div>{% endif %}
+                    <div class="col pt-4 mt-2">
                         <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>
                     </div>
                 </div>
@@ -59,17 +58,17 @@
                 {{ form_rest(filterForm) }}
                 {{ form_end(filterForm) }}
             </div>
-        {% endif %}
-
-        {% if entities|length %}
-            {% include '@SfsMedia/admin/media/list-page.html.twig' %}
-            {% include '@SfsComponents/paginator/pager.html.twig' with {'collection': entities} %}
-        {% else %}
-            <div class="p-5 m-5">
-                <p class="text-center text-muted">
-                    Upload first media
-                </p>
-            </div>
-        {% endif %}
+            {% endif %}
+            {% if entities|length %}
+                {% include '@SfsMedia/admin/media/list-page.html.twig' %}
+                {% include '@SfsComponents/paginator/pager.html.twig' with {'collection': entities} %}
+            {% else %}
+                <div class="p-5 m-5">
+                    <p class="text-center text-muted">
+                        Upload first media
+                    </p>
+                </div>
+            {% endif %}
+        </div>
     {% endif %}
 {% endblock content %}
