@@ -43,10 +43,12 @@ class StoreFileProcessor implements ProcessorInterface
         // clean database options
         $databaseOptions = $version->getOptions();
         unset($databaseOptions['upload_requirements']);
+        unset($databaseOptions['from']);
         $version->setOptions($databaseOptions);
 
         $version->setFileMimeType($upload->getMimeType());
-        $version->setFileSize($upload->getSize());
+        clearstatcache(); // prevent filesize cache problems returning 0
+        $version->setFileSize(filesize($version->getUpload()->getRealPath()));
 
         // call generator
         $generator = $this->mediaTypesCollection->getType($version->getMedia()->getType())['generator'];

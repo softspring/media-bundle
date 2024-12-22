@@ -1,0 +1,10 @@
+{% use 'bootstrap_5_layout.html.twig' %}
+
+{% block _type_entry_widget %}
+    {{ form_widget(form, {'attr': {'onclick': 'submit()'}}) }}
+{% endblock %}
+
+{% block form_label %}
+    {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' fw-bold')|trim}) %}
+    {{ parent() }}
+{% endblock form_label %}

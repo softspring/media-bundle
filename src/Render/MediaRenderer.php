@@ -2,7 +2,9 @@
 
 namespace Softspring\MediaBundle\Render;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Softspring\MediaBundle\Entity\Media;
 use Softspring\MediaBundle\Exception\InvalidTypeException;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
@@ -11,12 +13,17 @@ use Softspring\MediaBundle\Type\MediaTypesCollection;
 
 class MediaRenderer
 {
-    public function __construct(protected MediaTypesCollection $mediaTypesCollection, protected StorageDriverInterface $storageDriver)
-    {
+    public function __construct(
+        protected MediaTypesCollection $mediaTypesCollection,
+        protected StorageDriverInterface $storageDriver,
+        protected EntityManagerInterface $em,
+    ) {
     }
 
-    public function imageUrl(MediaInterface $media, $version, array $attr = []): ?string
+    public function imageUrl(MediaInterface|string $media, $version, array $attr = []): ?string
     {
+        $media = $this->getMedia($media);
+
         if (is_array($version)) {
             foreach ($version as $singleVersion) {
                 if ($url = $this->getFinalUrl($singleVersion)) {
@@ -57,8 +64,10 @@ class MediaRenderer
     /**
      * @throws Exception
      */
-    public function render(?MediaInterface $media, ?string $versionString, array $attr = []): string
+    public function render(MediaInterface|string|null $media, ?string $versionString, array $attr = []): string
     {
+        $media = $this->getMedia($media);
+
         if (!$media || !$versionString) {
             return '';
         }
@@ -74,8 +83,10 @@ class MediaRenderer
         };
     }
 
-    public function renderVideo(MediaInterface $media, $version, array $attr = []): string
+    public function renderVideo(MediaInterface|string $media, $version, array $attr = []): string
     {
+        $media = $this->getMedia($media);
+
         if (is_array($version)) {
             foreach ($version as $singleVersion) {
                 if ($html = $this->renderVideo($media, $singleVersion, $attr)) {
@@ -98,8 +109,10 @@ class MediaRenderer
         }
     }
 
-    public function renderImage(?MediaInterface $media, $version, array $attr = []): string
+    public function renderImage(MediaInterface|string|null $media, $version, array $attr = []): string
     {
+        $media = $this->getMedia($media);
+
         if (!$media) {
             return '';
         }
@@ -125,8 +138,10 @@ class MediaRenderer
      * @throws InvalidTypeException
      * @throws Exception
      */
-    public function renderPicture(?MediaInterface $media, string $picture = '_default', array $pictureAttr = [], array $imgAttr = []): string
+    public function renderPicture(MediaInterface|string|null $media, string $picture = '_default', array $pictureAttr = [], array $imgAttr = []): string
     {
+        $media = $this->getMedia($media);
+
         if (!$media) {
             return '';
         }
@@ -150,6 +165,15 @@ class MediaRenderer
         $html .= '</picture>';
 
         return $html;
+    }
+
+    protected function getMedia(MediaInterface|string|null $media): ?MediaInterface
+    {
+        if (is_string($media)) {
+            return $this->em->getRepository(Media::class)->findOneBy(['id' => $media]);
+        }
+
+        return $media;
     }
 
     protected function htmlAttributes(array $attributes): string

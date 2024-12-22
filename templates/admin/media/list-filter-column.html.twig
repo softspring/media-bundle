@@ -1,0 +1,25 @@
+{% form_theme filterForm '@SfsMedia/forms/admin_theme.html.twig' %}
+
+{% block fields %}
+    {% if filterForm.name is defined %}
+        {{ form_row(filterForm.name, {'attr': {'onchange': 'submit()'}}) }}
+    {% endif %}
+
+    {% if filterForm.description is defined %}
+        {{ form_row(filterForm.description, {'attr': {'onchange': 'submit()'}}) }}
+    {% endif %}
+
+    {% if filterForm.text is defined %}
+        {{ form_row(filterForm.text, {'attr': {'onchange': 'submit()'}}) }}
+    {% endif %}
+
+    {% if filterForm.type is defined %}
+        {{ form_row(filterForm.type, {}) }}
+    {% endif %}
+{% endblock %}
+
+{% block actions %}
+<div class="d-grid gap-2">
+    <button type="submit" class="btn btn-primary btn-block"><i class="bi bi-search"></i> Filter</button>
+</div>
+{% endblock %}

@@ -8,34 +8,16 @@
     <li class="breadcrumb-item active" aria-current="content">{{ 'admin_medias.read.breadcrumb'|trans({'%name%': media.name }) }}</li>
 {% endblock breadcrums_content %}
 
-
-{%- macro bytesToSize(bytes) -%}
-    {% set kilobyte = 1024 %}
-    {% set megabyte = kilobyte * 1024 %}
-    {% set gigabyte = megabyte * 1024 %}
-    {% set terabyte = gigabyte * 1024 %}
-
-    {% if bytes < kilobyte %}
-        {{ bytes ~ ' B' }}
-    {% elseif bytes < megabyte %}
-        {{ (bytes / kilobyte)|number_format(2, '.') ~ ' KiB' }}
-    {% elseif bytes < gigabyte %}
-        {{ (bytes / megabyte)|number_format(2, '.') ~ ' MiB' }}
-    {% elseif bytes < terabyte %}
-        {{ (bytes / gigabyte)|number_format(2, '.') ~ ' GiB' }}
-    {% else %}
-        {{ (bytes / terabyte)|number_format(2, '.') ~ ' TiB' }}
-    {% endif %}
-{%- endmacro -%}
+{% import '@SfsMedia/admin/media/_macros.html.twig' as macros %}
 
 {% block content %}
     <div class="float-end">
         {% if (checkVersions.new|length) + (checkVersions.delete|length) + (checkVersions.changed|length) %}
             {% if is_granted('PERMISSION_SFS_MEDIA_ADMIN_MEDIAS_MIGRATE', media) %}
                 <a href="{{ url('sfs_media_admin_medias_migrate', {'media': media}) }}" class="btn btn-primary">{{ 'admin_medias.read.actions.migrate.button'|trans }}</a>
-             {% else %}
-                 <a class="btn btn-primary disabled">{{ 'admin_medias.read.actions.migrate.button'|trans }}</a>
-             {% endif %}
+            {% else %}
+                <a class="btn btn-primary disabled">{{ 'admin_medias.read.actions.migrate.button'|trans }}</a>
+            {% endif %}
         {% endif %}
         {% if is_granted('PERMISSION_SFS_MEDIA_ADMIN_MEDIAS_UPDATE', media) %}
             <a href="{{ url('sfs_media_admin_medias_update', {'media': media}) }}" class="btn btn-primary">{{ 'admin_medias.read.actions.update.button'|trans }}</a>
@@ -54,139 +36,21 @@
         <p>{{ media.description|nl2br }}</p>
     {% endif %}
 
-    {% for version in checkVersions.new %}
-        <div class="alert alert-warning" role="alert">
-            Missing <strong>{{ version }}</strong> in this media, seems to be a <strong>new version</strong> in config. You need to run media migrations command.
-        </div>
-    {% endfor %}
-    {% for version in checkVersions.delete %}
-        <div class="alert alert-warning" role="alert">
-            Media <strong>{{ version }}</strong> version has been <strong>deleted</strong> in config. You need to run media migrations command to cleanup medias.
-        </div>
-    {% endfor %}
-    {% for version,changedOptions in checkVersions.changed %}
-        <div class="alert alert-warning" role="alert">
-            Media <strong>{{ version }}</strong> version has been <strong>changed</strong> in config ({{ changedOptions|map((changedOption) => changedOption.string)|join(', ') }}). You need to run media migrations command to cleanup medias.
-        </div>
-    {% endfor %}
-    {% for version in checkVersions.manual %}
-        <div class="alert alert-warning" role="alert">
-            Missing <strong>{{ version }}</strong> version in this media, seems to be <strong>new</strong> in config. It's mandatory that you provide this file manually.
-        </div>
-    {% endfor %}
+    {% include '@SfsMedia/admin/media/read_version_alerts.html.twig' %}
 
     <div class="container-fluid bg-white p-4">
         <div class="row">
             <div class="col">
-                <h4>Original</h4>
-                <div>
-                    {% if media.isVideo %}
-                        {{ media|sfs_media_render_video('_original', {'class':'img-thumbnail', 'controls': '', 'alt': 'Original media', 'title': 'Original media'}) }}
-                    {% elseif media.isImage %}
-                        {{ media|sfs_media_render_image('_original', {'class':'img-thumbnail', 'alt': 'Original media', 'title': 'Original media'}) }}
-                    {% endif %}
-                </div>
-                {{ media.version('_original').width }}x{{ media.version('_original').height }}
-                {{ media.version('_original').fileMimeType }}
-                {{ _self.bytesToSize(media.version('_original').fileSize) }}
-                <br/>
-                <em>Uploaded at: {{ media.version('_original').uploadedAt|date_span('H:i:s d-m-Y') }}</em>
+                {{ macros.renderOriginal(media) }}
             </div>
         </div>
 
         {% for version in media.versions|filter((version) => version.version not in ['_original'])|sort((a, b) => (a.width+a.height) <=> (b.width+b.height))|reverse %}
             <div class="row mt-5">
                 <div class="col">
-                    <h4>{{ version.version }}</h4>
-                    <div>
-                        {% if media.isVideo %}
-                            {% if version.fileMimeType starts with 'image/' %}
-                                {# can be a poster #}
-                                {{ media|sfs_media_render_image(version.version, {'class':'img-'~version.version}) }}
-                            {% else %}
-                                {{ media|sfs_media_render_video(version.version, {'class':'img-'~version.version}) }}
-                            {% endif %}
-                        {% elseif media.isImage %}
-                            {{ media|sfs_media_render_image(version.version, {'class':'img-'~version.version}) }}
-                        {% endif %}
-                    </div>
-                    {{ version.width }}x{{ version.height }}
-                    {{ version.fileMimeType }}
-                    {{ _self.bytesToSize(version.fileSize) }}
-                    {% for option,value in version.options %}
-                        {{ option }}: {{ value }}
-                    {% endfor %}
-                    <br/>
-                    <em>
-                        {% if version.uploadedAt %}
-                            Uploaded at: {{ version.uploadedAt|date_span('H:i:s d-m-Y') }}
-                        {% elseif version.generatedAt %}
-                            Automatically generated at: {{ version.generatedAt|date_span('H:i:s d-m-Y') }}
-                        {% endif %}
-                    </em>
-                    <br/>
-                    <br/>
-                    {% if media.isVideo %}
-                        {% if version.fileMimeType starts with 'image/' %}
-                            {# can be a poster #}
-                            <pre><code>&#123;&#123; media|sfs_media_render_image('{{ version.version }}', {'class':'img-{{ version.version }}'}) &#125;&#125;</code></pre>
-                        {% else %}
-                            <pre><code>&#123;&#123; media|sfs_media_render_video('{{ version.version }}', {'class':'img-{{ version.version }}'}) &#125;&#125;</code></pre>
-                        {% endif %}
-                    {% elseif media.isImage %}
-                        <pre><code>&#123;&#123; media|sfs_media_render_image('{{ version.version }}', {'class':'img-{{ version.version }}'}) &#125;&#125;</code></pre>
-                    {% endif %}
+                    {{ macros.renderVersion(media, version) }}
                 </div>
             </div>
         {% endfor %}
     </div>
-
-    {% if type_config.pictures|length %}
-        {% for picture_id, config in type_config.pictures %}
-        <div class="container p-4">
-            <div class="row">
-                <div class="col">
-                    <h3>Picture tag: {{ picture_id }}</h3>
-                    <pre><code>&#123;&#123; media|sfs_media_render_picture('{{ picture_id }}', {'data-example':'test'}, {'class': 'img-fluid'}) &#125;&#125;
-
-{{ media|sfs_media_render_picture(picture_id, {'data-example':'test'}, {'class': 'img-fluid'})|replace({'>':">\n"})|e('html') }}</code></pre>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    {% endif %}
-
-    {% if type_config.video_sets|length %}
-        {% for video_set_id, config in type_config.video_sets %}
-            <div class="container p-4">
-                <div class="row">
-                    <div class="col">
-                        <h3>Video sources set: {{ video_set_id }}</h3>
-                        <pre><code>&#123;&#123; media|sfs_media_render_video_set('{{ video_set_id }}') &#125;&#125;
-
-{{ media|sfs_media_render_video_set(video_set_id)|replace({'>':">\n"})|e('html') }}</code></pre>
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
-    {% endif %}
-
-    {% if linked_cms_versions is defined and linked_cms_versions|length %}
-        <div class="container p-4">
-            <h3>Linked CMS contents</h3>
-            <ul>
-                {% for content_version in linked_cms_versions %}
-                    <li>
-                        {% set content_type = sfs_cms_content_type(content_version.content) %}
-                        <a href="{{ url('sfs_cms_admin_content_'~content_type~'_version_info', {'content':content_version.content, 'version':content_version}) }}">
-                            {{ content_version.content.name }}
-                            v{{ content_version.versionNumber }}
-                        </a>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-    {% endif %}
-
-
 {% endblock content %}

@@ -33,6 +33,12 @@ sfs_media_admin_medias_migrate:
     defaults:
         configKey: migrate
 
+sfs_media_admin_medias_read_ajax:
+    controller: sfs_media.admin.media.controller::read
+    path: /{media}.ajax
+    defaults:
+        configKey: read_ajax
+
 sfs_media_admin_medias_read:
     controller: sfs_media.admin.media.controller::read
     path: /{media}

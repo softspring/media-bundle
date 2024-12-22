@@ -1,0 +1,127 @@
+{%- macro bytesToSize(bytes) -%}
+    {% set kilobyte = 1024 %}
+    {% set megabyte = kilobyte * 1024 %}
+    {% set gigabyte = megabyte * 1024 %}
+    {% set terabyte = gigabyte * 1024 %}
+
+    {% if bytes < kilobyte %}
+        {{ bytes ~ ' B' }}
+    {% elseif bytes < megabyte %}
+        {{ (bytes / kilobyte)|number_format(2, '.') ~ ' KiB' }}
+    {% elseif bytes < gigabyte %}
+        {{ (bytes / megabyte)|number_format(2, '.') ~ ' MiB' }}
+    {% elseif bytes < terabyte %}
+        {{ (bytes / gigabyte)|number_format(2, '.') ~ ' GiB' }}
+    {% else %}
+        {{ (bytes / terabyte)|number_format(2, '.') ~ ' TiB' }}
+    {% endif %}
+{%- endmacro -%}
+
+
+{%- macro renderOriginal(media) -%}
+    {{ _self.renderVersion(media, media.version('_original')) }}
+{%- endmacro -%}
+
+{%- macro renderVersion(media, version) -%}
+    <div class="text-small text-black-50 mb-1">
+        {% if media.isImage %}
+            <span class="me-2">Image size: {{ version.width }}x{{ version.height }}</span>
+        {% endif %}
+
+        <span class="me-2">Format: {{ version.fileMimeType }}</span>
+        <span class="me-2">File size: {{ _self.bytesToSize(version.fileSize) }}</span>
+
+        <div class="float-end mb-1">
+            <span class="me-2">
+                {% if version.uploadedAt %}
+                    Uploaded at: {{ version.uploadedAt|date_span('H:i:s d-m-Y') }}
+                {% elseif version.generatedAt %}
+                    <abbr title="PARAMETERS:
+{% for option,value in version.options %}{{ option }}: {{ value }}
+{% endfor %}">Automatically generated</abbr> at: {{ version.generatedAt|date_span('H:i:s d-m-Y') }}
+                {% endif %}
+            </span>
+            {# <a class="btn btn-link btn-sm" href="{{ version.publicUrl }}" download>
+                <i class="bi bi-download"></i>
+            </a> #}
+            <a class="btn btn-link btn-sm" href="{{ version.publicUrl }}" target="_blank">
+                <i class="bi bi-box-arrow-up-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        {% if media.isVideo %}
+            {% if version.fileMimeType starts with 'image/' %}
+                {# can be a poster #}
+                {{ media|sfs_media_render_image(version.version, {'class':'img-fluid img-'~version.version}) }}
+            {% else %}
+                {{ media|sfs_media_render_video(version.version, {'class':'img-fluid img-'~version.version, 'controls': true, 'autoplay': true, 'loop': true}) }}
+            {% endif %}
+        {% elseif media.isImage %}
+            {{ media|sfs_media_render_image(version.version, {'class':'img-fluid img-thumbnail img-'~version.version}) }}
+        {% endif %}
+    </div>
+
+    {#    {% if media.isVideo %} #}
+    {#        {% if version.fileMimeType starts with 'image/' %} #}
+    {#            #}{# can be a poster #}
+    {#            <pre class="border border-1 border-secondary p-2 text-secondary"><code>&#123;&#123; media|sfs_media_render_image('{{ version.version }}', {'class':'video-custom'}) &#125;&#125;</code></pre> #}
+    {#        {% else %} #}
+    {#            <pre class="border border-1 border-secondary p-2 text-secondary"><code>&#123;&#123; media|sfs_media_render_video('{{ version.version }}', {'class':'video-custom'}) &#125;&#125;</code></pre> #}
+    {#        {% endif %} #}
+    {#    {% elseif media.isImage %} #}
+    <p>
+        <a data-bs-toggle="collapse" href="#howToUse_{{ version.version }}" role="button" aria-expanded="false"
+           aria-controls="howToUse_{{ version.version }}">
+            <i class="bi bi-info-circle"></i> How to use this media
+        </a>
+    </p>
+
+    <div class="collapse" id="howToUse_{{ version.version }}">
+        <div class="card card-body bg-light">
+            <p>
+                <strong>Directly using the URL</strong><br/>
+                <a href="{{ version.publicUrl }}" target="_blank">{{ version.publicUrl }}</a>
+            </p>
+
+            {% if media.isImage %}
+                <p>
+                    <strong>Include HTML</strong><br/>
+                </p>
+                <pre class="border border-1 border-secondary p-2 text-secondary"><code>{{ sfs_media_render_image(version.media.id, version.version, {'class':'img-custom'})|escape }}</code></pre>
+            {% else %}
+                <p>
+                    <strong>Include HTML</strong><br/>
+                </p>
+                <pre class="border border-1 border-secondary p-2 text-secondary"><code>{{ sfs_media_render_video(version.media.id, version.version, {'class':'video-custom', 'controls': true, 'autoplay': true, 'loop': true})|escape }}</code></pre>
+            {% endif %}
+
+            {% if media.isImage %}
+                <p>
+                    <strong>Render twig (by object)</strong><br/>
+                </p>
+                <pre class="border border-1 border-secondary p-2 text-secondary"><code>&#123;&#123; media|sfs_media_render_image('{{ version.version }}', {'class':'img-custom'}) &#125;&#125;</code></pre>
+            {% else %}
+                <p>
+                    <strong>Render twig (by object)</strong><br/>
+                </p>
+                <pre class="border border-1 border-secondary p-2 text-secondary"><code>&#123;&#123; media|sfs_media_render_video('{{ version.version }}', {'class':'video-custom', 'controls': true, 'autoplay': true, 'loop': true}) &#125;&#125;</code></pre>
+            {% endif %}
+
+            {% if media.isImage %}
+                <p>
+                    <strong>Render twig (by id)</strong><br/>
+                </p>
+                <pre class="border border-1 border-secondary p-2 text-secondary"><code>&#123;&#123; sfs_media_render_image('{{ version.media.id }}', '{{ version.version }}', {'class':'img-custom'}) &#125;&#125;</code></pre>
+            {% else %}
+                <p>
+                    <strong>Render twig (by id)</strong><br/>
+                </p>
+                <pre class="border border-1 border-secondary p-2 text-secondary"><code>&#123;&#123; sfs_media_render_video('{{ version.media.id }}', '{{ version.version }}', {'class':'video-custom', 'controls': true, 'autoplay': true, 'loop': true}) &#125;&#125;</code></pre>
+            {% endif %}
+        </div>
+    </div>
+
+    {#    {% endif %} #}
+{%- endmacro -%}

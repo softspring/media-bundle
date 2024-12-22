@@ -5,6 +5,7 @@ parameters:
     sfs_media.admin.medias.update_view: '@@SfsMedia/admin/media/update.html.twig'
     sfs_media.admin.medias.delete_view: '@@SfsMedia/admin/media/delete.html.twig'
     sfs_media.admin.medias.read_view: '@@SfsMedia/admin/media/read.html.twig'
+    sfs_media.admin.medias.read_ajax_view: '@@SfsMedia/admin/media/read_ajax.html.twig'
 
 services:
     _defaults:
@@ -105,6 +106,16 @@ services:
                     view_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_READ_VIEW
                     exception_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_READ_EXCEPTION
                     view: '%sfs_media.admin.medias.read_view%'
+                read_ajax:
+                    is_granted: 'PERMISSION_SFS_MEDIA_ADMIN_MEDIAS_DETAILS'
+                    param_converter_key: 'id'
+                    initialize_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_READ_INITIALIZE
+                    load_entity_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_READ_LOAD_ENTITY
+                    not_found_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_READ_NOT_FOUND
+                    found_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_READ_FOUND
+                    view_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_READ_VIEW
+                    exception_event_name: !php/const Softspring\MediaBundle\SfsMediaEvents::ADMIN_MEDIAS_READ_EXCEPTION
+                    view: '%sfs_media.admin.medias.read_ajax_view%'
                 search_type:
                     filter_form: 'Softspring\MediaBundle\Form\MediaTypeSearchFilterForm'
                     view: '@@SfsMedia/admin/media/search_type.html.twig'

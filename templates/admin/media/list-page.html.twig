@@ -1,35 +1,72 @@
 {% trans_default_domain 'sfs_media_admin' %}
 
-<div class="row">
 {% for media in entities %}
     <div class="col-6 col-md-3">
         <div class="card text-center mb-3">
-            {% if is_granted('PERMISSION_SFS_MEDIA_ADMIN_MEDIAS_DETAILS', media) %}
-                <a href="{{ url('sfs_media_admin_medias_read', {'media':media.id}) }}" class="ml-2 text-nowrap text-dark">
-            {% endif %}
-                    {% if media.isVideo %}
-                        <div style="height:200px" class="bg-dark text-center row p-0 m-0 w-100">
-                            <div class="bi bi-play-btn h1 my-auto text-white"></div>
-                        </div>
-                    {% elseif media.isImage %}
-                        <div style="min-height:200px; max-height: 200px; width: auto; display: flex; align-items: center;" class="card-img-top bg-light overflow-hidden">
-                            {{ media|sfs_media_render_image(['_thumbnail'], {'class':'img-fluid w-auto mx-auto', 'style':' max-height: 200px;'}) }}
-                        </div>
-                    {% endif %}
-                    <p class="card-title mb-0 text-truncate px-2" title="{{ media.name }}"><small><strong>{{ media.name }}</strong></small></p>
-                    <span class="small">
-                        {{ media_types[media.type].name }}
+            <a
+                data-bs-target="#mediaPreview" aria-controls="mediaPreview"
+                data-bs-toggle="offcanvas" role="button"
+                data-title="{{ media.name }}"
+                data-description="{{ media.description }}"
+                data-offcanvas-href="{{ url('sfs_media_admin_medias_read_ajax', {'media':media.id}) }}"
+                href="{{ url('sfs_media_admin_medias_read', {'media':media.id}) }}"
+                class="ml-2 text-nowrap text-dark position-relative">
 
+                {% if media.isVideo %}
+                    <div style="height:200px" class="bg-dark text-center row p-0 m-0 w-100 position-relative">
+                        {{ media|sfs_media_render_image(['_thumbnail'], {'class':'img-fluid w-auto mx-auto opacity-50', 'style':''}) }}
+                        <div class="position-absolute top-50" style="margin-top: -20px"><div class="bi bi-play-btn h1 my-auto text-white"></div></div>
+                    </div>
+                {% elseif media.isImage %}
+                    <div style="min-height:200px; max-height: 200px; width: auto; display: flex; align-items: center;"
+                         class="card-img-top bg-light overflow-hidden">
+                        {{ media|sfs_media_render_image(['_thumbnail'], {'class':'img-fluid w-auto mx-auto', 'style':''}) }}
+                    </div>
+                {% endif %}
+                <p class="card-title mb-0 text-truncate px-2" title="{{ media.name }}">
+                    <small><strong>{{ media.name }}</strong></small>
+                </p>
+                <span class="small text-muted">
+                    {{ media_types[media.type].name }}
+                </span>
+                <span class="small text-muted">
+                    {{ media.createdAt|time_ago }}
+                </span>
+
+                {# <p class="small text-muted mb-0">
                         {% if media.isVideo %}
-                            {# nothing yet #}
-                        {% elseif media.isImage %}
-                            {{ media.version('_original').width }}x{{ media.version('_original').height }}
+                #}{# nothing yet #}{#
+                {% elseif media.isImage %}
+                    {{ media.version('_original').width }}x{{ media.version('_original').height }}
+                {% endif %}
+            </p> #}
+
+                {% if linked_cms_versions is defined %}
+                    <p class="container py-2 mb-0">
+                        {% if linked_cms_versions[media.id].universion_content_name|default(false) %}
+                            <span class="small text-truncate p-1 d-block border-top border-1 border-secondary text-primary"><i
+                                        class="bi bi-link"></i> {{ linked_cms_versions[media.id].universion_content_name }}</span>
+                        {% elseif linked_cms_versions[media.id]|default(false) %}
+                            <span class="small text-truncate p-1 d-block border-top border-1 border-secondary text-primary"><i
+                                        class="bi bi-link"></i> Linked to {{ linked_cms_versions[media.id].versions }} versions</span>
+                        {% else %}
+                            <span class="small text-truncate p-1 d-block border-top border-1 border-secondary text-muted">Not linked to any content item</span>
                         {% endif %}
-                    </span>
-            {% if is_granted('PERMISSION_SFS_MEDIA_ADMIN_MEDIAS_DETAILS', media) %}
-                </a>
-            {% endif %}
+                    </p>
+                {% endif %}
+
+            </a>
+            <div class="position-absolute ms-2 mt-2 top-0">
+                <input type="checkbox" data-bs-toggle="" data-bulk-select="" data-bulk-select-colletion="sfs_media" style="width: 20px; height: 20px" />
+            </div>
         </div>
     </div>
 {% endfor %}
-</div>
+
+{% if entities.nextPage %}
+    {% set pagination_route = pagination_route is defined ? pagination_route : app.request.attributes.get('_route') %}
+    {% set pagination_route_attributes = pagination_route_attributes is defined ? pagination_route_attributes : app.request.attributes.get('_route_params') %}
+    {% set query_params = query_params is defined ? query_params : app.request.query.all() %}
+    <a class="d-none" data-pagination="scroll"
+       href="{{ url(pagination_route, query_params|merge(pagination_route_attributes)|merge({ 'page': entities.nextPage })) }}">{{ entities.nextPage }}</a>
+{% endif %}

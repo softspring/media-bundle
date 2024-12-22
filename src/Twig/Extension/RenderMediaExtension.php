@@ -38,6 +38,12 @@ class RenderMediaExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
+            new TwigFunction('sfs_media_render_video', [$this->mediaRenderer, 'renderVideo'], ['is_safe' => ['html']]),
+            new TwigFunction('sfs_media_render_video_set', [$this->mediaRenderer, 'renderVideoWithSources'], ['is_safe' => ['html']]),
+            new TwigFunction('sfs_media_render_image', [$this->mediaRenderer, 'renderImage'], ['is_safe' => ['html']]),
+            new TwigFunction('sfs_media_render_picture', [$this->mediaRenderer, 'renderPicture'], ['is_safe' => ['html']]),
+            new TwigFunction('sfs_media_render', [$this->mediaRenderer, 'renderMediaOrArray'], ['is_safe' => ['html']]),
+            new TwigFunction('sfs_media_image_url', [$this->mediaRenderer, 'imageUrl']),
             new TwigFunction('sfs_media_type_config', [$this, 'getMediaTypeConfig']),
         ];
     }

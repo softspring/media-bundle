@@ -7,18 +7,21 @@ admin_medias:
         filter:
             title: "Selecciona un media del listado o sube un nuevo archivo"
     list:
-        meta.title: "Archivos"
-        title: "Archivos"
-        breadcrumb: "Archivos"
+        meta.title: "Medias"
+        title: "Medias"
+        breadcrumb: "Medias"
         actions:
             create.link: "Nuevo archivo"
         filter_form:
+            text:
+                label: "Texto"
+                placeholder: "Introduce el texto a buscar"
             name:
-                label: "Nombre de archivo"
-                placeholder: "Introduce el nombre del archivo"
+                label: "Nombre"
+                placeholder: "Introduce el nombre"
             type:
-                label: "Tipo de archivo"
-                placeholder: "Selecciona el tipo de archivo"
+                label: "Tipo de media"
+                placeholder: "Selecciona el tipo"
 
     create:
         meta.title: "%type%"
@@ -38,34 +41,6 @@ admin_medias:
             update.button: "Editar media"
             delete.button: "Borrar media"
             migrate.button: "Migrar configuración"
-
-    delete:
-        meta.title: "%name%"
-        title: "%name%"
-        breadcrumb: "Eliminar media"
-        message: "¿Estás seguro de que quieres eliminar este media?"
-        actions:
-            delete.button: "Eliminar media"
-            cancel.button: "Cancelar"
-        success_flash: "El media ha sido eliminado correctamente"
-        failure_flash: "La eliminación del media ha fallado.<br/><small>%exception%</small><br/><small>%previous%</small>"
-        exception_flash: "La eliminación del media ha fallado.<br/><small>%exception%</small><br/><small>%previous%</small>"
-
-    update:
-        meta.title: "%name%"
-        title: "%name%"
-        breadcrumb: "Editar media"
-        actions:
-            update.button: "Guardar cambios"
-            cancel.button: "Cancelar"
-        success_flash: "Media actualizado correctamente"
-        failure_flash: "El media no se ha podido actualizar.<br/><small>%exception%</small><br/><small>%previous%</small>"
-        exception_flash: "El media no se ha podido actualizar.<br/><small>%exception%</small><br/><small>%previous%</small>"
-
-    migrate:
-        success_flash: "Media migrado correctamente"
-        failure_flash: "Ha fallado la migración del media.<br/><small>%exception%</small><br/><small>%previous%</small>"
-        exception_flash: "Ha fallado la migración del media.<br/><small>%exception%</small><br/><small>%previous%</small>"
 
     form:
         name.label: "Nombre de la archivo"
