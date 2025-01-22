@@ -38,6 +38,7 @@ class VersionFileCopyProcessor implements ProcessorInterface
         $extension = [
             'image/jpeg' => 'jpg',
             'image/png' => 'png',
+            'image/apng' => 'apng',
             'image/gif' => 'gif',
             'image/webp' => 'webp',
         ][$originalVersion->getFileMimeType()] ?? '';

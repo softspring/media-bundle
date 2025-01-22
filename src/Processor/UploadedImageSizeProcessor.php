@@ -19,7 +19,7 @@ class UploadedImageSizeProcessor implements ProcessorInterface
 
     public function process(MediaVersionInterface $version): void
     {
-        if (in_array($version->getUpload()->getMimeType(), ['image/png', 'image/gif', 'image/jpeg', 'image/webp'])) {
+        if (in_array($version->getUpload()->getMimeType(), ['image/png', 'image/apng', 'image/gif', 'image/jpeg', 'image/webp'])) {
             [$width, $height] = getimagesize($version->getUpload()->getRealPath());
             $version->setWidth($width);
             $version->setHeight($height);

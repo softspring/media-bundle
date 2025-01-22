@@ -6,6 +6,7 @@ use Softspring\MediaBundle\Exception\InvalidTypeException;
 use Softspring\MediaBundle\Media\NameGenerators;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
 use Softspring\MediaBundle\Storage\StorageDriverInterface;
+use Softspring\MediaBundle\Tools\Apng;
 use Softspring\MediaBundle\Type\MediaTypesCollection;
 
 class StoreFileProcessor implements ProcessorInterface
@@ -45,7 +46,12 @@ class StoreFileProcessor implements ProcessorInterface
         unset($databaseOptions['upload_requirements']);
         $version->setOptions($databaseOptions);
 
-        $version->setFileMimeType($upload->getMimeType());
+        if ($upload->getMimeType() == 'image/png' && Apng::is($upload->getRealPath())) {
+            $version->setFileMimeType('image/apng');
+        } else {
+            $version->setFileMimeType($upload->getMimeType());
+        }
+
         $version->setFileSize($upload->getSize());
 
         // call generator
