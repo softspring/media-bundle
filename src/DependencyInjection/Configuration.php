@@ -28,7 +28,12 @@ class Configuration implements ConfigurationInterface
         function_exists('imagegif') && function_exists('imagecreatefromgif') && ($supportedTypes['versionTypeExtensions'][] = 'gif') && ($supportedTypes['mime'][] = 'image/gif');
         function_exists('imagejpeg') && function_exists('imagecreatefromjpeg') && ($supportedTypes['versionTypeExtensions'][] = 'jpeg') && ($supportedTypes['mime'][] = 'image/jpeg');
         function_exists('imagewebp') && function_exists('imagecreatefromwebp') && ($supportedTypes['versionTypeExtensions'][] = 'webp') && ($supportedTypes['mime'][] = 'image/webp');
-        function_exists('imagepng') && function_exists('imagecreatefrompng') && ($supportedTypes['versionTypeExtensions'][] = 'png') && ($supportedTypes['mime'][] = 'image/png');
+        if (function_exists('imagepng') && function_exists('imagecreatefrompng')) {
+            $supportedTypes['versionTypeExtensions'][] = 'png';
+            $supportedTypes['versionTypeExtensions'][] = 'apng';
+            $supportedTypes['mime'][] = 'image/png';
+            $supportedTypes['mime'][] = 'image/apng';
+        }
 
         return $supportedTypes;
     }
@@ -224,7 +229,7 @@ class Configuration implements ConfigurationInterface
                 ->normalizeKeys(false)
                 ->children()
                     ->append($this->getUploadRequirementsNode())
-                    ->enumNode('type')->values(['jpeg', 'png', 'webp', 'keep'])->end()
+                    ->enumNode('type')->values(['jpeg', 'png', 'webp', 'keep', 'apng'])->end()
                     ->integerNode('scale_width')->end()
                     ->integerNode('scale_height')->end()
                     ->integerNode('png_compression_level')->end()

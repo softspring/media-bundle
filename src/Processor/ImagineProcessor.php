@@ -37,7 +37,7 @@ class ImagineProcessor implements ProcessorInterface
             throw new Exception('Processor support method requires version options are initialized');
         }
 
-        if (!in_array($version->getOriginalVersion()->getFileMimeType(), ['image/jpeg', 'image/png', 'image/gif', 'image/webp'])) {
+        if (!in_array($version->getOriginalVersion()->getFileMimeType(), ['image/jpeg', 'image/png', 'image/apng', 'image/gif', 'image/webp'])) {
             // origin type can not be other than an image
             return false;
         }
@@ -58,6 +58,12 @@ class ImagineProcessor implements ProcessorInterface
 
         $originalVersion = $version->getOriginalVersion();
         $options = $version->getOptions();
+        $saveFormat = $this->getSaveFormat($options, $version);
+
+        if ('image/apng' === $originalVersion->getFileMimeType() && 'apng' === $saveFormat) {
+            // APNG files can not be scaled
+            return;
+        }
 
         $imagine = new Imagine();
         $gdMedia = $imagine->open($version->getUpload()->getRealPath());
@@ -80,12 +86,7 @@ class ImagineProcessor implements ProcessorInterface
         // https://imagine.readthedocs.io/en/stable/usage/introduction.html#save-medias
         $validOptions = array_flip(['png_compression_level', 'webp_quality', 'flatten', 'jpeg_quality', 'resolution-units', 'resolution-x', 'resolution-y', 'resampling-filter']);
         $saveOptions = array_intersect_key($options, $validOptions);
-
-        if ('keep' == $options['type']) {
-            $saveOptions['format'] = $version->getUpload()->getExtension();
-        } else {
-            $saveOptions['format'] = $options['type'];
-        }
+        $saveOptions['format'] = $saveFormat;
 
         // change format if needed
         $fileName = $version->getUpload()->getRealPath();
@@ -99,5 +100,20 @@ class ImagineProcessor implements ProcessorInterface
         }
 
         $gdMedia->save($version->getUpload()->getRealPath(), $saveOptions);
+    }
+
+    protected function getSaveFormat(array $options, MediaVersionInterface $currentVersion): string
+    {
+        if ('keep' !== $options['type']) {
+            return $options['type'];
+        }
+
+        $saveFormat = $currentVersion->getUpload()->getExtension();
+
+        if ('image/apng' === $currentVersion->getOriginalVersion()->getFileMimeType() && 'png' === $saveFormat) {
+            return 'apng';
+        }
+
+        return $saveFormat;
     }
 }

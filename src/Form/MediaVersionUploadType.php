@@ -3,13 +3,13 @@
 namespace Softspring\MediaBundle\Form;
 
 use Softspring\MediaBundle\EntityManager\MediaVersionManagerInterface;
+use Softspring\MediaBundle\Validator\Constraints\Image;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\Image;
 
 class MediaVersionUploadType extends AbstractType
 {
