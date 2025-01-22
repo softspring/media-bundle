@@ -46,7 +46,7 @@ class StoreFileProcessor implements ProcessorInterface
         unset($databaseOptions['upload_requirements']);
         $version->setOptions($databaseOptions);
 
-        if ($upload->getMimeType() == 'image/png' && Apng::is($upload->getRealPath())) {
+        if ('image/png' == $upload->getMimeType() && Apng::is($upload->getRealPath())) {
             $version->setFileMimeType('image/apng');
         } else {
             $version->setFileMimeType($upload->getMimeType());

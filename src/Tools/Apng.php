@@ -2,6 +2,8 @@
 
 namespace Softspring\MediaBundle\Tools;
 
+use SplFileObject;
+
 class Apng
 {
     /**
@@ -9,9 +11,9 @@ class Apng
      */
     public static function is(string $filename): bool
     {
-        $f = new \SplFileObject($filename, 'rb');
+        $f = new SplFileObject($filename, 'rb');
         $header = $f->fread(8);
-        if ($header !== "\x89PNG\r\n\x1A\n") {
+        if ("\x89PNG\r\n\x1A\n" !== $header) {
             return false;
         }
         while (!$f->eof()) {
@@ -29,6 +31,7 @@ class Apng
             }
             $f->fseek($length + 4, SEEK_CUR);
         }
+
         return false;
     }
 }

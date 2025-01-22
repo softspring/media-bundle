@@ -25,14 +25,14 @@ class ImageValidator extends BaseImageValidator
         $this->removeInappropriateApngViolation($value, $constraint);
     }
 
-    protected function removeInappropriateApngViolation(UploadedFile $uploadedFile, Image $constraint):void
+    protected function removeInappropriateApngViolation(UploadedFile $uploadedFile, Image $constraint): void
     {
         // if invalid mime type, it is an apng image and supported mimetypes has image/apng, remove violation.
         $mimeTypes = (array) $constraint->mimeTypes;
         foreach ($this->context->getViolations() as $v => $violation) {
             if (str_starts_with($violation->getMessage(), substr($constraint->mimeTypesMessage, 0, strpos($constraint->mimeTypesMessage, '({{')))) {
                 $mime = $uploadedFile->getMimeType();
-                if ($mime === 'image/png' && Apng::is($uploadedFile->getRealPath()) && in_array('image/apng', $mimeTypes)) {
+                if ('image/png' === $mime && Apng::is($uploadedFile->getRealPath()) && in_array('image/apng', $mimeTypes)) {
                     $this->context->getViolations()->remove($v);
                 }
             }

@@ -56,7 +56,7 @@ class ImagineProcessor implements ProcessorInterface
         $options = $version->getOptions();
         $saveFormat = $this->getSaveFormat($options, $version);
 
-        if ($originalVersion->getFileMimeType() === 'image/apng' && $saveFormat === 'apng') {
+        if ('image/apng' === $originalVersion->getFileMimeType() && 'apng' === $saveFormat) {
             // APNG files can not be scaled
             return;
         }
@@ -106,7 +106,7 @@ class ImagineProcessor implements ProcessorInterface
 
         $saveFormat = $currentVersion->getUpload()->getExtension();
 
-        if ($currentVersion->getOriginalVersion()->getFileMimeType() === 'image/apng' && $saveFormat === 'png') {
+        if ('image/apng' === $currentVersion->getOriginalVersion()->getFileMimeType() && 'png' === $saveFormat) {
             return 'apng';
         }
 
