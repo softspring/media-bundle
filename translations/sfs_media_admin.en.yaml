@@ -13,12 +13,24 @@ admin_medias:
         actions:
             create.link: "New media"
         filter_form:
+            text:
+                label: "Text"
+                placeholder: "Enter text"
             name:
                 label: "File name"
                 placeholder: "Enter file name"
             type:
                 label: "Media type"
                 placeholder: "Select media type"
+            content:
+                label: "Content"
+                placeholder: "Select content"
+            order_field:
+                name: "Name"
+                createdAt: "Creation date"
+            ordir_field:
+                asc: "Ascending"
+                desc: "Descending"
 
     create:
         meta.title: "%type%"

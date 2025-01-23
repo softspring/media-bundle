@@ -2,6 +2,7 @@
 
 namespace Softspring\MediaBundle\Tests\Unit\Render;
 
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Softspring\MediaBundle\Entity\Media;
 use Softspring\MediaBundle\Entity\MediaVersion;
@@ -52,7 +53,8 @@ class MediaRendererTest extends TestCase
     public function testRenderImages()
     {
         $storageDriver = new FilesystemStorageDriver('path', 'url');
-        $renderer = new MediaRenderer(new MediaTypesCollection([new ConfigMediaTypeProvider(self::TYPES)]), $storageDriver);
+        $em = $this->createMock(EntityManagerInterface::class);
+        $renderer = new MediaRenderer(new MediaTypesCollection([new ConfigMediaTypeProvider(self::TYPES)]), $storageDriver, $em);
 
         $media = new Media();
         $media->setMediaType(MediaInterface::MEDIA_TYPE_IMAGE);
@@ -98,7 +100,8 @@ class MediaRendererTest extends TestCase
     public function testPictureException()
     {
         $storageDriver = new FilesystemStorageDriver('path', 'url');
-        $renderer = new MediaRenderer(new MediaTypesCollection([new ConfigMediaTypeProvider(self::TYPES)]), $storageDriver);
+        $em = $this->createMock(EntityManagerInterface::class);
+        $renderer = new MediaRenderer(new MediaTypesCollection([new ConfigMediaTypeProvider(self::TYPES)]), $storageDriver, $em);
 
         $media = new Media();
         $media->setMediaType(MediaInterface::MEDIA_TYPE_IMAGE);

@@ -2,6 +2,7 @@
 
 namespace Softspring\MediaBundle\Form\Admin;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Softspring\CmsBundle\Entity\ContentVersion;
@@ -71,24 +72,28 @@ class MediaListFilterForm extends PaginatorForm implements MediaListFilterFormIn
         $builder->add($options['order_field_name'], ChoiceType::class, [
             'mapped' => false,
             'choices' => array_combine($options['order_valid_fields'], $options['order_valid_fields']),
+            'choice_label' => fn ($label) => "admin_medias.list.filter_form.order_field.$label",
             'default_value' => $options['order_default_value'],
         ]);
 
         $builder->add($options['order_direction_field_name'], ChoiceType::class, [
             'mapped' => false,
             'choices' => array_combine($options['order_direction_valid_fields'], $options['order_direction_valid_fields']),
+            'choice_label' => fn ($label) => "admin_medias.list.filter_form.ordir_field.$label",
             'default_value' => $options['order_direction_default_value'],
         ]);
 
-        $builder->add('content', EntityType::class, [
-            'em' => $this->em,
-            'class' => ContentInterface::class,
-            'required' => false,
-            'choice_label' => 'name',
-            'property_path' => '[content__in]',
-            'expanded' => true,
-            'multiple' => true,
-        ]);
+        if (interface_exists(ContentInterface::class)) {
+            $builder->add('content', EntityType::class, [
+                'em' => $this->em,
+                'class' => ContentInterface::class,
+                'required' => false,
+                'choice_label' => 'name',
+                'property_path' => '[content__in]',
+                'expanded' => false,
+                'multiple' => false,
+            ]);
+        }
     }
 
     public function preProcessQueryBuilder(QueryBuilder $qb, array &$filters, array &$orderSort, int &$filtersMode): QueryBuilder
@@ -99,7 +104,7 @@ class MediaListFilterForm extends PaginatorForm implements MediaListFilterFormIn
 
         $contentIds = array_map(function (ContentInterface $content) {
             return $content->getId();
-        }, $filters['content__in']->toArray());
+        }, $filters['content__in'] instanceof Collection ? $filters['content__in']->toArray() : [$filters['content__in']]);
 
         if (!empty($contentIds)) {
             $query = $qb->getEntityManager()->createQuery('SELECT cvm FROM '.ContentVersion::class.' cv LEFT JOIN cv.medias cvm WHERE cv.content IN (:contentIds)')->getDQL();

@@ -16,10 +16,21 @@
     {% if filterForm.type is defined %}
         {{ form_row(filterForm.type, {}) }}
     {% endif %}
+
+    {% if filterForm.content is defined %}
+        {{ form_row(filterForm.content, {'attr': {'onchange': 'submit()'}}) }}
+    {% endif %}
 {% endblock %}
 
 {% block actions %}
 <div class="d-grid gap-2">
     <button type="submit" class="btn btn-primary btn-block"><i class="bi bi-search"></i> Filter</button>
 </div>
+
+{% if filterForm.vars.data|filter(v=>v) is not empty %}
+    <div class="d-grid gap-2 mt-2">
+        <a class="btn btn-outline-primary btn-block" href="{{ url('sfs_media_admin_medias_list') }}"><i class="bi bi-x-circle"></i> Clear filters</a>
+    </div>
+{% endif %}
+
 {% endblock %}

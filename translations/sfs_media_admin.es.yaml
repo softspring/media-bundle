@@ -22,6 +22,15 @@ admin_medias:
             type:
                 label: "Tipo de media"
                 placeholder: "Selecciona el tipo"
+            content:
+                label: "Contenido"
+                placeholder: "Selecciona el contenido"
+            order_field:
+                name: "Nombre"
+                createdAt: "Fecha de creación"
+            ordir_field:
+                asc: "Ascendente"
+                desc: "Descendente"
 
     create:
         meta.title: "%type%"
