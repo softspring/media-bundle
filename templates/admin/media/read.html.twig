@@ -4,8 +4,10 @@
 
 {% block breadcrums_content %}
     {{ parent() }}
-    <li class="breadcrumb-item"><a href="{{ url('sfs_media_admin_medias_list') }}">{{ 'admin_medias.list.breadcrumb'|trans }}</a></li>
-    <li class="breadcrumb-item active" aria-current="content">{{ 'admin_medias.read.breadcrumb'|trans({'%name%': media.name }) }}</li>
+    <li class="breadcrumb-item"><a
+                href="{{ url('sfs_media_admin_medias_list') }}">{{ 'admin_medias.list.breadcrumb'|trans }}</a></li>
+    <li class="breadcrumb-item active"
+        aria-current="content">{{ 'admin_medias.read.breadcrumb'|trans({'%name%': media.name }) }}</li>
 {% endblock breadcrums_content %}
 
 {% import '@SfsMedia/admin/media/_macros.html.twig' as macros %}
@@ -14,18 +16,21 @@
     <div class="float-end">
         {% if (checkVersions.new|length) + (checkVersions.delete|length) + (checkVersions.changed|length) %}
             {% if is_granted('PERMISSION_SFS_MEDIA_ADMIN_MEDIAS_MIGRATE', media) %}
-                <a href="{{ url('sfs_media_admin_medias_migrate', {'media': media}) }}" class="btn btn-primary">{{ 'admin_medias.read.actions.migrate.button'|trans }}</a>
+                <a href="{{ url('sfs_media_admin_medias_migrate', {'media': media}) }}"
+                   class="btn btn-primary">{{ 'admin_medias.read.actions.migrate.button'|trans }}</a>
             {% else %}
                 <a class="btn btn-primary disabled">{{ 'admin_medias.read.actions.migrate.button'|trans }}</a>
             {% endif %}
         {% endif %}
         {% if is_granted('PERMISSION_SFS_MEDIA_ADMIN_MEDIAS_UPDATE', media) %}
-            <a href="{{ url('sfs_media_admin_medias_update', {'media': media}) }}" class="btn btn-primary">{{ 'admin_medias.read.actions.update.button'|trans }}</a>
+            <a href="{{ url('sfs_media_admin_medias_update', {'media': media}) }}"
+               class="btn btn-primary">{{ 'admin_medias.read.actions.update.button'|trans }}</a>
         {% else %}
             <a class="btn btn-primary disabled">{{ 'admin_medias.read.actions.update.button'|trans }}</a>
         {% endif %}
         {% if is_granted('PERMISSION_SFS_MEDIA_ADMIN_MEDIAS_DELETE', media) %}
-            <a href="{{ url('sfs_media_admin_medias_delete', {'media': media}) }}" class="btn btn-danger">{{ 'admin_medias.read.actions.delete.button'|trans }}</a>
+            <a href="{{ url('sfs_media_admin_medias_delete', {'media': media}) }}"
+               class="btn btn-danger">{{ 'admin_medias.read.actions.delete.button'|trans }}</a>
         {% else %}
             <a class="btn btn-danger disabled">{{ 'admin_medias.read.actions.delete.button'|trans }}</a>
         {% endif %}
@@ -38,19 +43,9 @@
 
     {% include '@SfsMedia/admin/media/read_version_alerts.html.twig' %}
 
-    <div class="container-fluid bg-white p-4">
-        <div class="row">
-            <div class="col">
-                {{ macros.renderOriginal(media) }}
-            </div>
-        </div>
+    {% include '@SfsMedia/admin/media/read_tabs.html.twig' %}
 
-        {% for version in media.versions|filter((version) => version.version not in ['_original'])|sort((a, b) => (a.width+a.height) <=> (b.width+b.height))|reverse %}
-            <div class="row mt-5">
-                <div class="col">
-                    {{ macros.renderVersion(media, version) }}
-                </div>
-            </div>
-        {% endfor %}
+    <div class="container-fluid bg-white p-4">
+        {% include '@SfsMedia/admin/media/read_tabs_content.html.twig' %}
     </div>
 {% endblock content %}
