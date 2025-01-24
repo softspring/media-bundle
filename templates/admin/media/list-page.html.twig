@@ -31,7 +31,7 @@
                     <small><strong>{{ media.name }}</strong></small>
                 </p>
                 <p class="small text-muted mb-0 text-wrap">
-                    {% if media_types[media.type]|default(false) %}
+                    {% if not valid_media_type %}
                         <small>{{ media_types[media.type].name }}</small>
                     {% else %}
                         <small class="text-danger">Media type {{ media.type }} does not exit</small>
