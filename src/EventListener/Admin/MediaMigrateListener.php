@@ -20,15 +20,18 @@ class MediaMigrateListener extends AbstractMediaListener
             SfsMediaEvents::ADMIN_MEDIAS_MIGRATE_APPLY => [
                 ['onMigrateApply', 0],
             ],
-            //            SfsMediaEvents::ADMIN_MEDIAS_MIGRATE_SUCCESS => [
-            //                ['onMigrateSuccess', 0],
-            //            ],
-            //            SfsMediaEvents::ADMIN_MEDIAS_MIGRATE_FAILURE => [
-            //                ['onMigrateFailure', 0],
-            //            ],
-            //            SfsMediaEvents::ADMIN_MEDIAS_MIGRATE_EXCEPTION => [
-            //                ['onMigrateException', 0],
-            //            ],
+            SfsMediaEvents::ADMIN_MEDIAS_MIGRATE_SUCCESS => [
+                ['onSuccessShowFlash', 10],
+                ['onSuccessRedirectToMediaRead', 9],
+            ],
+            SfsMediaEvents::ADMIN_MEDIAS_MIGRATE_FAILURE => [
+                ['onFailureShowFlash', 0],
+                ['onFailureRedirectToMediaRead', 0],
+            ],
+            SfsMediaEvents::ADMIN_MEDIAS_MIGRATE_EXCEPTION => [
+                ['onExceptionShowFlash', 0],
+                ['onExceptionRedirectToMediaRead', 0],
+            ],
         ];
     }
 
