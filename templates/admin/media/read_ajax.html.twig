@@ -1,0 +1,28 @@
+{% trans_default_domain 'sfs_media_admin' %}
+
+{% import '@SfsMedia/admin/media/_macros.html.twig' as macros %}
+
+{% include '@SfsMedia/admin/media/read_version_alerts.html.twig' %}
+
+<div class="header-btns d-none">
+    {% if (checkVersions.new|length) + (checkVersions.delete|length) + (checkVersions.changed|length) %}
+        {% if is_granted('PERMISSION_SFS_MEDIA_ADMIN_MEDIAS_MIGRATE', media) %}
+            <a href="{{ url('sfs_media_admin_medias_migrate', {'media': media}) }}" class="btn btn-primary">{{ 'admin_medias.read.actions.migrate.button'|trans }}</a>
+        {% else %}
+            <a class="btn btn-primary disabled">{{ 'admin_medias.read.actions.migrate.button'|trans }}</a>
+        {% endif %}
+    {% endif %}
+    {% if is_granted('PERMISSION_SFS_MEDIA_ADMIN_MEDIAS_UPDATE', media) %}
+        <a href="{{ url('sfs_media_admin_medias_update', {'media': media}) }}" class="btn btn-primary" title="{{ 'admin_medias.read.actions.update.button'|trans }}"><i class="bi bi-pencil-square"></i></a>
+    {% else %}
+        <a class="btn btn-primary disabled" title="{{ 'admin_medias.read.actions.update.button'|trans }}"><i class="bi bi-pencil-square"></i></a>
+    {% endif %}
+    {% if is_granted('PERMISSION_SFS_MEDIA_ADMIN_MEDIAS_DELETE', media) %}
+        <a href="{{ url('sfs_media_admin_medias_delete', {'media': media}) }}" class="btn btn-danger" title="{{ 'admin_medias.read.actions.delete.button'|trans }}"><i class="bi bi-trash"></i></a>
+    {% else %}
+        <a class="btn btn-danger disabled" title="{{ 'admin_medias.read.actions.delete.button'|trans }}"><i class="bi bi-trash"></i></a>
+    {% endif %}
+</div>
+
+{% include '@SfsMedia/admin/media/read_tabs.html.twig' %}
+{% include '@SfsMedia/admin/media/read_tabs_content.html.twig' %}

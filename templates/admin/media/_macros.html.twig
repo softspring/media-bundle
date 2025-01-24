@@ -1,0 +1,182 @@
+{%- macro bytesToSize(bytes) -%}
+    {% set kilobyte = 1024 %}
+    {% set megabyte = kilobyte * 1024 %}
+    {% set gigabyte = megabyte * 1024 %}
+    {% set terabyte = gigabyte * 1024 %}
+
+    {% if bytes < kilobyte %}
+        {{ bytes ~ ' B' }}
+    {% elseif bytes < megabyte %}
+        {{ (bytes / kilobyte)|number_format(2, '.') ~ ' KiB' }}
+    {% elseif bytes < gigabyte %}
+        {{ (bytes / megabyte)|number_format(2, '.') ~ ' MiB' }}
+    {% elseif bytes < terabyte %}
+        {{ (bytes / gigabyte)|number_format(2, '.') ~ ' GiB' }}
+    {% else %}
+        {{ (bytes / terabyte)|number_format(2, '.') ~ ' TiB' }}
+    {% endif %}
+{%- endmacro -%}
+
+
+{%- macro renderOriginal(media) -%}
+    {{ _self.renderVersion(media, media.version('_original')) }}
+{%- endmacro -%}
+
+{%- macro renderVersion(media, version) -%}
+    <div class="text-small text-black-50 mb-1">
+        {% if media.isImage %}
+            <span class="me-2">Image size: {{ version.width }}x{{ version.height }}</span>
+        {% endif %}
+
+        <span class="me-2">Format: {{ version.fileMimeType }}</span>
+        <span class="me-2">File size: {{ _self.bytesToSize(version.fileSize) }}</span>
+
+        <div class="float-end mb-1">
+            <span class="me-2">
+                {% if version.uploadedAt %}
+                    Uploaded at: {{ version.uploadedAt|date_span('H:i:s d-m-Y') }}
+                {% elseif version.generatedAt %}
+                    <abbr title="PARAMETERS:
+{% for option,value in version.options %}{{ option }}: {{ value }}
+{% endfor %}">Automatically generated</abbr> at: {{ version.generatedAt|date_span('H:i:s d-m-Y') }}
+                {% endif %}
+            </span>
+            {# <a class="btn btn-link btn-sm" href="{{ version.publicUrl }}" download>
+                <i class="bi bi-download"></i>
+            </a> #}
+            <a class="btn btn-link btn-sm" href="{{ version.publicUrl }}" target="_blank">
+                <i class="bi bi-box-arrow-up-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        {% if media.isVideo %}
+            {% if version.fileMimeType starts with 'image/' %}
+                {# can be a poster #}
+                {{ media|sfs_media_render_image(version.version, {'class':'img-fluid img-'~version.version}) }}
+            {% else %}
+                {{ media|sfs_media_render_video(version.version, {'class':'img-fluid img-'~version.version, 'controls': true, 'autoplay': true, 'loop': true}) }}
+            {% endif %}
+        {% elseif media.isImage %}
+            {{ media|sfs_media_render_image(version.version, {'class':'img-fluid img-thumbnail img-'~version.version}) }}
+        {% endif %}
+    </div>
+
+    <p>
+        <a data-bs-toggle="collapse" href="#howToUse_{{ version.version }}" role="button" aria-expanded="false"
+           aria-controls="howToUse_{{ version.version }}">
+            <i class="bi bi-info-circle"></i> How to use this media
+        </a>
+    </p>
+
+    <div class="collapse" id="howToUse_{{ version.version }}">
+        <div class="card card-body bg-light">
+            <p>
+                <strong>Directly using the URL</strong>
+                <a href="#" onclick="navigator.clipboard.writeText(document.querySelector('#media_version_url_{{ version.version }}').textContent); return false" title="Copy to clipboard"><i class="bi bi-copy"></i></a>
+                <br/>
+                <a href="{{ version.publicUrl }}" target="_blank" id="media_version_url_{{ version.version }}">{{ version.publicUrl }}</a>
+            </p>
+
+            <p>
+                <strong>Include HTML</strong>
+                <a href="#" onclick="navigator.clipboard.writeText(document.querySelector('#media_version_html_code_{{ version.version }}').textContent); return false" title="Copy to clipboard"><i class="bi bi-copy"></i></a>
+            </p>
+            {% if media.isImage %}
+                <pre class="border border-1 border-secondary p-2 text-secondary"><code id="media_version_html_code_{{ version.version }}">{{ sfs_media_render_image(version.media.id, version.version, {'class':'img-custom'})|escape }}</code></pre>
+            {% else %}
+                <pre class="border border-1 border-secondary p-2 text-secondary"><code id="media_version_html_code_{{ version.version }}">{{ sfs_media_render_video(version.media.id, version.version, {'class':'video-custom', 'controls': true, 'autoplay': true, 'loop': true})|escape }}</code></pre>
+            {% endif %}
+
+            <p>
+                <strong>Render twig (by object)</strong>
+                <a href="#" onclick="navigator.clipboard.writeText(document.querySelector('#media_version_twig_object_{{ version.version }}').textContent); return false" title="Copy to clipboard"><i class="bi bi-copy"></i></a>
+            </p>
+            {% if media.isImage %}
+                <pre class="border border-1 border-secondary p-2 text-secondary"><code id="media_version_twig_object_{{ version.version }}">&#123;&#123; media|sfs_media_render_image('{{ version.version }}', {'class':'img-custom'}) &#125;&#125;</code></pre>
+            {% else %}
+                <pre class="border border-1 border-secondary p-2 text-secondary"><code id="media_version_twig_object_{{ version.version }}">&#123;&#123; media|sfs_media_render_video('{{ version.version }}', {'class':'video-custom', 'controls': true, 'autoplay': true, 'loop': true}) &#125;&#125;</code></pre>
+            {% endif %}
+
+            <p>
+                <strong>Render twig (by id)</strong>
+                <a href="#" onclick="navigator.clipboard.writeText(document.querySelector('#media_version_twig_id_{{ version.version }}').textContent); return false" title="Copy to clipboard"><i class="bi bi-copy"></i></a>
+            </p>
+            {% if media.isImage %}
+                <pre class="border border-1 border-secondary p-2 text-secondary"><code id="media_version_twig_id_{{ version.version }}">&#123;&#123; sfs_media_render_image('{{ version.media.id }}', '{{ version.version }}', {'class':'img-custom'}) &#125;&#125;</code></pre>
+            {% else %}
+                <pre class="border border-1 border-secondary p-2 text-secondary"><code id="media_version_twig_id_{{ version.version }}">&#123;&#123; sfs_media_render_video('{{ version.media.id }}', '{{ version.version }}', {'class':'video-custom', 'controls': true, 'autoplay': true, 'loop': true}) &#125;&#125;</code></pre>
+            {% endif %}
+        </div>
+    </div>
+{%- endmacro -%}
+
+
+{%- macro renderPicture(media, picture_id, config) -%}
+    <div class="text-small text-black-50 mb-1">
+        Picture tag "{{ picture_id }}" autogenerates a picture with configured versions.
+    </div>
+
+    <div class="mb-3">
+        {{ media|sfs_media_render_picture(picture_id, {'data-example':'test'}, {'class': 'img-fluid'}) }}
+    </div>
+
+    <p class="text-primary"><i class="bi bi-info-circle"></i> How to use this picture tag</p>
+
+    <div class="card card-body bg-light">
+        <p>
+            <strong>Include HTML</strong>
+            <a href="#" onclick="navigator.clipboard.writeText(document.querySelector('#media_picture_html_{{ picture_id }}').textContent); return false" title="Copy to clipboard"><i class="bi bi-copy"></i></a>
+        </p>
+
+        <pre class="border border-1 border-secondary p-2 text-secondary"><code id="media_picture_html_{{ picture_id }}">{{ media|sfs_media_render_picture(picture_id, {'data-example':'test'}, {'class': 'img-fluid'})|replace({'>':">\n"})|e('html') }}</code></pre>
+
+        <p>
+            <strong>Render twig (by object)</strong>
+            <a href="#" onclick="navigator.clipboard.writeText(document.querySelector('#media_picture_twig_object_{{ picture_id }}').textContent); return false" title="Copy to clipboard"><i class="bi bi-copy"></i></a>
+        </p>
+
+        <pre class="border border-1 border-secondary p-2 text-secondary"><code id="media_picture_twig_object_{{ picture_id }}">&#123;&#123; media|sfs_media_render_picture('{{ picture_id }}', {'data-example':'test'}, {'class': 'img-fluid'}) &#125;&#125;</code></pre>
+
+        <p>
+            <strong>Render twig (by id)</strong>
+            <a href="#" onclick="navigator.clipboard.writeText(document.querySelector('#media_picture_twig_id_{{ picture_id }}').textContent); return false" title="Copy to clipboard"><i class="bi bi-copy"></i></a>
+        </p>
+        <pre class="border border-1 border-secondary p-2 text-secondary"><code id="media_picture_twig_id_{{ picture_id }}">&#123;&#123; sfs_media_render_picture('{{ media.id }}', '{{ picture_id }}', {'data-example':'test'}, {'class': 'img-fluid'}) &#125;&#125;</code></pre>
+    </div>
+{%- endmacro -%}
+
+{%- macro renderVideoSet(media, video_set_id, config) -%}
+    <div class="text-small text-black-50 mb-1">
+        Video set tag "{{ video_set_id }}" autogenerates a video set with configured versions.
+    </div>
+
+    <div class="mb-3">
+        {{ media|sfs_media_render_video_set(video_set_id, {'class': 'img-fluid'}) }}
+    </div>
+
+    <p class="text-primary"><i class="bi bi-info-circle"></i> How to use this video set tag</p>
+
+    <div class="card card-body bg-light">
+        <p>
+            <strong>Include HTML</strong>
+            <a href="#" onclick="navigator.clipboard.writeText(document.querySelector('#media_videoset_html_{{ video_set_id }}').textContent); return false" title="Copy to clipboard"><i class="bi bi-copy"></i></a>
+        </p>
+
+        <pre class="border border-1 border-secondary p-2 text-secondary"><code id="media_videoset_html_{{ video_set_id }}">{{ media|sfs_media_render_video_set(video_set_id, {'class': 'img-fluid'})|replace({'>':">\n"})|e('html') }}</code></pre>
+
+        <p>
+            <strong>Render twig (by object)</strong>
+            <a href="#" onclick="navigator.clipboard.writeText(document.querySelector('#media_videoset_twig_object_{{ video_set_id }}').textContent); return false" title="Copy to clipboard"><i class="bi bi-copy"></i></a>
+        </p>
+
+        <pre class="border border-1 border-secondary p-2 text-secondary"><code id="media_videoset_twig_object_{{ video_set_id }}">&#123;&#123; media|sfs_media_render_video_set('{{ video_set_id }}', {'class': 'img-fluid'}) &#125;&#125;</code></pre>
+
+        <p>
+            <strong>Render twig (by id)</strong>
+            <a href="#" onclick="navigator.clipboard.writeText(document.querySelector('#media_videoset_twig_id_{{ video_set_id }}').textContent); return false" title="Copy to clipboard"><i class="bi bi-copy"></i></a>
+        </p>
+        <pre class="border border-1 border-secondary p-2 text-secondary"><code id="media_videoset_twig_id_{{ video_set_id }}">&#123;&#123; sfs_media_render_video_set('{{ media.id }}', '{{ video_set_id }}', {'class': 'img-fluid'}) &#125;&#125;</code></pre>
+    </div>
+{%- endmacro -%}

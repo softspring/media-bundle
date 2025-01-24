@@ -1,0 +1,32 @@
+{% form_theme filterForm '@SfsMedia/forms/admin_theme.html.twig' %}
+
+{% block fields %}
+    {% if filterForm.name is defined %}
+        {{ form_row(filterForm.name, {'attr': {'onchange': 'submit()'}}) }}
+    {% endif %}
+
+    {% if filterForm.description is defined %}
+        {{ form_row(filterForm.description, {'attr': {'onchange': 'submit()'}}) }}
+    {% endif %}
+
+    {% if filterForm.text is defined %}
+        {{ form_row(filterForm.text, {'attr': {'onchange': 'submit()'}}) }}
+    {% endif %}
+
+    {% if filterForm.type is defined %}
+        {{ form_row(filterForm.type, {}) }}
+    {% endif %}
+
+    {% if filterForm.content_entity is defined %}
+        {{ form_row(filterForm.content_entity, {'attr': {'onchange': 'submit()'}}) }}
+    {% endif %}
+{% endblock %}
+
+{% block actions %}
+<button type="submit" class="btn btn-primary btn-block w-100"><i class="bi bi-search"></i> Filter</button>
+
+{% if filterForm.vars.data|filter(v=>v) is not empty %}
+    <a class="btn btn-link btn-block btn-sm mt-2 w-100" href="{{ url('sfs_media_admin_medias_list') }}"><i class="bi bi-x-circle"></i> Clear filters</a>
+{% endif %}
+
+{% endblock %}

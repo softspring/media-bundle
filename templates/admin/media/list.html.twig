@@ -2,6 +2,8 @@
 {% extends '@SfsMedia/admin_layout.html.twig' %}
 {% block title %}{{ 'admin_medias.list.meta.title'|trans }}{% endblock %}
 
+{% form_theme filterForm '@SfsMedia/forms/admin_theme.html.twig' %}
+
 {% block breadcrums_content %}
     {{ parent() }}
     <li class="breadcrumb-item active" aria-current="content">{{ 'admin_medias.list.breadcrumb'|trans }}</li>
@@ -18,7 +20,8 @@
                     No media types are configured.
                     <br/>
                     <br/>
-                    Check how to configure media types at <a href="https://github.com/softspring/media-bundle" target="_blank">documentation</a>
+                    Check how to configure media types at <a href="https://github.com/softspring/media-bundle"
+                                                             target="_blank">documentation</a>
                 </p>
             </div>
         </div>
@@ -26,15 +29,17 @@
         <div class="d-flex align-items-center justify-content-between mb-4">
             <h1 class="h3">{{ 'admin_medias.list.title'|trans }}</h1>
 
-            <div class="d-flex flex-wrap justify-items-end alig-items-center">
+            <div class="float-end">
                 {% if is_granted('PERMISSION_SFS_MEDIA_ADMIN_MEDIAS_CREATE') and media_types|length %}
                     <div class="dropdown">
-                        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownCreateMedia" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownCreateMedia"
+                                data-bs-toggle="dropdown" aria-expanded="false">
                             {{ 'admin_medias.list.actions.create.link'|trans }}
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownCreateMedia">
                             {% for key,type in media_types %}
-                                <li><a href="{{ url('sfs_media_admin_medias_create', {'type':key}) }}" class="dropdown-item">{{ type.name }}</a></li>
+                                <li><a href="{{ url('sfs_media_admin_medias_create', {'type':key}) }}"
+                                       class="dropdown-item">{{ type.name }}</a></li>
                             {% endfor %}
                         </ul>
                     </div>
@@ -42,33 +47,130 @@
             </div>
         </div>
 
-        <div class="container-fluid bg-white p-4">
-            {% if filterForm.vars.submitted or entities|length %}
-            <div class="mb-5">
-                {{ form_start(filterForm) }}
-                <button class="btn btn-link px-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter"><i class="bi bi-filter h4 text-muted align-middle"></i> Filters</button>
-                <div class="row align-items-start border shadow-sm rounded p-3 collapse show" id="collapseFilter">
-                    {% if filterForm.name is defined %}<div class="col-12 col-md-6 col-lg-4">{{ form_row(filterForm.name) }}</div>{% endif %}
-                    {% if filterForm.type is defined %}<div class="col-12 col-md-6 col-lg-4">{{ form_row(filterForm.type) }}</div>{% endif %}
-                    <div class="col pt-4 mt-2">
-                        <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>
+        {{ form_start(filterForm) }}
+        <div class="container-fluid bg-white">
+            <div class="row">
+                <div class="col-12 col-md-3 col-xl-2 border-end p-3">
+                    {% include '@SfsMedia/admin/media/list-filter-column.html.twig' %}
+                </div>
+                <div class="col-12 col-md-9 col-xl-10 p-3">
+                    <div class="h-100 overflow-auto">
+                        <div class="container-fluid mb-3">
+                            <div class="row">
+                                <div class="col-4 col-md-6">
+                                    {{ entities.total }} medias
+                                </div>
+                                <div class="col-4 col-md-3">{{ form_widget(filterForm.order, {'attr': {'onchange': 'submit()', 'class': 'form-control-sm'}}) }}</div>
+                                <div class="col-4 col-md-3">{{ form_widget(filterForm.sort, {'attr': {'onchange': 'submit()', 'class': 'form-control-sm'}}) }}</div>
+                            </div>
+                        </div>
+
+                        {% if entities|length %}
+                            <div class="container-fluid">
+                                <div class="row">
+                                    {% include '@SfsMedia/admin/media/list-page.html.twig' %}
+                                    {# {% include '@SfsComponents/paginator/pager.html.twig' with {'collection': entities} %} #}
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="p-5 m-5">
+                                <p class="text-center text-muted">
+                                    {% if filterForm|default(false) and filterForm.vars.data|default([])|filter(v=>v) is not empty %}
+                                        No search results found, try to be less restrictive.
+                                    {% else %}
+                                        Upload first media
+                                    {% endif %}
+                                </p>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
-                {{ form_widget(filterForm) }}
-                {{ form_rest(filterForm) }}
-                {{ form_end(filterForm) }}
             </div>
-            {% endif %}
-            {% if entities|length %}
-                {% include '@SfsMedia/admin/media/list-page.html.twig' %}
-                {% include '@SfsComponents/paginator/pager.html.twig' with {'collection': entities} %}
-            {% else %}
-                <div class="p-5 m-5">
-                    <p class="text-center text-muted">
-                        Upload first media
-                    </p>
-                </div>
-            {% endif %}
         </div>
+        {{ form_end(filterForm) }}
     {% endif %}
 {% endblock content %}
+
+{% block body_end %}
+    <div class="offcanvas offcanvas-end w-75" data-bs-scroll="false" data-bs-backdrop="true" tabindex="-1"
+         id="mediaPreview" aria-labelledby="mediaPreviewLabel">
+        {#    <div class="offcanvas offcanvas-end" data-bs-backdrop="static" tabindex="-1" id="mediaPreview" aria-labelledby="mediaPreviewLabel"> #}
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title me-auto" id="mediaPreviewLabel">Offcanvas</h5>
+            <div class="offcanvas-header-buttons text-right">
+
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body"></div>
+    </div>
+
+    <script type="text/javascript">
+        const mediaPreview = document.getElementById('mediaPreview')
+        mediaPreview.addEventListener('show.bs.offcanvas', event => {
+            const detailsUrl = event.relatedTarget.dataset.offcanvasHref;
+            const offcanvas = event.target;
+
+            offcanvas.querySelector('#mediaPreviewLabel').innerHTML = event.relatedTarget.dataset.title + '<br/>' +
+                '<small class="small fw-normal">' + event.relatedTarget.dataset.description + '</small>';
+
+            fetch(detailsUrl)
+                .then(response => response.text())
+                .then(html => {
+                    offcanvas.querySelector('.offcanvas-body').innerHTML = html;
+
+                    const headerBtns = offcanvas.querySelector('.offcanvas-body > .header-btns');
+                    if (headerBtns) {
+                        offcanvas.querySelector('.offcanvas-header > .offcanvas-header-buttons').innerHTML = '';
+                        offcanvas.querySelector('.offcanvas-header > .offcanvas-header-buttons').appendChild(headerBtns);
+                        headerBtns.classList.remove('d-none');
+                    }
+                });
+        })
+
+
+        /* Infinite scroll */
+
+        let loadingNextPage = false;
+
+        document.addEventListener('scroll', function () {
+            const scrollElement = document.querySelector('a[data-pagination="scroll"]');
+            if (scrollElement && window.scrollY + window.innerHeight >= scrollElement.offsetTop) {
+                if (loadingNextPage) {
+                    return;
+                }
+
+                loadingNextPage = true;
+                // load ajax by XMLHttpRequest
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', scrollElement.href, true);
+                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        console.log('loading next page');
+                        scrollElement.outerHTML = xhr.responseText;
+                    }
+
+                    if (xhr.readyState === 4) {
+                        loadingNextPage = false;
+                    }
+                };
+                xhr.send();
+            }
+        })
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.matches('[data-bulk-select]')) {
+                return;
+            }
+
+            e.stopPropagation();
+
+            if (e.target.checked) {
+                e.target.parentNode.parentNode.classList.add('border-danger');
+            } else {
+                e.target.parentNode.parentNode.classList.remove('border-danger');
+            }
+        });
+    </script>
+{% endblock body_end %}

@@ -1,0 +1,40 @@
+{% trans_default_domain 'sfs_media_admin' %}
+
+<ul class="nav nav-pills mb-3" id="tab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="original-tab" data-bs-toggle="pill" data-bs-target="#original" type="button" role="tab" aria-controls="original" aria-selected="true">
+            {% if media.version('_original').fileMimeType starts with 'image/' %}<i class="bi bi-image"></i>{% else %}<i class="bi bi-film"></i>{% endif %}
+            _original
+        </button>
+    </li>
+    {% for version in media.versions|filter((version) => version.version not in ['_original'])|sort((a, b) => (a.width+a.height) <=> (b.width+b.height))|reverse %}
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="{{ version.version }}-tab" data-bs-toggle="pill" data-bs-target="#{{ version.version }}" type="button" role="tab" aria-controls="{{ version.version }}" aria-selected="false">
+                {% if version.fileMimeType starts with 'image/' %}<i class="bi bi-image"></i>{% else %}<i class="bi bi-film"></i>{% endif %}
+                {{ version.version }}
+            </button>
+        </li>
+    {% endfor %}
+    {% if type_config.pictures|length %}
+        {% for picture_id, config in type_config.pictures %}
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="{{ picture_id }}-tab" data-bs-toggle="pill" data-bs-target="#{{ picture_id }}"
+                        type="button" role="tab" aria-controls="{{ picture_id }}" aria-selected="false"><i class="bi bi-code-slash"></i> {{ picture_id }}</button>
+            </li>
+        {% endfor %}
+    {% endif %}
+    {% if type_config.video_sets|length %}
+        {% for video_set_id, config in type_config.video_sets %}
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="{{ video_set_id }}-tab" data-bs-toggle="pill" data-bs-target="#{{ video_set_id }}"
+                        type="button" role="tab" aria-controls="{{ video_set_id }}" aria-selected="false"><i class="bi bi-code-slash"></i> {{ video_set_id }}</button>
+            </li>
+        {% endfor %}
+    {% endif %}
+    {% if linked_cms_versions is defined and linked_cms_versions|length %}
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="linked-cms-tab" data-bs-toggle="pill" data-bs-target="#linked-cms"
+                    type="button" role="tab" aria-controls="linked-cms" aria-selected="false"><i class="bi bi-link"></i> linked CMS contents</button>
+        </li>
+    {% endif %}
+</ul>

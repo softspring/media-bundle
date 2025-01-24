@@ -149,6 +149,7 @@ class ConfigurationTest extends TestCase
                             'resolution-y' => 72,
                             'resampling-filter' => 'lanczos',
                             'resolution-units' => 'ppi',
+                            'from' => '_original'
                         ],
                     ],
                     'pictures' => [

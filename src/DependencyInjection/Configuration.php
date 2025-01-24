@@ -241,6 +241,7 @@ class Configuration implements ConfigurationInterface
                     ->integerNode('resolution-y')->end()
                     ->scalarNode('resampling-filter')->end()
                     ->scalarNode('resolution-units')->end()
+                    ->scalarNode('from')->defaultValue('_original')->end()
                 ->end()
             ->end()
         ;

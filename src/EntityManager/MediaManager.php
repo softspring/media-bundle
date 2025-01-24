@@ -78,10 +78,11 @@ class MediaManager implements MediaManagerInterface
     public function generateVersionEntity(MediaInterface $media, string $versionKey): MediaVersionInterface
     {
         $versionOptions = $this->mediaTypesCollection->getTypes()[$media->getType()]['versions'][$versionKey];
-        $originalVersion = $media->getVersion('_original');
         $version = $this->mediaVersionManager->createEntity();
         $version->setVersion($versionKey);
-        $version->setOriginalVersion($originalVersion);
+        if (!isset($versionOptions['upload_requirements'])) {
+            $version->setOriginalVersion($media->getVersion($versionOptions['from']));
+        }
         $version->setOptions($versionOptions);
         $media->addVersion($version);
 
