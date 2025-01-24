@@ -84,7 +84,7 @@ class MediaListFilterForm extends PaginatorForm implements MediaListFilterFormIn
         ]);
 
         if (interface_exists(ContentInterface::class)) {
-            $builder->add('content', EntityType::class, [
+            $builder->add('content_entity', EntityType::class, [
                 'em' => $this->em,
                 'class' => ContentInterface::class,
                 'required' => false,

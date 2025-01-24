@@ -22,7 +22,7 @@ admin_medias:
             type:
                 label: "Tipo de media"
                 placeholder: "Selecciona el tipo"
-            content:
+            content_entity:
                 label: "Contenido"
                 placeholder: "Selecciona el contenido"
             order_field:

@@ -17,8 +17,8 @@
         {{ form_row(filterForm.type, {}) }}
     {% endif %}
 
-    {% if filterForm.content is defined %}
-        {{ form_row(filterForm.content, {'attr': {'onchange': 'submit()'}}) }}
+    {% if filterForm.content_entity is defined %}
+        {{ form_row(filterForm.content_entity, {'attr': {'onchange': 'submit()'}}) }}
     {% endif %}
 {% endblock %}
 
