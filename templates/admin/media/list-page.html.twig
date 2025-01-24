@@ -1,16 +1,20 @@
 {% trans_default_domain 'sfs_media_admin' %}
 
 {% for media in entities %}
+    {% set valid_media_type = media_types[media.type]|default(false) %}
+
     <div class="col-6 col-md-4 col-xl-3 mb-3">
         <div class="card text-center h-100">
             <a
-                data-bs-target="#mediaPreview" aria-controls="mediaPreview"
-                data-bs-toggle="offcanvas" role="button"
-                data-title="{{ media.name }}"
-                data-description="{{ media.description }}"
-                data-offcanvas-href="{{ url('sfs_media_admin_medias_read_ajax', {'media':media.id}) }}"
-                href="{{ url('sfs_media_admin_medias_read', {'media':media.id}) }}"
-                class="ml-2 text-nowrap text-dark position-relative">
+                {% if valid_media_type %}
+                    data-bs-target="#mediaPreview" aria-controls="mediaPreview"
+                    data-bs-toggle="offcanvas" role="button"
+                    data-title="{{ media.name }}"
+                    data-description="{{ media.description }}"
+                    data-offcanvas-href="{{ url('sfs_media_admin_medias_read_ajax', {'media':media.id}) }}"
+                    href="{{ url('sfs_media_admin_medias_read', {'media':media.id}) }}"
+                {% endif %}
+                class="ml-2 text-nowrap text-dark position-relative {% if not valid_media_type %}opacity-75{% endif %}">
 
                 {% if media.isVideo %}
                     <div style="height:200px" class="bg-dark text-center row p-0 m-0 w-100 position-relative">
@@ -27,7 +31,11 @@
                     <small><strong>{{ media.name }}</strong></small>
                 </p>
                 <p class="small text-muted mb-0 text-wrap">
-                    <small>{{ media_types[media.type].name }}</small>
+                    {% if media_types[media.type]|default(false) %}
+                        <small>{{ media_types[media.type].name }}</small>
+                    {% else %}
+                        <small class="text-danger">Media type {{ media.type }} does not exit</small>
+                    {% endif %}
                     <small>{{ media.createdAt|time_ago }}</small>
                 </p>
 
