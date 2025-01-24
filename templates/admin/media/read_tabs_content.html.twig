@@ -15,26 +15,20 @@
     {% if type_config.pictures|length %}
         {% for picture_id, config in type_config.pictures %}
             <div class="tab-pane fade" id="{{ picture_id }}" role="tabpanel" aria-labelledby="{{ picture_id }}-tab" tabindex="0">
-                <h3>Picture tag: {{ picture_id }}</h3>
-                <pre><code>&#123;&#123; media|sfs_media_render_picture('{{ picture_id }}', {'data-example':'test'}, {'class': 'img-fluid'}) &#125;&#125;
-
-{{ media|sfs_media_render_picture(picture_id, {'data-example':'test'}, {'class': 'img-fluid'})|replace({'>':">\n"})|e('html') }}</code></pre>
+                {{ macros.renderPicture(media, picture_id, config) }}
             </div>
         {% endfor %}
     {% endif %}
     {% if type_config.video_sets|length %}
         {% for video_set_id, config in type_config.video_sets %}
             <div class="tab-pane fade" id="{{ video_set_id }}" role="tabpanel" aria-labelledby="{{ video_set_id }}-tab" tabindex="0">
-                <h3>Video sources set: {{ video_set_id }}</h3>
-                <pre><code>&#123;&#123; media|sfs_media_render_video_set('{{ video_set_id }}') &#125;&#125;
-
-{{ media|sfs_media_render_video_set(video_set_id)|replace({'>':">\n"})|e('html') }}</code></pre>
+                {{ macros.renderVideoSet(media, video_set_id, config) }}
             </div>
         {% endfor %}
     {% endif %}
 
     {% if linked_cms_versions is defined and linked_cms_versions|length %}
-        <div class="tab-pane fade container" id="linked-cms" role="tabpanel" aria-labelledby="linked-cms-tab" tabindex="0">
+        <div class="tab-pane fade" id="linked-cms" role="tabpanel" aria-labelledby="linked-cms-tab" tabindex="0">
             {#            <h3>Linked CMS contents</h3>#}
             <ul>
                 {% for content_version in linked_cms_versions %}
