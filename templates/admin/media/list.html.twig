@@ -48,20 +48,20 @@
         </div>
 
         {{ form_start(filterForm) }}
-        <div class="container-fluid">
+        <div class="container-fluid bg-white">
             <div class="row">
-                <div class="col-2">
+                <div class="col-12 col-md-3 col-xl-2 border-end p-3">
                     {% include '@SfsMedia/admin/media/list-filter-column.html.twig' %}
                 </div>
-                <div class="col-10">
+                <div class="col-12 col-md-9 col-xl-10 p-3">
                     <div class="h-100 overflow-auto">
                         <div class="container-fluid mb-3">
                             <div class="row">
-                                <div class="col-8">
+                                <div class="col-4 col-md-6">
                                     {{ entities.total }} medias
                                 </div>
-                                <div class="col-2">{{ form_widget(filterForm.order, {'attr': {'onchange': 'submit()', 'class': 'form-control-sm'}}) }}</div>
-                                <div class="col-2">{{ form_widget(filterForm.sort, {'attr': {'onchange': 'submit()', 'class': 'form-control-sm'}}) }}</div>
+                                <div class="col-4 col-md-3">{{ form_widget(filterForm.order, {'attr': {'onchange': 'submit()', 'class': 'form-control-sm'}}) }}</div>
+                                <div class="col-4 col-md-3">{{ form_widget(filterForm.sort, {'attr': {'onchange': 'submit()', 'class': 'form-control-sm'}}) }}</div>
                             </div>
                         </div>
 
