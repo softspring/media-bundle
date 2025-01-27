@@ -97,10 +97,10 @@
         {#    <div class="offcanvas offcanvas-end" data-bs-backdrop="static" tabindex="-1" id="mediaPreview" aria-labelledby="mediaPreviewLabel"> #}
         <div class="offcanvas-header">
             <h5 class="offcanvas-title me-auto" id="mediaPreviewLabel">Offcanvas</h5>
-            <div class="offcanvas-header-buttons text-right">
-
+            <div class="offcanvas-header-actions d-flex">
+                <div class="offcanvas-header-buttons"></div>
+                <button type="button" class="btn-close p-4" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body"></div>
     </div>
@@ -121,8 +121,8 @@
 
                     const headerBtns = offcanvas.querySelector('.offcanvas-body > .header-btns');
                     if (headerBtns) {
-                        offcanvas.querySelector('.offcanvas-header > .offcanvas-header-buttons').innerHTML = '';
-                        offcanvas.querySelector('.offcanvas-header > .offcanvas-header-buttons').appendChild(headerBtns);
+                        offcanvas.querySelector('.offcanvas-header .offcanvas-header-buttons').innerHTML = '';
+                        offcanvas.querySelector('.offcanvas-header .offcanvas-header-buttons').appendChild(headerBtns);
                         headerBtns.classList.remove('d-none');
                     }
                 });

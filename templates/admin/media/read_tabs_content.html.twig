@@ -30,13 +30,14 @@
     {% if linked_cms_versions is defined and linked_cms_versions|length %}
         <div class="tab-pane fade" id="linked-cms" role="tabpanel" aria-labelledby="linked-cms-tab" tabindex="0">
             {#            <h3>Linked CMS contents</h3>#}
-            <ul>
+            <ul class="list-group mt-3">
                 {% for content_version in linked_cms_versions %}
-                    <li>
+                    <li class="list-group-item list-group-item-action">
                         {% set content_type = sfs_cms_content_type(content_version.content) %}
-                        <a href="{{ url('sfs_cms_admin_content_'~content_type~'_version_info', {'content':content_version.content, 'version':content_version}) }}">
+                        <a class="d-block" target="_blank" href="{{ url('sfs_cms_admin_content_'~content_type~'_version_info', {'content':content_version.content, 'version':content_version}) }}">
                             {{ content_version.content.name }}
                             v{{ content_version.versionNumber }}
+                            <i class="bi bi-box-arrow-up-right ms-2"></i>
                         </a>
                     </li>
                 {% endfor %}
