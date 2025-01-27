@@ -13,14 +13,14 @@
         {% endif %}
     {% endif %}
     {% if is_granted('PERMISSION_SFS_MEDIA_ADMIN_MEDIAS_UPDATE', media) %}
-        <a href="{{ url('sfs_media_admin_medias_update', {'media': media}) }}" class="btn btn-primary" title="{{ 'admin_medias.read.actions.update.button'|trans }}"><i class="bi bi-pencil-square"></i></a>
+        <a href="{{ url('sfs_media_admin_medias_update', {'media': media}) }}" class="btn btn-primary" title="{{ 'admin_medias.read.actions.update.button'|trans }}">{{ 'admin_medias.read.actions.update.button'|trans }} <i class="bi bi-pencil-square"></i></a>
     {% else %}
-        <a class="btn btn-primary disabled" title="{{ 'admin_medias.read.actions.update.button'|trans }}"><i class="bi bi-pencil-square"></i></a>
+        <a class="btn btn-primary disabled" title="{{ 'admin_medias.read.actions.update.button'|trans }}">{{ 'admin_medias.read.actions.update.button'|trans }} <i class="bi bi-pencil-square"></i></a>
     {% endif %}
     {% if is_granted('PERMISSION_SFS_MEDIA_ADMIN_MEDIAS_DELETE', media) %}
-        <a href="{{ url('sfs_media_admin_medias_delete', {'media': media}) }}" class="btn btn-danger" title="{{ 'admin_medias.read.actions.delete.button'|trans }}"><i class="bi bi-trash"></i></a>
+        <a href="{{ url('sfs_media_admin_medias_delete', {'media': media}) }}" class="btn btn-danger text-white ms-2" title="{{ 'admin_medias.read.actions.delete.button'|trans }}">{{ 'admin_medias.read.actions.delete.button'|trans }} <i class="bi bi-trash"></i></a>
     {% else %}
-        <a class="btn btn-danger disabled" title="{{ 'admin_medias.read.actions.delete.button'|trans }}"><i class="bi bi-trash"></i></a>
+        <a class="btn btn-danger text-white disabled ms-2" title="{{ 'admin_medias.read.actions.delete.button'|trans }}">{{ 'admin_medias.read.actions.delete.button'|trans }} <i class="bi bi-trash"></i></a>
     {% endif %}
 </div>
 
