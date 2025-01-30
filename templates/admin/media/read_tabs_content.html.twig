@@ -34,7 +34,7 @@
                 {% for content_version in linked_cms_versions %}
                     <li class="list-group-item list-group-item-action">
                         {% set content_type = sfs_cms_content_type(content_version.content) %}
-                        <a class="d-block" target="_blank" href="{{ url('sfs_cms_admin_content_'~content_type~'_version_info', {'content':content_version.content, 'version':content_version}) }}">
+                        <a class="d-block" target="_blank" href="{{ url('sfs_cms_admin_content_'~content_type~'_version_info', {'content':content_version.content.id, 'version':content_version.id}) }}">
                             {{ content_version.content.name }}
                             v{{ content_version.versionNumber }}
                             <i class="bi bi-box-arrow-up-right ms-2"></i>

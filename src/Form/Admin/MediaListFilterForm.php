@@ -12,6 +12,7 @@ use Softspring\Component\DoctrinePaginator\Form\QueryBuilderProcessorInterface;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Type\MediaTypesCollection;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -84,6 +85,11 @@ class MediaListFilterForm extends PaginatorForm implements MediaListFilterFormIn
         ]);
 
         if (interface_exists(ContentInterface::class)) {
+            $builder->add('no_content_entity', CheckboxType::class, [
+                'required' => false,
+                'property_path' => '[content__empty]',
+            ]);
+
             $builder->add('content_entity', EntityType::class, [
                 'em' => $this->em,
                 'class' => ContentInterface::class,
@@ -98,25 +104,33 @@ class MediaListFilterForm extends PaginatorForm implements MediaListFilterFormIn
 
     public function preProcessQueryBuilder(QueryBuilder $qb, array &$filters, array &$orderSort, int &$filtersMode): QueryBuilder
     {
-        if (empty($filters['content__in'])) {
-            return $qb;
+        if (!empty($filters['content__in'])) {
+            $contentIds = array_map(function (ContentInterface $content) {
+                return $content->getId();
+            }, $filters['content__in'] instanceof Collection ? $filters['content__in']->toArray() : [$filters['content__in']]);
+
+            if (!empty($contentIds)) {
+                $query = $qb->getEntityManager()->createQuery('SELECT cvm FROM '.ContentVersion::class.' cv LEFT JOIN cv.medias cvm WHERE cv.content IN (:contentIds)')->getDQL();
+                $qb->where($qb->expr()->in(
+                    'm',
+                    $query
+                ))
+                    ->setParameter('contentIds', $contentIds)
+                ;
+            }
+
+            unset($filters['content__in']);
         }
 
-        $contentIds = array_map(function (ContentInterface $content) {
-            return $content->getId();
-        }, $filters['content__in'] instanceof Collection ? $filters['content__in']->toArray() : [$filters['content__in']]);
-
-        if (!empty($contentIds)) {
-            $query = $qb->getEntityManager()->createQuery('SELECT cvm FROM '.ContentVersion::class.' cv LEFT JOIN cv.medias cvm WHERE cv.content IN (:contentIds)')->getDQL();
-            $qb->where($qb->expr()->in(
+        if (!empty($filters['content__empty'])) {
+            $query = $qb->getEntityManager()->createQuery('SELECT DISTINCT cvm FROM '.ContentVersion::class.' cv LEFT JOIN cv.medias cvm WHERE cvm IS NOT NULL')->getDQL();
+            $qb->where($qb->expr()->notIn(
                 'm',
                 $query
-            ))
-                ->setParameter('contentIds', $contentIds)
-            ;
-        }
+            ));
 
-        unset($filters['content__in']);
+            unset($filters['content__empty']);
+        }
 
         return $qb;
     }
