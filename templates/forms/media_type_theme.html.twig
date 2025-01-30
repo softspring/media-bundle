@@ -10,7 +10,7 @@
                 <strong data-drop-media-zone-file-name class="text-primary d-block pb-2"></strong>
                 <small class="d-block">
                     {{ 'admin_medias.form.upload_requirements.title'|trans }}:
-                    <strong>
+                    <em>
                         {% for attribute, value in form.vars.upload_requirements|filter((value, attribute) => attribute not in ['detectCorrupted']) %}
                             {% if value is same as true or value is same as false %}
                                 {{ ('admin_medias.form.upload_requirements.'~attribute~'.'~(value?'true':'false'))|trans }}{% if not loop.last %},{% endif %}
@@ -20,7 +20,7 @@
                                 {{ ('admin_medias.form.upload_requirements.'~attribute)|trans({'%value%': value }) }}{% if not loop.last %},{% endif %}
                             {% endif %}
                         {% endfor %}
-                    </strong>
+                        </em>
                 </small>
             </p>
             <div class="d-flex align-items-center justify-content-end">
