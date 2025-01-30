@@ -413,3 +413,55 @@ window.addEventListener('load', (event) => {
         loadSearchPage(modalSearchUrl);
     });
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    /**
+     * Select all drop zones in the document
+     */
+    document.querySelectorAll('[data-drop-media-zone]').forEach(dropZone => {
+        const fileInput = dropZone.querySelector('[data-drop-media-zone-input]');
+        const uploadBtn = dropZone.querySelector('[data-drop-media-zone-btn]');
+        const fileNameDisplay = dropZone.querySelector('[data-drop-media-zone-file-name]');
+
+        // Click event on upload button to trigger file input
+        uploadBtn.addEventListener("click", () => fileInput.click());
+
+        // Change event for file selection
+        fileInput.addEventListener('change', function () {
+            handleFile(fileInput.files[0]);
+        });
+
+        // Drag & Drop Events
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('border-primary');
+            dropZone.classList.add('info');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('border-primary');
+            dropZone.classList.remove('info');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-primary');
+            dropZone.classList.remove('info');
+
+            if (e.dataTransfer.files.length > 0) {
+                fileInput.files = e.dataTransfer.files;
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        // Function to handle file selection
+        function handleFile(file) {
+            if (file) {
+                fileNameDisplay.textContent = `${file.name}`;
+            } else {
+                fileNameDisplay.textContent = "";
+            }
+        }
+    });
+});

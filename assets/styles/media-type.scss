@@ -11,3 +11,28 @@
     background: white;
   }
 }
+
+.custom-media-input {
+  padding: 0;
+  height: 0;
+  overflow: hidden;
+  color: transparent;
+  background-color: transparent;
+  border-color: transparent;
+  pointer-events: none;
+
+  &:focus,
+  &:active,
+  &:hover,
+  &:visited {
+    outline: none;
+    color: transparent;
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;
+  }
+
+  &::-webkit-file-upload-button {
+    visibility: hidden;
+  }
+}

@@ -1,30 +1,48 @@
+{% use 'bootstrap_5_layout.html.twig' %}
 {% trans_default_domain 'sfs_media_admin' %}
 
 {% block media_version_upload_row %}
-    <div class="row">
-        <div class="col-3">{{ form_label(form) }}</div>
-        <div class="col">{{ form_widget(form) }}</div>
+    {#    <div class="mb-3">#}
+    {#        <label class="form-label">Upload your file</label>#}
+    {#        <div class="drop-zone border border-primary p-4 text-center bg-light rounded" data-file-input="file-upload">#}
+    {#            <p>Drag & drop your file here or</p>#}
+    {#            <input type="file" class="d-none file-input" name="file-upload">#}
+    {#            <button type="button" class="btn btn-primary upload-btn">Select File</button>#}
+    {#        </div>#}
+    {#        <div class="file-name mt-2 text-muted"></div>#}
+    {#    </div>#}
+    {{ form_label(form) }}
+    <div data-drop-media-zone class="border border-3 rounded-3 bg-light mb-3 p-3" style="border-style: dashed !important;">
+        <div class="d-flex align-items justify-content-between">
+            <p class="mb-0">
+                <span class="">{{ 'admin_medias.form.instructions'|trans }}:</span>
+                <strong data-drop-media-zone-file-name class="text-primary d-block pb-2"></strong>
+                <small class="d-block">
+                    {{ 'admin_medias.form.upload_requirements.title'|trans }}:
+                    <strong>
+                        {% for attribute, value in form.vars.upload_requirements|filter((value, attribute) => attribute not in ['detectCorrupted']) %}
+                            {% if value is same as true or value is same as false %}
+                                {{ ('admin_medias.form.upload_requirements.'~attribute~'.'~(value?'true':'false'))|trans }}{% if not loop.last %},{% endif %}
+                            {% elseif value is iterable %}
+                                {{ ('admin_medias.form.upload_requirements.'~attribute)|trans({'%value%': value|join(',') }) }}{% if not loop.last %},{% endif %}
+                            {% else %}
+                                {{ ('admin_medias.form.upload_requirements.'~attribute)|trans({'%value%': value }) }}{% if not loop.last %},{% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </strong>
+                </small>
+            </p>
+            <div class="d-flex align-items-center justify-content-end">
+                <button data-drop-media-zone-btn type="button" class="btn btn-outline-primary btn-sm text-nowrap px-2" data-upload-media-btn>{{ 'admin_medias.form.button'|trans }} <span class="bi bi-upload ms-2"></span></button>
+            </div>
+        </div>
+        {{ form_widget(form) }}
     </div>
 {% endblock media_version_upload_row %}
 
 {% block media_version_upload_widget %}
-    {{ form_widget(form.upload) }}
+    {{ form_widget(form.upload, {'attr': {'data-drop-media-zone-input': '', 'class' : 'custom-media-input'}}) }}
     {{ form_errors(form.upload) }}
-    <p class="py-2 small">
-        <em>
-            {{ 'admin_medias.form.upload_requirements.title'|trans }}:
-            {% for attribute, value in form.vars.upload_requirements|filter((value, attribute) => attribute not in ['detectCorrupted']) %}
-                {% if value is same as true or value is same as false %}
-                    {{ ('admin_medias.form.upload_requirements.'~attribute~'.'~(value?'true':'false'))|trans }}{% if not loop.last %},{% endif %}
-                {% elseif value is iterable %}
-                    {{ ('admin_medias.form.upload_requirements.'~attribute)|trans({'%value%': value|join(',') }) }}{% if not loop.last %},{% endif %}
-                {% else %}
-                    {{ ('admin_medias.form.upload_requirements.'~attribute)|trans({'%value%': value }) }}{% if not loop.last %},{% endif %}
-                {% endif %}
-
-            {% endfor %}
-        </em>
-    </p>
 {% endblock media_version_upload_widget %}
 
 {% block media_modal_row %}
