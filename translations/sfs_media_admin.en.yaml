@@ -28,6 +28,8 @@ admin_medias:
             type:
                 label: "Media type"
                 placeholder: "Select media type"
+            no_content_entity:
+                label: "Not used in content"
             content_entity:
                 label: "Content"
                 placeholder: "Select content"

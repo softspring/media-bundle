@@ -20,6 +20,10 @@
     {% if filterForm.content_entity is defined %}
         {{ form_row(filterForm.content_entity, {'attr': {'onchange': 'submit()'}}) }}
     {% endif %}
+
+    {% if filterForm.no_content_entity is defined %}
+        {{ form_row(filterForm.no_content_entity, {'attr': {'onchange': 'submit()'}}) }}
+    {% endif %}
 {% endblock %}
 
 {% block actions %}
