@@ -10,6 +10,12 @@ admin_medias:
         meta.title: "Medias"
         title: "Medias"
         breadcrumb: "Medias"
+        empty:
+            no_types_configured:
+                message_raw: "No se han configurado tipos de media"
+                go_to_doc_raw: "Comprueba cómo configurar los tipos de media en la <a href=\"https://github.com/softspring/media-bundle\" target=\"_blank\">documentación</a>"
+            create_first_raw: "Aún no se ha subido ningún archivo, pulsa en el botón \"Nuevo archivo\" para subir uno."
+            clean_filters_raw: "No se han encontrado resultados, intenta ser menos restrictivo."
         actions:
             create.link: "Nuevo archivo"
         filter_form:
