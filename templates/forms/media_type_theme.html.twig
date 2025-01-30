@@ -2,15 +2,6 @@
 {% trans_default_domain 'sfs_media_admin' %}
 
 {% block media_version_upload_row %}
-    {#    <div class="mb-3">#}
-    {#        <label class="form-label">Upload your file</label>#}
-    {#        <div class="drop-zone border border-primary p-4 text-center bg-light rounded" data-file-input="file-upload">#}
-    {#            <p>Drag & drop your file here or</p>#}
-    {#            <input type="file" class="d-none file-input" name="file-upload">#}
-    {#            <button type="button" class="btn btn-primary upload-btn">Select File</button>#}
-    {#        </div>#}
-    {#        <div class="file-name mt-2 text-muted"></div>#}
-    {#    </div>#}
     {{ form_label(form) }}
     <div data-drop-media-zone class="border border-3 rounded-3 bg-light mb-3 p-3" style="border-style: dashed !important;">
         <div class="d-flex align-items justify-content-between">
