@@ -46,7 +46,15 @@
             </div>
         </div>
 
-        {% if filterForm|default(false) and filterForm.vars.data|default([])|filter(v=>v) is not empty %}
+        {% if entities is empty and not filterForm.vars.submitted %}
+            <div class="container-fluid bg-white p-4">
+                <div class="p-5 m-5">
+                    <p class="text-center text-muted">
+                        {{ 'admin_medias.list.empty.create_first_raw'|trans|raw }}
+                    </p>
+                </div>
+            </div>
+        {% else %}
             {{ form_start(filterForm) }}
             <div class="container-fluid bg-white">
                 <div class="row">
@@ -81,15 +89,6 @@
                             {% endif %}
                         </div>
                     </div>
-                </div>
-            </div>
-            {{ form_end(filterForm) }}
-        {% else %}
-            <div class="container-fluid bg-white p-4">
-                <div class="p-5 m-5">
-                    <p class="text-center text-muted">
-                        {{ 'admin_medias.list.empty.create_first_raw'|trans|raw }}
-                    </p>
                 </div>
             </div>
         {% endif %}
