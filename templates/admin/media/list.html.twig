@@ -17,11 +17,10 @@
         <div class="container-fluid bg-white p-4">
             <div class="p-5 m-5">
                 <p class="text-center text-muted">
-                    No media types are configured.
+                    {{ 'admin_medias.list.empty.no_types_configured.message_raw'|trans|raw }}
                     <br/>
                     <br/>
-                    Check how to configure media types at <a href="https://github.com/softspring/media-bundle"
-                                                             target="_blank">documentation</a>
+                    {{ 'admin_medias.list.empty.no_types_configured.go_to_doc_raw'|trans|raw }}
                 </p>
             </div>
         </div>
@@ -47,47 +46,52 @@
             </div>
         </div>
 
-        {{ form_start(filterForm) }}
-        <div class="container-fluid bg-white">
-            <div class="row">
-                <div class="col-12 col-md-3 col-xl-2 border-end p-3">
-                    {% include '@SfsMedia/admin/media/list-filter-column.html.twig' %}
+        {% if entities is empty and not filterForm.vars.submitted %}
+            <div class="container-fluid bg-white p-4">
+                <div class="p-5 m-5">
+                    <p class="text-center text-muted">
+                        {{ 'admin_medias.list.empty.create_first_raw'|trans|raw }}
+                    </p>
                 </div>
-                <div class="col-12 col-md-9 col-xl-10 p-3">
-                    <div class="h-100 overflow-auto">
-                        <div class="container-fluid mb-3">
-                            <div class="row">
-                                <div class="col-4 col-md-6">
-                                    {{ entities.total }} medias
-                                </div>
-                                <div class="col-4 col-md-3">{{ form_widget(filterForm.order, {'attr': {'onchange': 'submit()', 'class': 'form-control-sm'}}) }}</div>
-                                <div class="col-4 col-md-3">{{ form_widget(filterForm.sort, {'attr': {'onchange': 'submit()', 'class': 'form-control-sm'}}) }}</div>
-                            </div>
-                        </div>
-
-                        {% if entities|length %}
-                            <div class="container-fluid">
+            </div>
+        {% else %}
+            {{ form_start(filterForm) }}
+            <div class="container-fluid bg-white">
+                <div class="row">
+                    <div class="col-12 col-md-3 col-xl-2 border-end p-3">
+                        {% include '@SfsMedia/admin/media/list-filter-column.html.twig' %}
+                    </div>
+                    <div class="col-12 col-md-9 col-xl-10 p-3">
+                        <div class="h-100 overflow-auto">
+                            <div class="container-fluid mb-3">
                                 <div class="row">
-                                    {% include '@SfsMedia/admin/media/list-page.html.twig' %}
-                                    {# {% include '@SfsComponents/paginator/pager.html.twig' with {'collection': entities} %} #}
+                                    <div class="col-4 col-md-6">
+                                        {{ entities.total }} medias
+                                    </div>
+                                    <div class="col-4 col-md-3">{{ form_widget(filterForm.order, {'attr': {'onchange': 'submit()', 'class': 'form-control-sm'}}) }}</div>
+                                    <div class="col-4 col-md-3">{{ form_widget(filterForm.sort, {'attr': {'onchange': 'submit()', 'class': 'form-control-sm'}}) }}</div>
                                 </div>
                             </div>
-                        {% else %}
-                            <div class="p-5 m-5">
-                                <p class="text-center text-muted">
-                                    {% if filterForm|default(false) and filterForm.vars.data|default([])|filter(v=>v) is not empty %}
-                                        No search results found, try to be less restrictive.
-                                    {% else %}
-                                        Upload first media
-                                    {% endif %}
-                                </p>
-                            </div>
-                        {% endif %}
+
+                            {% if entities|length %}
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        {% include '@SfsMedia/admin/media/list-page.html.twig' %}
+                                        {# {% include '@SfsComponents/paginator/pager.html.twig' with {'collection': entities} %} #}
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="p-5 m-5">
+                                    <p class="text-center text-muted">
+                                        {{ 'admin_medias.list.empty.clean_filters_raw'|trans|raw }}
+                                    </p>
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        {{ form_end(filterForm) }}
+        {% endif %}
     {% endif %}
 {% endblock content %}
 
@@ -159,7 +163,7 @@
             }
         })
 
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (!e.target.matches('[data-bulk-select]')) {
                 return;
             }

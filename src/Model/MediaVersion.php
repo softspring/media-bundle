@@ -109,6 +109,10 @@ abstract class MediaVersion implements MediaVersionInterface
             return 'https://storage.googleapis.com/'.substr($url, 5);
         }
 
+        if (str_starts_with($url, 'sfs-media-filesystem://')) {
+            return '/media/'.substr($url, 23);
+        }
+
         return $url;
     }
 
@@ -150,6 +154,16 @@ abstract class MediaVersion implements MediaVersionInterface
     public function setFileMimeType(?string $fileMimeType): void
     {
         $this->fileMimeType = $fileMimeType;
+    }
+
+    public function isVideoFile(): bool
+    {
+        return str_starts_with($this->fileMimeType, 'video/');
+    }
+
+    public function isImageFile(): bool
+    {
+        return str_starts_with($this->fileMimeType, 'image/');
     }
 
     public function getUploadedAt(): ?DateTime
