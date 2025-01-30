@@ -76,6 +76,7 @@ admin_medias:
         actions:
             update.button: "Save changes"
             cancel.button: "Cancel"
+            delete.button: "Delete"
         success_flash: "Media updated successfully"
         failure_flash: "Media update failed.<br/><small>%exception%</small><br/><small>%previous%</small>"
         exception_flash: "Media update failed.<br/><small>%exception%</small><br/><small>%previous%</small>"
