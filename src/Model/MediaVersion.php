@@ -156,6 +156,16 @@ abstract class MediaVersion implements MediaVersionInterface
         $this->fileMimeType = $fileMimeType;
     }
 
+    public function isVideo(): bool
+    {
+        return str_starts_with($this->fileMimeType, 'video/');
+    }
+
+    public function isImage(): bool
+    {
+        return str_starts_with($this->fileMimeType, 'image/');
+    }
+
     public function getUploadedAt(): ?DateTime
     {
         return $this->uploadedAt ? DateTime::createFromFormat('U', "{$this->uploadedAt}") : null;

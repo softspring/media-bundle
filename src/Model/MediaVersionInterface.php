@@ -45,6 +45,10 @@ interface MediaVersionInterface
 
     public function setFileMimeType(?string $fileMimeType): void;
 
+    public function isVideo(): bool;
+
+    public function isImage(): bool;
+
     public function getUploadedAt(): ?DateTime;
 
     public function getGeneratedAt(): ?DateTime;
