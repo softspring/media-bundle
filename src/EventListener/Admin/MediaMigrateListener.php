@@ -37,6 +37,8 @@ class MediaMigrateListener extends AbstractMediaListener
 
     public function onMigrateApply(ApplyEvent $event): void
     {
+        $this->mediaManager->setMigrating(true);
+
         /** @var MediaInterface $media */
         $media = $event->getEntity();
 

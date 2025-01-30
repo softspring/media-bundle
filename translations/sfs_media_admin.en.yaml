@@ -30,6 +30,8 @@ admin_medias:
                 placeholder: "Select media type"
             no_content_entity:
                 label: "Not used in content"
+            with_duplicates:
+                label: "With duplicates"
             content_entity:
                 label: "Content"
                 placeholder: "Select content"

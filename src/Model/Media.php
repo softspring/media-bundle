@@ -23,6 +23,8 @@ abstract class Media implements MediaInterface
 
     protected ?int $createdAt = null;
 
+    protected ?string $sha1 = null;
+
     public function __construct()
     {
         $this->versions = new ArrayCollection();
@@ -183,5 +185,15 @@ abstract class Media implements MediaInterface
         return $this->versions->filter(function (MediaVersionInterface $mediaVersion) use ($version) {
             return $mediaVersion->getVersion() == $version;
         })->first() ?: null;
+    }
+
+    public function getSha1(): ?string
+    {
+        return $this->sha1;
+    }
+
+    public function setSha1(?string $sha1): void
+    {
+        $this->sha1 = $sha1;
     }
 }

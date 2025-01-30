@@ -4,28 +4,35 @@ namespace Softspring\MediaBundle\EntityListener;
 
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
+use Softspring\MediaBundle\EntityManager\MediaManagerInterface;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
 use Softspring\MediaBundle\Processor\ProcessorProvider;
 use Softspring\MediaBundle\Storage\StorageDriverInterface;
 
 class MediaVersionListener
 {
-    protected StorageDriverInterface $storageDriver;
-    protected ProcessorProvider $processorProvider;
-
-    public function __construct(StorageDriverInterface $storageDriver, ProcessorProvider $processorProvider)
-    {
-        $this->storageDriver = $storageDriver;
-        $this->processorProvider = $processorProvider;
+    public function __construct(
+        protected StorageDriverInterface $storageDriver,
+        protected ProcessorProvider $processorProvider,
+        protected MediaManagerInterface $mediaManager,
+    ) {
     }
 
     public function prePersist(MediaVersionInterface $mediaVersion, LifecycleEventArgs $eventArgs): void
     {
+        if ($this->mediaManager->isMigrating()) {
+            return;
+        }
+
         $this->processorProvider->applyProcessors($mediaVersion);
     }
 
     public function preUpdate(MediaVersionInterface $mediaVersion, LifecycleEventArgs $eventArgs): void
     {
+        if ($this->mediaManager->isMigrating()) {
+            return;
+        }
+
         $this->processorProvider->applyProcessors($mediaVersion);
     }
 

@@ -60,4 +60,8 @@ interface MediaVersionInterface
     public function getOriginalVersion(): ?MediaVersionInterface;
 
     public function setOriginalVersion(?MediaVersionInterface $originalVersion): void;
+
+    public function getSha1(): ?string;
+
+    public function setSha1(?string $sha1): void;
 }

@@ -52,4 +52,8 @@ interface MediaInterface
     public function getCreatedAt(): ?DateTime;
 
     public function markCreatedAtNow(): void;
+
+    public function getSha1(): ?string;
+
+    public function setSha1(?string $sha1): void;
 }

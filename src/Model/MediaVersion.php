@@ -32,6 +32,8 @@ abstract class MediaVersion implements MediaVersionInterface
 
     protected ?array $options = null;
 
+    protected ?string $sha1 = null;
+
     /**
      * This field is not mapped.
      */
@@ -194,5 +196,19 @@ abstract class MediaVersion implements MediaVersionInterface
     public function setOriginalVersion(?MediaVersionInterface $originalVersion): void
     {
         $this->originalVersion = $originalVersion;
+    }
+
+    public function getSha1(): ?string
+    {
+        return $this->sha1;
+    }
+
+    public function setSha1(?string $sha1): void
+    {
+        $this->sha1 = $sha1;
+
+        if ($this->getVersion() === '_original') {
+            $this->getMedia()?->setSha1($sha1);
+        }
     }
 }
