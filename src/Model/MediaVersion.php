@@ -156,12 +156,12 @@ abstract class MediaVersion implements MediaVersionInterface
         $this->fileMimeType = $fileMimeType;
     }
 
-    public function isVideo(): bool
+    public function isVideoFile(): bool
     {
         return str_starts_with($this->fileMimeType, 'video/');
     }
 
-    public function isImage(): bool
+    public function isImageFile(): bool
     {
         return str_starts_with($this->fileMimeType, 'image/');
     }
