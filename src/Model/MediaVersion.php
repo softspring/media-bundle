@@ -109,6 +109,10 @@ abstract class MediaVersion implements MediaVersionInterface
             return 'https://storage.googleapis.com/'.substr($url, 5);
         }
 
+        if (str_starts_with($url, 'sfs-media-filesystem://')) {
+            return '/media/'.substr($url, 23);
+        }
+
         return $url;
     }
 
