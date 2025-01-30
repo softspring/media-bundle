@@ -396,7 +396,7 @@ window.addEventListener('load', (event) => {
 
         const mediaTypeSubmitBtn = event.target.querySelector('button[type="submit"]');
         const spinner = document.createElement('span');
-        spinner.classList.add('spinner-border', 'spinner-border-sm');;
+        spinner.classList.add('spinner-border', 'spinner-border-sm');
         spinner.setAttribute('role', 'status');
         spinner.setAttribute('aria-hidden', 'true');
 
@@ -423,6 +423,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const fileInput = dropZone.querySelector('[data-drop-media-zone-input]');
         const uploadBtn = dropZone.querySelector('[data-drop-media-zone-btn]');
         const fileNameDisplay = dropZone.querySelector('[data-drop-media-zone-file-name]');
+        const previewContainer = dropZone.querySelector('[data-drop-media-zone-preview]');
+        const previewImage = previewContainer.querySelector('img');
+        const previewVideo = previewContainer.querySelector('video');
+        const thumbnailIcon = previewContainer.querySelector('.icon');
+        const previewSource = previewVideo.querySelector("source");
 
         // Click event on upload button to trigger file input
         uploadBtn.addEventListener("click", () => fileInput.click());
@@ -459,8 +464,39 @@ document.addEventListener("DOMContentLoaded", function () {
         function handleFile(file) {
             if (file) {
                 fileNameDisplay.textContent = `${file.name}`;
+
+                if (file.type.startsWith("image/")) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        previewImage.src = e.target.result;
+                        previewImage.classList.remove("d-none");
+                        previewVideo.classList.add("d-none");
+                        thumbnailIcon.classList.add("d-none");
+                        previewContainer.classList.remove("d-none");
+                    };
+                    reader.readAsDataURL(file);
+                } else if (file.type.startsWith("video/")) {
+                    const videoURL = URL.createObjectURL(file);
+                    previewSource.src = videoURL;
+                    previewSource.type = file.type;
+                    previewVideo.load();
+                    previewVideo.classList.remove("d-none");
+                    previewImage.classList.add("d-none");
+                    thumbnailIcon.classList.add("d-none");
+                    previewContainer.classList.remove("d-none");
+                } else {
+                    // Hide preview
+                    previewImage.classList.add("d-none");
+                    previewVideo.classList.add("d-none");
+                    thumbnailIcon.classList.remove("d-none");
+                    previewContainer.classList.add("d-none");
+                }
             } else {
-                fileNameDisplay.textContent = "";
+                fileNameDisplay.textContent = "No file selected";
+                previewImage.classList.add("d-none");
+                previewVideo.classList.add("d-none");
+                thumbnailIcon.classList.remove("d-none");
+                previewContainer.classList.add("d-none");
             }
         }
     });
