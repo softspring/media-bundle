@@ -24,7 +24,7 @@ class MediaManager implements MediaManagerInterface
         protected EntityManagerInterface $em,
         protected MediaTypesCollection $mediaTypesCollection,
         protected MediaVersionManagerInterface $mediaVersionManager,
-        protected StorageDriverInterface $storageDriver
+        protected StorageDriverInterface $storageDriver,
     ) {
     }
 
@@ -133,7 +133,7 @@ class MediaManager implements MediaManagerInterface
             }
 
             foreach ($checkVersions['changed'] as $versionId => $changes) {
-                $changedOptionsString = implode(', ', array_map(fn($v) => $v['string'], $changes));
+                $changedOptionsString = implode(', ', array_map(fn ($v) => $v['string'], $changes));
                 $output && $output->write(sprintf(' - version "%s" needs to be recreated (%s): ', $versionId, $changedOptionsString));
                 try {
                     $media->removeVersion($oldVersion = $media->getVersion($versionId));

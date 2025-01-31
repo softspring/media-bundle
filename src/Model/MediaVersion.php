@@ -207,7 +207,7 @@ abstract class MediaVersion implements MediaVersionInterface
     {
         $this->sha1 = $sha1;
 
-        if ($this->getVersion() === '_original') {
+        if ('_original' === $this->getVersion()) {
             $this->getMedia()?->setSha1($sha1);
         }
     }
