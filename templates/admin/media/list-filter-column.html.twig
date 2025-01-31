@@ -5,15 +5,15 @@
 
     {% if filterForm.duplicates.vars.media %}
         {# TODO update this layout for bootstrap #}
-        <div class="ui info message visible" title="Duplicates this media">
-            <i class="close icon" title="Clear this filter" onclick="document.getElementById('duplicates').value=''; this.closest('form').submit()"></i>
+        <div class="alert alert-info alert-dismissible show" role="alert" title="Duplicates this media">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="document.getElementById('duplicates').value=''; document.getElementById('duplicates').closest('form').submit()"></button>
 
             {% if filterForm.duplicates.vars.media.isVideo %}
                 {{ filterForm.duplicates.vars.media|sfs_media_render_video('_original', {'class':'img-fluid', 'style':' max-height: 50px; max-width: 100%;'}) }}
             {% elseif filterForm.duplicates.vars.media.isImage %}
                 {{ filterForm.duplicates.vars.media|sfs_media_render_image(['_thumbnail'], {'class':'img-fluid', 'style':' max-height: 50px; max-width: 100%; width: auto;'}) }}
             {% endif %}
-            {#            Duplicates this media#}
+            Duplicates this media
         </div>
     {% endif %}
 

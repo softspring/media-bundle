@@ -30,6 +30,7 @@
 
         <span class="me-2">Format: {{ version.fileMimeType }}</span>
         <span class="me-2">File size: {{ _self.bytesToSize(version.fileSize) }}</span>
+        <abbr class="small me-2" title="{{ version.sha1 }}">SHA1</abbr>
 
         <div class="float-end mb-1">
             <span class="me-2">
