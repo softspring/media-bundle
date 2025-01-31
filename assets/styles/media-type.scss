@@ -13,12 +13,13 @@
 }
 
 .custom-media-input {
+  width: 0.1px;
+  height: 0.1px;
   padding: 0;
-  height: 0;
+  opacity: 0;
   overflow: hidden;
-  color: transparent;
-  background-color: transparent;
-  border-color: transparent;
+  position: absolute;
+  z-index: -1;
   pointer-events: none;
 
   &:focus,
