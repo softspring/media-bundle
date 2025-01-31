@@ -13,6 +13,7 @@
 {% import '@SfsMedia/admin/media/_macros.html.twig' as macros %}
 
 {% block content %}
+    <h1 class="h3 mb-4">{{ 'admin_medias.read.title'|trans({'%name%': media.name }) }}</h1>
     <div class="float-end">
         {% if (checkVersions.new|length) + (checkVersions.delete|length) + (checkVersions.changed|length) %}
             {% if is_granted('PERMISSION_SFS_MEDIA_ADMIN_MEDIAS_MIGRATE', media) %}
@@ -35,7 +36,6 @@
             <a class="btn btn-danger disabled">{{ 'admin_medias.read.actions.delete.button'|trans }}</a>
         {% endif %}
     </div>
-    <h1 class="h3 mb-4">{{ 'admin_medias.read.title'|trans({'%name%': media.name }) }}</h1>
 
     {% if media.description %}
         <p>{{ media.description|nl2br }}</p>
