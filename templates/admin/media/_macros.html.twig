@@ -54,12 +54,12 @@
         {% if media.isVideo %}
             {% if version.fileMimeType starts with 'image/' %}
                 {# can be a poster #}
-                {{ media|sfs_media_render_image(version.version, {'class':'img-fluid img-'~version.version}) }}
+                {{ media|sfs_media_render_image(version.version, {'class':'transparent-background img-fluid img-'~version.version}) }}
             {% else %}
                 {{ media|sfs_media_render_video(version.version, {'class':'img-fluid img-'~version.version, 'controls': true, 'autoplay': true, 'loop': true}) }}
             {% endif %}
         {% elseif media.isImage %}
-            {{ media|sfs_media_render_image(version.version, {'class':'img-fluid img-thumbnail img-'~version.version}) }}
+            {{ media|sfs_media_render_image(version.version, {'class':'transparent-background img-fluid img-thumbnail img-'~version.version}) }}
         {% endif %}
     </div>
 
@@ -119,7 +119,7 @@
     </div>
 
     <div class="mb-3">
-        {{ media|sfs_media_render_picture(picture_id, {'data-example':'test'}, {'class': 'img-fluid'}) }}
+        {{ media|sfs_media_render_picture(picture_id, {'data-example':'test'}, {'class': 'transparent-background img-fluid'}) }}
     </div>
 
     <p class="text-primary"><i class="bi bi-info-circle"></i> How to use this picture tag</p>
