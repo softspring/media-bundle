@@ -471,16 +471,18 @@ function initDropZone(dropZone) {
     // Drag & Drop Events
     dropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
-        dropZone.classList.add('border-primary', 'info');
+        dropZone.classList.add('border-primary', 'teal');
+        // dropZone.style.border = "3px dashed #ccc";
     });
 
     dropZone.addEventListener('dragleave', () => {
-        dropZone.classList.remove('border-primary', 'info');
+        dropZone.classList.remove('border-primary', 'teal');
+        // dropZone.style.border = "3px dashed #000";
     });
 
     dropZone.addEventListener('drop', (e) => {
         e.preventDefault();
-        dropZone.classList.remove('border-primary', 'info');
+        dropZone.classList.remove('border-primary', 'teal');
 
         if (e.dataTransfer.files.length > 0) {
             fileInput.files = e.dataTransfer.files;
@@ -502,10 +504,10 @@ function initDropZone(dropZone) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     previewImage.src = e.target.result;
-                    previewImage.classList.remove("d-none");
-                    previewVideo.classList.add("d-none");
-                    thumbnailIcon.classList.add("d-none");
-                    previewContainer.classList.remove("d-none");
+                    previewImage.classList.remove('d-none', 'hidden');
+                    previewVideo.classList.add('d-none', 'hidden');
+                    thumbnailIcon.classList.add('d-none', 'hidden');
+                    previewContainer.classList.remove('d-none', 'hidden');
                 };
                 reader.readAsDataURL(file);
             } else if (file.type.startsWith("video/")) {
@@ -514,24 +516,24 @@ function initDropZone(dropZone) {
                 previewSource.src = videoURL;
                 previewSource.type = file.type;
                 previewVideo.load();
-                previewVideo.classList.remove("d-none");
-                previewImage.classList.add("d-none");
-                thumbnailIcon.classList.add("d-none");
-                previewContainer.classList.remove("d-none");
+                previewVideo.classList.remove('d-none', 'hidden');
+                previewImage.classList.add('d-none', 'hidden');
+                thumbnailIcon.classList.add('d-none', 'hidden');
+                previewContainer.classList.remove('d-none', 'hidden');
             } else {
                 // Hide preview for unsupported file types
-                previewImage.classList.add("d-none");
-                previewVideo.classList.add("d-none");
-                thumbnailIcon.classList.remove("d-none");
-                previewContainer.classList.add("d-none");
+                previewImage.classList.add('d-none', 'hidden');
+                previewVideo.classList.add('d-none', 'hidden');
+                thumbnailIcon.classList.remove('d-none', 'hidden');
+                previewContainer.classList.add('d-none', 'hidden');
             }
         } else {
             // Reset UI if no file is selected
             fileNameDisplay.textContent = "No file selected";
-            previewImage.classList.add("d-none");
-            previewVideo.classList.add("d-none");
-            thumbnailIcon.classList.remove("d-none");
-            previewContainer.classList.add("d-none");
+            previewImage.classList.add('d-none', 'hidden');
+            previewVideo.classList.add('d-none', 'hidden');
+            thumbnailIcon.classList.remove('d-none', 'hidden');
+            previewContainer.classList.add('d-none', 'hidden');
         }
     }
 }
