@@ -31,10 +31,14 @@
             </li>
         {% endfor %}
     {% endif %}
-    {% if linked_cms_versions is defined and linked_cms_versions|length %}
+    {% if linked_cms_versions is defined %}
+        {% if linked_cms_versions|length %}
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="linked-cms-tab" data-bs-toggle="pill" data-bs-target="#linked-cms"
-                    type="button" role="tab" aria-controls="linked-cms" aria-selected="false"><i class="bi bi-link"></i> linked CMS contents</button>
+                    type="button" role="tab" aria-controls="linked-cms" aria-selected="false"><i class="bi bi-link"></i> linked CMS contents ({{ linked_cms_versions|length }})</button>
         </li>
+        {% else %}
+            {# TODO show disabled #}
+        {% endif %}
     {% endif %}
 </ul>

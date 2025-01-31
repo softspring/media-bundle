@@ -81,15 +81,15 @@
     {% if form.vars.data %}
         {% for version in form.vars.data.versions %}
             {% if form.vars.data.isImage() %}
-                {% set attr = attr|merge({('data-media-image-'~version.version): form.vars.data|sfs_media_render_image([version.version], {'class':'img-fluid'})}) %}
+                {% set attr = attr|merge({('data-media-image-'~version.version): form.vars.data|sfs_media_render_image([version.version], {'class':'img-fluid'}|merge(image_attr|default({})))}) %}
             {% elseif form.vars.data.isVideo() %}
-                {% set attr = attr|merge({('data-media-video-'~version.version): form.vars.data|sfs_media_render_video([version.version], {'class':'img-fluid'})}) %}
+                {% set attr = attr|merge({('data-media-video-'~version.version): form.vars.data|sfs_media_render_video([version.version], {'class':'img-fluid'}|merge(video_attr|default({})))}) %}
             {% endif %}
             {% for picture,config in sfs_media_type_config(form.vars.data)['pictures']|default([]) %}
-                {% set attr = attr|merge({('data-media-picture-'~picture): form.vars.data|sfs_media_render_picture(picture)}) %}
+                {% set attr = attr|merge({('data-media-picture-'~picture): form.vars.data|sfs_media_render_picture(picture, {'class':'img-fluid'}|merge(picture_attr|default({})))}) %}
             {% endfor %}
             {% for video_set,config in sfs_media_type_config(form.vars.data)['video_sets']|default([]) %}
-                {% set attr = attr|merge({('data-media-video-set-'~video_set): form.vars.data|sfs_media_render_video_set(video_set)}) %}
+                {% set attr = attr|merge({('data-media-video-set-'~video_set): form.vars.data|sfs_media_render_video_set(video_set, {'class':'img-fluid'}|merge(video_attr|default({})))}) %}
             {% endfor %}
         {% endfor %}
     {% endif %}
