@@ -38,7 +38,10 @@
                     type="button" role="tab" aria-controls="linked-cms" aria-selected="false"><i class="bi bi-link"></i> linked CMS contents ({{ linked_cms_versions|length }})</button>
         </li>
         {% else %}
-            {# TODO show disabled #}
+            <li class="nav-item" role="presentation">
+                <button class="nav-link disabled" id="linked-cms-tab" data-bs-toggle="pill" data-bs-target="#linked-cms"
+                        type="button" role="tab" aria-controls="linked-cms" aria-selected="false"><i class="bi bi-link"></i> linked CMS contents (0)</button>
+            </li>
         {% endif %}
     {% endif %}
 </ul>

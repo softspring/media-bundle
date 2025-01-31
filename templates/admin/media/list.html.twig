@@ -55,6 +55,13 @@
                 </div>
             </div>
         {% else %}
+            {% if duplicates.total %}
+                <div class="alert alert-warning" role="alert">
+                    {{ 'admin_medias.alerts.total_duplicates_raw'|trans({'%different%': duplicates.different, '%total%': duplicates.total, '%duplicates%': duplicates.total - duplicates.different})|raw }}
+                </div>
+                {#{{ dump(duplicates) }}#}
+            {% endif %}
+
             {{ form_start(filterForm) }}
             <div class="container-fluid bg-white">
                 <div class="row">

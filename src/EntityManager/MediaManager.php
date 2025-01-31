@@ -12,6 +12,7 @@ use Softspring\MediaBundle\Exception\MigrateMediaException;
 use Softspring\MediaBundle\Helper\TypeChecker;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
+use Softspring\MediaBundle\Storage\StorageDriverInterface;
 use Softspring\MediaBundle\Type\MediaTypesCollection;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -19,17 +20,12 @@ class MediaManager implements MediaManagerInterface
 {
     use CrudlEntityManagerTrait;
 
-    protected EntityManagerInterface $em;
-
-    protected MediaTypesCollection $mediaTypesCollection;
-
-    protected MediaVersionManagerInterface $mediaVersionManager;
-
-    public function __construct(EntityManagerInterface $em, MediaTypesCollection $mediaTypesCollection, MediaVersionManagerInterface $mediaVersionManager)
-    {
-        $this->em = $em;
-        $this->mediaTypesCollection = $mediaTypesCollection;
-        $this->mediaVersionManager = $mediaVersionManager;
+    public function __construct(
+        protected EntityManagerInterface $em,
+        protected MediaTypesCollection $mediaTypesCollection,
+        protected MediaVersionManagerInterface $mediaVersionManager,
+        protected StorageDriverInterface $storageDriver,
+    ) {
     }
 
     public function getTargetClass(): string
@@ -137,7 +133,7 @@ class MediaManager implements MediaManagerInterface
             }
 
             foreach ($checkVersions['changed'] as $versionId => $changes) {
-                $changedOptionsString = implode(', ', array_map(fn($v) => $v['string'], $changes));
+                $changedOptionsString = implode(', ', array_map(fn ($v) => $v['string'], $changes));
                 $output && $output->write(sprintf(' - version "%s" needs to be recreated (%s): ', $versionId, $changedOptionsString));
                 try {
                     $media->removeVersion($oldVersion = $media->getVersion($versionId));
@@ -178,8 +174,15 @@ class MediaManager implements MediaManagerInterface
                     continue;
                 }
 
+                if (!$version->getUrl()) {
+                    continue;
+                }
+
                 if (!$version->getSha1()) {
-                    $version->setSha1(sha1_file($version->getUrl()));
+                    $tmpFile = tempnam(sys_get_temp_dir(), 'sfs-media-migrate');
+                    $this->storageDriver->download($version->getUrl(), $tmpFile);
+                    $version->setSha1(sha1_file($tmpFile));
+                    unlink($tmpFile);
                     $output && $output->writeln('<fg=green>Updated sha1</>');
                 }
 

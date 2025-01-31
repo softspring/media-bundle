@@ -2,6 +2,7 @@
 
 namespace Softspring\MediaBundle\EntityManager;
 
+use Doctrine\Common\Collections\Collection;
 use Softspring\Component\CrudlController\Manager\CrudlEntityManagerInterface;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
@@ -35,4 +36,10 @@ interface MediaManagerInterface extends CrudlEntityManagerInterface
      * @param MediaInterface $entity
      */
     public function deleteEntity(object $entity): void;
+
+    public function findMediaDuplicates(MediaInterface $media): Collection;
+
+    public function findDuplicates(): array;
+
+    public function getDuplicatesStats(): array;
 }
