@@ -64,7 +64,7 @@
                     >
                         {% if media.isImage %}
                         <div style="min-height:150px; max-height: 150px; width: auto; display: flex; align-items: center;" class="card-img-top bg-light overflow-hidden">
-                            {{ media|sfs_media_render_image(['_thumbnail'], {'class':'img-thumbnail'}) }}
+                            {{ media|sfs_media_render_image(['_thumbnail'], {'class':'img-thumbnail transparent-background'}) }}
                         </div>
                         {% elseif media.isVideo %}
                         <div style="height:200px" class="bg-dark text-center row p-0 m-0 w-100">
@@ -72,8 +72,8 @@
                         </div>
                         {% endif %}
                         <p class="card-title lh-sm mb-0 text-truncate px-2" title="{{ media.name }}"><small><strong>{{ media.name }}</strong></small></p>
-                        <p class="small text-truncate lh-1 mb-2" title="{{ media_types[media.type].name }}">
-                                {{ media_types[media.type].name }}
+                        <p class="small text-truncate lh-1 mb-2" title="{{ media_types[media.type].name|default }}">
+                                {{ media_types[media.type].name|default }}
                             <br/>
                             {% if media.isVideo %}
                                 {# nothing yet #}
