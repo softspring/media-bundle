@@ -18,13 +18,13 @@
 
                 {% if media.isVideo %}
                     <div style="height:200px" class="bg-dark text-center row p-0 m-0 w-100 position-relative">
-                        {{ media|sfs_media_render_image(['_thumbnail'], {'class':'img-fluid w-auto mx-auto opacity-50', 'style':''}) }}
+                        {{ media|sfs_media_render_image(['_thumbnail'], {'class':'transparent-background img-fluid w-auto mx-auto opacity-50', 'style':''}) }}
                         <div class="position-absolute top-50" style="margin-top: -20px"><div class="bi bi-play-btn h1 my-auto text-white"></div></div>
                     </div>
                 {% elseif media.isImage %}
                     <div style="min-height:200px; max-height: 200px; width: auto; display: flex; align-items: center;"
                          class="card-img-top bg-light overflow-hidden">
-                        {{ media|sfs_media_render_image(['_thumbnail'], {'class':'img-fluid w-auto mx-auto', 'style':''}) }}
+                        {{ media|sfs_media_render_image(['_thumbnail'], {'class':'transparent-background img-fluid w-auto mx-auto', 'style':''}) }}
                     </div>
                 {% endif %}
                 <p class="card-title mb-0 text-truncate px-2" title="{{ media.name }}">
