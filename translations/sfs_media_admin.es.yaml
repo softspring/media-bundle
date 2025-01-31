@@ -66,6 +66,9 @@ admin_medias:
         title: "%name%"
         breadcrumb: "Delete media"
         message: "Are you sure you want to delete this media?"
+        warning:
+            title: "Are you sure you want to delete this media?"
+            text: "This will permanently remove the files. If the media is hardcoded anywhere, its link will break."
         actions:
             delete.button: "Delete media"
             cancel.button: "Cancel"
