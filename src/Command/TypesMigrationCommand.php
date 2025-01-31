@@ -22,27 +22,30 @@ class TypesMigrationCommand extends Command
         $this->setName('sfs:media:types-migration');
     }
 
-    /**
-     * @throws InvalidTypeException
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $medias = $this->mediaManager->getRepository()->findAll();
 
+        $this->mediaManager->setMigrating(true);
+
         /** @var MediaInterface $media */
         foreach ($medias as $media) {
-            $typeConfig = $this->mediaTypesCollection->getType($media->getType());
+            try {
+                $typeConfig = $this->mediaTypesCollection->getType($media->getType());
 
-            if (!$typeConfig) {
-                $output->writeln(sprintf('<error>Media "%s" has an error. Type "%s" has been deleted</error>', $media->getName(), $media->getType()));
-                continue;
+                if (!$typeConfig) {
+                    $output->writeln(sprintf('<error>Media "%s" has an error. Type "%s" has been deleted</error>', $media->getName(), $media->getType()));
+                    continue;
+                }
+
+                $output->writeln(sprintf('Media "%s" of type "%s"', $media->getName(), $media->getType()));
+
+                $this->mediaManager->migrate($media, $output);
+
+                $output->writeln('');
+            } catch (InvalidTypeException $e) {
+                $output->writeln(sprintf('<error>Media "%s" has an error. Type "%s" is invalid</error>', $media->getName(), $media->getType()));
             }
-
-            $output->writeln(sprintf('Media "%s" of type "%s"', $media->getName(), $media->getType()));
-
-            $this->mediaManager->migrate($media, $output);
-
-            $output->writeln('');
         }
 
         return Command::SUCCESS;

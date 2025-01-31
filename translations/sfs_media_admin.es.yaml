@@ -30,6 +30,8 @@ admin_medias:
                 placeholder: "Selecciona el tipo"
             no_content_entity:
                 label: "No utilizada en contenidos"
+            with_duplicates:
+                label: "Con duplicados"
             content_entity:
                 label: "Contenido"
                 placeholder: "Selecciona el contenido"
@@ -111,3 +113,11 @@ admin_medias:
             allowLandscape.false: "archivo horizontal no permitida"
             allowPortrait.true: "archivo vertical permitida"
             allowPortrait.false: "archivo vertical no permitida"
+
+    alerts:
+        media_new_versions_raw: "La versión <strong>%version%</strong> de este media no existe, parece ser una <strong>nueva versión</strong> en la configuración. Debes ejecutar el comando de migración de medias."
+        media_delete_versions_raw: "La versión <strong>%version%</strong> de este media ha sido <strong>eliminada</strong> en la configuración. Debes ejecutar el comando de migración de medias para limpiar los medias."
+        media_changed_versions_raw: "La configuración de la versión <strong>%version%</strong> ha sido <strong>cambiada</strong> (%change_list%). Debes ejecutar el comando de migración de medias para limpiar los medias."
+        media_manual_versions_raw: "Falta la versión <strong>%version%</strong> de este media, parece ser una <strong>nueva versión</strong> en la configuración. Es obligatorio que proporciones este archivo manualmente."
+        media_duplicates_raw: "%duplicates% duplicados de este media. <a href=\"%url%\">Ver lista</a>"
+        total_duplicates_raw: "Hay %different% medias con algunos duplicados. Un total de %duplicates% medias están afectados, por lo tanto hay %duplicates% medias que potencialmente están duplicados y pueden ser eliminados."

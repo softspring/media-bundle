@@ -31,5 +31,6 @@ class MediaReadListener extends AbstractMediaListener
         /** @var MediaInterface $media */
         $media = $event->getData()['media'];
         $event->getData()['checkVersions'] = TypeChecker::checkMedia($media, $event->getData()['type_config']);
+        $event->getData()['duplicates'] = $this->mediaManager->findMediaDuplicates($media);
     }
 }

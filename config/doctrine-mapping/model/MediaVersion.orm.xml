@@ -38,6 +38,7 @@
             </options>
         </field>
         <field name="options" column="options" type="json" nullable="true" />
+        <field name="sha1" column="sha1" type="string" length="40" nullable="true" />
     </mapped-superclass>
 
 </doctrine-mapping>

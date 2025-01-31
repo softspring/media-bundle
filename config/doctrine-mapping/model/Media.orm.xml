@@ -23,6 +23,7 @@
                 <option name="unsigned">true</option>
             </options>
         </field>
+        <field name="sha1" column="sha1" type="string" length="40" nullable="true" />
     </mapped-superclass>
 
 </doctrine-mapping>

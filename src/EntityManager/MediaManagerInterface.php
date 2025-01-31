@@ -17,6 +17,10 @@ interface MediaManagerInterface extends CrudlEntityManagerInterface
 
     public function migrate(MediaInterface $media, ?OutputInterface $output = null): void;
 
+    public function isMigrating(): bool;
+
+    public function setMigrating(bool $migrating): void;
+
     /**
      * @return MediaInterface
      */

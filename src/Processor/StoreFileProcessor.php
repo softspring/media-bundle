@@ -61,6 +61,7 @@ class StoreFileProcessor implements ProcessorInterface
         $generator = $this->mediaTypesCollection->getType($version->getMedia()->getType())['generator'];
         $name = $this->nameGenerators->getGenerator($generator)->generateName($version->getMedia(), $version->getVersion(), $upload);
 
+        $version->setSha1(sha1_file($upload->getRealPath()));
         $version->setUrl($this->storage->store($upload, $name));
 
         if (!$version->isKeepTmpFile()) {

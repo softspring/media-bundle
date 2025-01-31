@@ -3,6 +3,7 @@
 namespace Softspring\MediaBundle\EventListener\Admin;
 
 use Softspring\Component\CrudlController\Event\FilterEvent;
+use Softspring\Component\CrudlController\Event\ViewEvent;
 use Softspring\MediaBundle\SfsMediaEvents;
 
 class MediaListListener extends AbstractMediaListener
@@ -20,6 +21,7 @@ class MediaListListener extends AbstractMediaListener
             ],
             SfsMediaEvents::ADMIN_MEDIAS_LIST_VIEW => [
                 ['onViewAddMediaTypes', 0],
+                ['onMediasListViewAddDuplicates', 5],
             ],
             // SfsMediaEvents::ADMIN_MEDIAS_LIST_EXCEPTION => [],
         ];
@@ -30,5 +32,10 @@ class MediaListListener extends AbstractMediaListener
         $filters = $event->getFilters();
         $filters['private'] = false;
         $event->setFilters($filters);
+    }
+
+    public function onMediasListViewAddDuplicates(ViewEvent $event): void
+    {
+        $event->getData()['duplicates'] = $this->mediaManager->getDuplicatesStats();
     }
 }

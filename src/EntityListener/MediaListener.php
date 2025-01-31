@@ -19,6 +19,10 @@ class MediaListener
 
     public function preFlush(MediaInterface $media, PreFlushEventArgs $eventArgs): void
     {
+        if ($this->mediaManager->isMigrating()) {
+            return;
+        }
+
         $this->mediaManager->generateVersionEntities($media);
     }
 
