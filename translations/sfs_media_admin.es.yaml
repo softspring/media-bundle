@@ -93,6 +93,8 @@ admin_medias:
         description.label: "Descripción"
         _original.label: "Archivo principal"
         upload.label: "Fichero"
+        instructions: "Arrastra y suelta tu archivo aquí o súbelo usando el botón."
+        button: "Seleccionar archivo"
         upload_requirements:
             title: "Requisitos"
             minWidth: "ancho mínimo %value%"

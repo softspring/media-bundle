@@ -93,6 +93,8 @@ admin_medias:
         description.label: "Description"
         _original.label: "Main media"
         upload.label: "File"
+        instructions: "Drag & drop your file here or upload it using the button."
+        button: "Select file"
         upload_requirements:
             title: "Requirements"
             minWidth: "min width %value%"
