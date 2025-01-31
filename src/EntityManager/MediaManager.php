@@ -137,7 +137,7 @@ class MediaManager implements MediaManagerInterface
             }
 
             foreach ($checkVersions['changed'] as $versionId => $changes) {
-                $changedOptionsString = implode(', ', array_map(fn ($v) => $v['string'], $changes));
+                $changedOptionsString = implode(', ', array_map(fn($v) => $v['string'], $changes));
                 $output && $output->write(sprintf(' - version "%s" needs to be recreated (%s): ', $versionId, $changedOptionsString));
                 try {
                     $media->removeVersion($oldVersion = $media->getVersion($versionId));
@@ -202,7 +202,11 @@ class MediaManager implements MediaManagerInterface
         }
     }
 
-    public function findDuplicates(MediaInterface $media): Collection
+    /**
+     * This finds the number of duplicates of a media in the media table.
+     * @todo move this to a repository
+     */
+    public function findMediaDuplicates(MediaInterface $media): Collection
     {
         $qb = $this->em->getRepository(MediaInterface::class)->createQueryBuilder('m')
             ->andWhere('m.type = :type')
@@ -222,5 +226,35 @@ class MediaManager implements MediaManagerInterface
         $qb->setParameter('media', $media->getId());
 
         return new ArrayCollection($qb->getQuery()->getResult());
+    }
+
+    /**
+     * Counts the number of duplicates in the media table.
+     * It includes: type key, sha1 code, number of duplicates and the id of the first media found.
+     *
+     * @throws \Doctrine\DBAL\Exception
+     *
+     * @todo move this to a repository
+     */
+    public function findDuplicates(): array
+    {
+        $sql = 'SELECT m.type_key, m.sha1, COUNT(*) duplicated, MIN(m.id) media_id FROM media m
+WHERE m.sha1 IS NOT NULL
+GROUP BY m.type_key, m.sha1 
+HAVING duplicated > 1
+ORDER BY duplicated DESC';
+
+        return $this->em->getConnection()->executeQuery($sql)->fetchAllAssociative();
+    }
+
+    public function getDuplicatesStats(): array
+    {
+        $duplicates = $this->findDuplicates();
+
+        return [
+            'different' => count($duplicates),
+            'total' => array_sum(array_column($duplicates, 'duplicated')),
+            'duplicates' => $duplicates,
+        ];
     }
 }

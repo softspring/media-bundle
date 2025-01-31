@@ -1,30 +1,27 @@
+{% trans_default_domain 'sfs_media_admin' %}
+
 {% for version in checkVersions.new %}
     <div class="alert alert-danger" role="alert">
-        Missing <strong>{{ version }}</strong> version in this media, seems to be a <strong>new version</strong> in config.
-        You need to run media migrations command.
+        {{ 'admin_medias.alerts.media_new_versions_raw'|trans({'%version%': version})|raw }}
     </div>
 {% endfor %}
 {% for version in checkVersions.delete %}
     <div class="alert alert-warning" role="alert">
-        Media <strong>{{ version }}</strong> version has been <strong>deleted</strong> in config.
-        You need to run media migrations command to cleanup medias.
+        {{ 'admin_medias.alerts.media_delete_versions_raw'|trans({'%version%': version})|raw }}
     </div>
 {% endfor %}
 {% for version,changedOptions in checkVersions.changed %}
     <div class="alert alert-warning" role="alert">
-        <strong>{{ version }}</strong> version configuration has been <strong>changed</strong>
-        ({{ changedOptions|map((changedOption) => changedOption.string)|join(', ') }}).
-        You need to run media migrations command to cleanup medias.
+        {{ 'admin_medias.alerts.media_changed_versions_raw'|trans({'%version%': version, '%change_list%': changedOptions|map((changedOption) => changedOption.string)|join(', ')})|raw }}
     </div>
 {% endfor %}
 {% for version in checkVersions.manual %}
     <div class="alert alert-warning" role="alert">
-        Missing <strong>{{ version }}</strong> version in this media, seems to be <strong>new</strong> in config.
-        It's mandatory that you provide this file manually.
+        {{ 'admin_medias.alerts.media_manual_versions_raw'|trans({'%version%': version})|raw }}
     </div>
 {% endfor %}
 {% if duplicates|length %}
     <div class="alert alert-warning" role="alert">
-        Hay {{ duplicates|length }} duplicados de este media. <a href="{{ url('sfs_media_admin_medias_list', {'duplicates':media.id}) }}">Ver listado</a>
+        {{ 'admin_medias.alerts.media_duplicates_raw'|trans({'%duplicates%': duplicates|length, '%url%': url('sfs_media_admin_medias_list', {'duplicates':media.id})})|raw }}
     </div>
 {% endif %}

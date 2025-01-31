@@ -111,3 +111,11 @@ admin_medias:
             allowLandscape.false: "landscape media not allowed"
             allowPortrait.true: "portrait media allowed"
             allowPortrait.false: "portrait media not allowed"
+
+    alerts:
+        media_new_versions_raw: "Missing <strong>%version%</strong> version in this media, seems to be a <strong>new version</strong> in config. You need to run media migrations command."
+        media_delete_versions_raw: "Media <strong>%version%</strong> version has been <strong>deleted</strong> in config. You need to run media migrations command to cleanup medias."
+        media_changed_versions_raw: "<strong>%version%</strong> version configuration has been <strong>changed</strong> (%change_list%). You need to run media migrations command to cleanup medias."
+        media_manual_versions_raw: "Missing <strong>%version%</strong> version in this media, seems to be <strong>new</strong> in config. It's mandatory that you provide this file manually."
+        media_duplicates_raw: "%duplicates% duplicates of this media. <a href=\"%url%\">View list</a>"
+        total_duplicates_raw: "There are %different% medias with some duplicates. A total of %total% medias are affected, so there are %duplicates% medias that are potentially duplicated and they can be deleted."
