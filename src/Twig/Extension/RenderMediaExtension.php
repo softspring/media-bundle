@@ -55,11 +55,19 @@ class RenderMediaExtension extends AbstractExtension
     public function getMediaTypeConfig($typeOrMedia): ?array
     {
         if (is_string($typeOrMedia)) {
-            return $this->mediaTypesCollection->getType($typeOrMedia);
+            try {
+                return $this->mediaTypesCollection->getType($typeOrMedia);
+            } catch (InvalidTypeException $e) {
+                return null;
+            }
         }
 
         if ($typeOrMedia instanceof MediaInterface) {
-            return $this->mediaTypesCollection->getType($typeOrMedia->getType());
+            try {
+                return $this->mediaTypesCollection->getType($typeOrMedia->getType());
+            } catch (InvalidTypeException $e) {
+                return null;
+            }
         }
 
         throw new Exception('sfs_media_type_config parameter can be a string or a MediaInterface');
