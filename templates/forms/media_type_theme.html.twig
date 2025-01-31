@@ -4,8 +4,8 @@
 {% block media_version_upload_row %}
     {{ form_label(form) }}
     <div data-drop-media-zone class="border border-3 rounded-3 bg-light mb-3 p-3" style="border-style: dashed !important;">
-        <div class="d-flex align-items justify-content-between">
-            <div class="d-flex align-items-center pe-3">
+        <div class="d-flex align-items justify-content-between flex-wrap">
+            <div class="d-flex align-items-center pe-3 col">
                 <div class="d-flex justify-content-center align-items-center rounded me-3 h-100 px-2" data-drop-media-zone-preview style="width: 125px;">
                     <i class="icon bi bi-image{{ (form.vars.value.publicUrl is empty) ? '' : ' d-none' }}"></i>
                     <img src="{{ form.vars.value.publicUrl|default('') }}" class="img-thumbnail preview-image{{ (form.vars.value.publicUrl is not empty and form.vars.value.isImageFile) ? '' : ' d-none' }}" alt="Image Preview" style="max-width: 120px; max-height: 120px;">
@@ -33,7 +33,7 @@
                     </small>
                 </p>
             </div>
-            <div class="d-flex align-items-center justify-content-end">
+            <div class="d-flex align-items-center justify-content-end py-3 col" style="min-width: 250px;">
                 <button data-drop-media-zone-btn type="button" class="btn btn-outline-primary btn-sm text-nowrap px-2" data-upload-media-btn><small>{{ 'admin_medias.form.button'|trans }}</small> <span class="bi bi-upload ms-2"></span></button>
             </div>
         </div>

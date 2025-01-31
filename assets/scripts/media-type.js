@@ -414,90 +414,125 @@ window.addEventListener('load', (event) => {
     });
 });
 
-document.addEventListener("DOMContentLoaded", function () {
+/**
+ * DROP MEDIA ZONE
+ */
 
-    /**
-     * Select all drop zones in the document
-     */
-    document.querySelectorAll('[data-drop-media-zone]').forEach(dropZone => {
-        const fileInput = dropZone.querySelector('[data-drop-media-zone-input]');
-        const uploadBtn = dropZone.querySelector('[data-drop-media-zone-btn]');
-        const fileNameDisplay = dropZone.querySelector('[data-drop-media-zone-file-name]');
-        const previewContainer = dropZone.querySelector('[data-drop-media-zone-preview]');
-        const previewImage = previewContainer.querySelector('img');
-        const previewVideo = previewContainer.querySelector('video');
-        const thumbnailIcon = previewContainer.querySelector('.icon');
-        const previewSource = previewVideo.querySelector("source");
+document.addEventListener("DOMContentLoaded", () => {
+    initDropZones();
+});
 
-        // Click event on upload button to trigger file input
-        uploadBtn.addEventListener("click", () => fileInput.click());
-
-        // Change event for file selection
-        fileInput.addEventListener('change', function () {
-            handleFile(fileInput.files[0]);
-        });
-
-        // Drag & Drop Events
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('border-primary');
-            dropZone.classList.add('info');
-        });
-
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('border-primary');
-            dropZone.classList.remove('info');
-        });
-
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('border-primary');
-            dropZone.classList.remove('info');
-
-            if (e.dataTransfer.files.length > 0) {
-                fileInput.files = e.dataTransfer.files;
-                handleFile(e.dataTransfer.files[0]);
+// Detect new elements added dynamically (e.g., via AJAX)
+const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === 1 && node.querySelector('[data-drop-media-zone]')) {
+                initDropZone(node);
             }
         });
+    });
+});
 
-        // Function to handle file selection
-        function handleFile(file) {
-            if (file) {
-                fileNameDisplay.textContent = `${file.name}`;
+// Observe changes in the entire `body`
+observer.observe(document.body, { childList: true, subtree: true });
 
-                if (file.type.startsWith("image/")) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        previewImage.src = e.target.result;
-                        previewImage.classList.remove("d-none");
-                        previewVideo.classList.add("d-none");
-                        thumbnailIcon.classList.add("d-none");
-                        previewContainer.classList.remove("d-none");
-                    };
-                    reader.readAsDataURL(file);
-                } else if (file.type.startsWith("video/")) {
-                    const videoURL = URL.createObjectURL(file);
-                    previewSource.src = videoURL;
-                    previewSource.type = file.type;
-                    previewVideo.load();
-                    previewVideo.classList.remove("d-none");
-                    previewImage.classList.add("d-none");
+/**
+ * Initialize all drop zones on page load
+ */
+function initDropZones() {
+    document.querySelectorAll('[data-drop-media-zone]').forEach(initDropZone);
+}
+
+/**
+ * Initialize a single drop zone
+ */
+function initDropZone(dropZone) {
+    if (dropZone.dataset.initialized) return; // Prevents multiple initializations
+    // Find data-drop-media-zon element
+    dropZone = (dropZone.hasAttribute('data-drop-media-zone')) ? dropZone : dropZone.querySelector('[data-drop-media-zone]');
+
+    dropZone.dataset.initialized = "true";
+
+    const fileInput = dropZone.querySelector('[data-drop-media-zone-input]');
+    const uploadBtn = dropZone.querySelector('[data-drop-media-zone-btn]');
+    const fileNameDisplay = dropZone.querySelector('[data-drop-media-zone-file-name]');
+    const previewContainer = dropZone.querySelector('[data-drop-media-zone-preview]');
+    const previewImage = previewContainer.querySelector('img');
+    const previewVideo = previewContainer.querySelector('video');
+    const thumbnailIcon = previewContainer.querySelector('.icon');
+    const previewSource = previewVideo.querySelector("source");
+
+    // Click event on the upload button to trigger the file input
+    uploadBtn.addEventListener("click", () => fileInput.click());
+
+    // Change event for file selection
+    fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
+
+    // Drag & Drop Events
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('border-primary', 'info');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('border-primary', 'info');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('border-primary', 'info');
+
+        if (e.dataTransfer.files.length > 0) {
+            fileInput.files = e.dataTransfer.files;
+            handleFile(e.dataTransfer.files[0]);
+        }
+    });
+
+    /**
+     * Handles file selection and previews
+     */
+    function handleFile(file) {
+        if (file) {
+            fileNameDisplay.textContent = `${file.name}`;
+
+            if (file.type.startsWith("image/")) {
+                // Preview image
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    previewImage.src = e.target.result;
+                    previewImage.classList.remove("d-none");
+                    previewVideo.classList.add("d-none");
                     thumbnailIcon.classList.add("d-none");
                     previewContainer.classList.remove("d-none");
-                } else {
-                    // Hide preview
-                    previewImage.classList.add("d-none");
-                    previewVideo.classList.add("d-none");
-                    thumbnailIcon.classList.remove("d-none");
-                    previewContainer.classList.add("d-none");
-                }
+                };
+                reader.readAsDataURL(file);
+            } else if (file.type.startsWith("video/")) {
+                // Preview video
+                const videoURL = URL.createObjectURL(file);
+                previewSource.src = videoURL;
+                previewSource.type = file.type;
+                previewVideo.load();
+                previewVideo.classList.remove("d-none");
+                previewImage.classList.add("d-none");
+                thumbnailIcon.classList.add("d-none");
+                previewContainer.classList.remove("d-none");
             } else {
-                fileNameDisplay.textContent = "No file selected";
+                // Hide preview for unsupported file types
                 previewImage.classList.add("d-none");
                 previewVideo.classList.add("d-none");
                 thumbnailIcon.classList.remove("d-none");
                 previewContainer.classList.add("d-none");
             }
+        } else {
+            // Reset UI if no file is selected
+            fileNameDisplay.textContent = "No file selected";
+            previewImage.classList.add("d-none");
+            previewVideo.classList.add("d-none");
+            thumbnailIcon.classList.remove("d-none");
+            previewContainer.classList.add("d-none");
         }
-    });
-});
+        // Trigger change event on the file input
+        fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+}
+
