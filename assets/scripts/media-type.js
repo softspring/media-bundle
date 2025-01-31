@@ -485,6 +485,8 @@ function initDropZone(dropZone) {
         if (e.dataTransfer.files.length > 0) {
             fileInput.files = e.dataTransfer.files;
             handleFile(e.dataTransfer.files[0]);
+            // Trigger change event on the file input
+            fileInput.dispatchEvent(new Event('change', { bubbles: true }));
         }
     });
 
@@ -531,8 +533,6 @@ function initDropZone(dropZone) {
             thumbnailIcon.classList.remove("d-none");
             previewContainer.classList.add("d-none");
         }
-        // Trigger change event on the file input
-        fileInput.dispatchEvent(new Event('change', { bubbles: true }));
     }
 }
 
