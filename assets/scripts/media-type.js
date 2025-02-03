@@ -83,11 +83,12 @@ window.addEventListener('load', (event) => {
     });
 
     document.addEventListener('click', function (event) {
-        if (!event.target.matches('.modal-media .page-link')) {
+        const element = event.target.closest('.modal-media .page-link');
+        if (!element) {
             return;
         }
 
-        loadSearchPage(event.target.dataset.pageHref);
+        loadSearchPage(element.dataset.pageHref);
 
         event.preventDefault();
 
