@@ -64,14 +64,17 @@ admin_medias:
     delete:
         meta.title: "%name%"
         title: "%name%"
-        breadcrumb: "Delete media"
-        message: "Are you sure you want to delete this media?"
+        breadcrumb: "Eliminar media"
+        message: "¿Estás seguro que quieres borrar este media?"
+        warning:
+            title: "¿Estás seguro que quieres borrar este media?"
+            text: "Los ficheros serán también eliminados. Ten en cuenta que si las URLs están direccionadas en algún sitio, los enlaces fallarán."
         actions:
-            delete.button: "Delete media"
-            cancel.button: "Cancel"
-        success_flash: "Media deleted successfully"
-        failure_flash: "Media deletion failed.<br/><small>%exception%</small><br/><small>%previous%</small>"
-        exception_flash: "Media deletion failed.<br/><small>%exception%</small><br/><small>%previous%</small>"
+            delete.button: "Eliminar media"
+            cancel.button: "Cancelar"
+        success_flash: "El media se ha eliminado correctamente."
+        failure_flash: "Ha fallado la eliminación del media.<br/><small>%exception%</small><br/><small>%previous%</small>"
+        exception_flash: "Ha fallado la eliminación del media.<br/><small>%exception%</small><br/><small>%previous%</small>"
 
     update:
         meta.title: "%name%"
