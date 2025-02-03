@@ -68,7 +68,7 @@ admin_medias:
         message: "Are you sure you want to delete this media?"
         warning:
             title: "Are you sure you want to delete this media?"
-            text: "This will permanently remove the files. If the media is hardcoded anywhere, its link will break."
+            text: "This will permanently remove the files. If the file URLs are hardcoded anywhere, the links will break."
         actions:
             delete.button: "Delete media"
             cancel.button: "Cancel"
