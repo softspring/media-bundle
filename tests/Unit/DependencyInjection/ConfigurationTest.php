@@ -10,39 +10,23 @@ use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends TestCase
 {
-    public function testEmptyConfig()
-    {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Invalid configuration for path "sfs_media": google_cloud_storage config block is required when driver is google_cloud_storage.');
-
-        $configs = [];
-        $expected = [];
-
-        $processor = new Processor();
-        $configuration = new Configuration();
-        $config = $processor->processConfiguration($configuration, $configs);
-        $this->assertEquals($expected, $config);
-    }
-
     public function testBasicRequiredConfig()
     {
         $configs = [
             'sfs_media' => [
-                'google_cloud_storage' => [
-                    'bucket' => 'test-bucket',
-                ],
             ],
         ];
         $expected = [
-            'google_cloud_storage' => [
-                'bucket' => 'test-bucket',
+            'filesystem' => [
+                'path' => '%kernel.project_dir%/public/media',
+                'url' => '/media',
             ],
             'entity_manager' => 'default',
-            'driver' => 'google_cloud_storage',
+            'driver' => 'filesystem',
             'media' => [
                 'class' => 'Softspring\MediaBundle\Entity\Media',
                 'find_field_name' => 'id',
-                'admin_controller' => false,
+                'admin_controller' => true,
             ],
             'version' => [
                 'class' => 'Softspring\MediaBundle\Entity\MediaVersion',
@@ -61,14 +45,11 @@ class ConfigurationTest extends TestCase
     {
         $configs = [
             'sfs_media' => [
-                'google_cloud_storage' => [
-                    'bucket' => 'test-bucket',
-                ],
                 'entity_manager' => 'other_em',
                 'media' => [
                     'class' => 'App\Entity\Media',
                     'find_field_name' => 'identificator',
-                    'admin_controller' => true,
+                    'admin_controller' => false,
                 ],
                 'version' => [
                     'class' => 'App\Entity\MediaVersion',
@@ -114,15 +95,16 @@ class ConfigurationTest extends TestCase
             ],
         ];
         $expected = [
-            'google_cloud_storage' => [
-                'bucket' => 'test-bucket',
+            'filesystem' => [
+                'path' => '%kernel.project_dir%/public/media',
+                'url' => '/media',
             ],
             'entity_manager' => 'other_em',
-            'driver' => 'google_cloud_storage',
+            'driver' => 'filesystem',
             'media' => [
                 'class' => 'App\Entity\Media',
                 'find_field_name' => 'identificator',
-                'admin_controller' => true,
+                'admin_controller' => false,
             ],
             'version' => [
                 'class' => 'App\Entity\MediaVersion',
