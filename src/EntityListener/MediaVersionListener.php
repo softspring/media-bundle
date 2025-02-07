@@ -38,7 +38,7 @@ class MediaVersionListener
 
     public function preRemove(MediaVersionInterface $mediaVersion, LifecycleEventArgs $eventArgs): void
     {
-        $this->storageDriver->remove($mediaVersion->getUrl());
+        $mediaVersion->getUrl() && $this->storageDriver->remove($mediaVersion->getUrl());
     }
 
     /**

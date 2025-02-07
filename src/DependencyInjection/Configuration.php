@@ -65,20 +65,21 @@ class Configuration implements ConfigurationInterface
                 ->end()
 
                 ->enumNode('driver')
-                    ->defaultValue('google_cloud_storage')
+                    ->defaultValue('filesystem')
                     ->values(['filesystem', 'google_cloud_storage'])
                 ->end()
 
                 ->arrayNode('google_cloud_storage')
                     ->children()
-                        ->scalarNode('bucket')->isRequired()->end()
+                        ->scalarNode('bucket')->end()
                     ->end()
                 ->end()
 
                 ->arrayNode('filesystem')
+                    ->addDefaultsIfNotSet()
                     ->children()
-                        ->scalarNode('path')->isRequired()->end()
-                        ->scalarNode('url')->isRequired()->end()
+                        ->scalarNode('path')->defaultValue('%kernel.project_dir%/public/media')->end()
+                        ->scalarNode('url')->defaultValue('/media')->end()
                     ->end()
                 ->end()
 
@@ -87,7 +88,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('class')->defaultValue('Softspring\MediaBundle\Entity\Media')->end()
                         ->scalarNode('find_field_name')->defaultValue('id')->end()
-                        ->booleanNode('admin_controller')->defaultFalse()->end()
+                        ->booleanNode('admin_controller')->defaultTrue()->end()
                     ->end()
                 ->end()
 
