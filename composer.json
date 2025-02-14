@@ -2,7 +2,7 @@
     "name": "softspring/media-bundle",
     "description": "An media management bundle",
     "type": "symfony-bundle",
-    "license": "MIT",
+    "license": "AGPL-3.0",
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
