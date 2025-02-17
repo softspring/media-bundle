@@ -263,6 +263,6 @@ class MediaRenderer
             return null;
         }
 
-        return $version->getUrl() ? $this->storageDriver->url($version->getUrl()) : null;
+        return $version->getPublicUrl() ?: ($version->getUrl() ? $this->storageDriver->url($version->getUrl()) : null);
     }
 }

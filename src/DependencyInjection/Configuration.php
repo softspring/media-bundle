@@ -54,9 +54,39 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->validate()
                 ->ifTrue(function ($config) {
+                    return 'google_cloud_storage' !== $config['driver'] && !empty($config['google_cloud_storage']);
+                })
+                ->thenInvalid('google_cloud_storage config block is only allowed when driver is google_cloud_storage.')
+            ->end()
+            ->validate()
+                ->ifTrue(function ($config) {
                     return 'filesystem' === $config['driver'] && empty($config['filesystem']);
                 })
                 ->thenInvalid('filesystem config block is required when driver is filesystem.')
+            ->end()
+            ->validate()
+                ->ifTrue(function ($config) {
+                    return 'filesystem' !== $config['driver'] && !empty($config['filesystem']);
+                })
+                ->thenInvalid('filesystem config block is only allowed when driver is filesystem.')
+            ->end()
+            ->beforeNormalization()
+                ->always(function ($config) {
+                    if (empty($config['driver'])) {
+                        if (!empty($config['google_cloud_storage'])) {
+                            $config['driver'] = 'google_cloud_storage';
+                        } else {
+                            $config['driver'] = 'filesystem';
+                        }
+                    }
+
+                    if ('filesystem' === $config['driver'] && empty($config['filesystem'])) {
+                        $config['filesystem']['path'] = '%kernel.project_dir%/public/media';
+                        $config['filesystem']['url'] = '/media';
+                    }
+
+                    return $config;
+                })
             ->end()
 
             ->children()
@@ -76,7 +106,6 @@ class Configuration implements ConfigurationInterface
                 ->end()
 
                 ->arrayNode('filesystem')
-                    ->addDefaultsIfNotSet()
                     ->children()
                         ->scalarNode('path')->defaultValue('%kernel.project_dir%/public/media')->end()
                         ->scalarNode('url')->defaultValue('/media')->end()
