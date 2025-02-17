@@ -124,10 +124,15 @@ window.addEventListener('load', (event) => {
 
             const xhr = new XMLHttpRequest()
             xhr.onreadystatechange = function () {
+                console.log(xhr);
                 if (xhr.readyState === 4) {
                     if (xhr.status === 201) {
                         loadSearchPage(modalSearchUrl);
+                    } else if (xhr.status >= 500 && xhr.status < 600) {
+                        console.error(`Error ${xhr.status}: Internal Server Error`, xhr.responseText);
+                        mediaTypeModalBody.innerHTML = "<p style='color: red; padding: 1.5rem; font-size: 1.5rem;'>A server error occurred. Please try again later.</p>";
                     } else {
+                        console.warn("Error:", xhr.status, xhr.responseText);
                         mediaTypeModalBody.innerHTML = xhr.response;
                         configureCreateForm(createFormUrl);
                     }
