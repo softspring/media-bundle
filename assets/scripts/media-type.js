@@ -131,7 +131,6 @@ window.addEventListener('load', (event) => {
                         console.error(`Error ${xhr.status}: Internal Server Error`, xhr.responseText);
                         mediaTypeModalBody.innerHTML = "<p style='color: red; padding: 1.5rem; font-size: 1.5rem;'>A server error occurred. Please try again later.</p>";
                     } else {
-                        console.warn("Error:", xhr.status, xhr.responseText);
                         mediaTypeModalBody.innerHTML = xhr.response;
                         configureCreateForm(createFormUrl);
                     }
