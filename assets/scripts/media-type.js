@@ -124,7 +124,6 @@ window.addEventListener('load', (event) => {
 
             const xhr = new XMLHttpRequest()
             xhr.onreadystatechange = function () {
-                console.log(xhr);
                 if (xhr.readyState === 4) {
                     if (xhr.status === 201) {
                         loadSearchPage(modalSearchUrl);
