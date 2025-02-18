@@ -4,11 +4,11 @@
 
 <div class="tab-content" id="tabContent">
     <div class="tab-pane fade show active" id="original" role="tabpanel" aria-labelledby="original-tab" tabindex="0">
-        {{ macros.renderOriginal(media) }}
+        {{ macros.renderOriginal(media, media_types) }}
     </div>
     {% for version in media.versions|filter((version) => version.version not in ['_original'])|sort((a, b) => (a.width+a.height) <=> (b.width+b.height))|reverse %}
         <div class="tab-pane fade" id="{{ version.version }}" role="tabpanel" aria-labelledby="{{ version.version }}-tab" tabindex="0">
-            {{ macros.renderVersion(media, version) }}
+            {{ macros.renderVersion(media, version, media_types) }}
         </div>
     {% endfor %}
 

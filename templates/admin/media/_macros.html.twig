@@ -18,12 +18,16 @@
 {%- endmacro -%}
 
 
-{%- macro renderOriginal(media) -%}
-    {{ _self.renderVersion(media, media.version('_original')) }}
+{%- macro renderOriginal(media, media_types) -%}
+    {{ _self.renderVersion(media, media.version('_original'), media_types) }}
 {%- endmacro -%}
 
-{%- macro renderVersion(media, version) -%}
+{%- macro renderVersion(media, version, media_types) -%}
     <div class="text-small text-black-50 mb-1">
+        {% if media_types[media.type].name|default(null) %}
+            <span class="me-2">{{ media_types[media.type].name }}</span>
+        {% endif %}
+
         {% if media.isImage %}
             <span class="me-2">Image size: {{ version.width }}x{{ version.height }}</span>
         {% endif %}
