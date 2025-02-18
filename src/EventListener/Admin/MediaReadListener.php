@@ -21,6 +21,7 @@ class MediaReadListener extends AbstractMediaListener
             SfsMediaEvents::ADMIN_MEDIAS_READ_VIEW => [
                 ['onViewAddTypeConfigFromEntity', 10],
                 ['onReadViewAddCheckVersion', 9],
+                ['onViewAddMediaTypes', 0],
             ],
             // SfsMediaEvents::ADMIN_MEDIAS_READ_EXCEPTION => [],
         ];
