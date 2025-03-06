@@ -8,20 +8,20 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/softspring/media-bundle/ci.yml?branch=5.4&style=flat-square&label=CI)](https://github.com/softspring/media-bundle/actions/workflows/ci.yml)
 ![Coverage](https://raw.githubusercontent.com/softspring/media-bundle/5.4/.github/badges/coverage.svg)
 
+This is a Symfony bundle that provides a robust and easy-to-use solution for image management and manipulation in your applications.
+
+## Armonic
+
+This bundle is part of Armonic.
+
 ## Documentation
 
-- [0. Requirements](docs/0_requirements.md)
-- [1. Installation](docs/1_installation.md)
-- [2. Getting started](docs/2_getting_started.md)
-- [3. Concepts](docs/3_concepts.md)
-- [4. Configure media types](docs/4_media_types.md)
-- 4- Using medias
-- 6- Admin medias
-- 7- Integrations
-- [8. Storage options](docs/8_storage_options.md)
-- 9- Name generators
-- 10- Extending bundle
+[Armonic Documentation](https://armonic.softspring.es/latest/bundles/media-bundle/install)
+
+## Contributing
+
+[Report issues](https://github.com/softspring/media-bundle/issues) and [send Pull Requests](https://github.com/softspring/media-bundle/pulls)
 
 ## License
 
-This bundle is under the MIT license. See the complete license in the bundle [LICENSE](LICENSE) file.
+This package is free and released under the [MIT license](LICENSE).
