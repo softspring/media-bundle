@@ -10,17 +10,7 @@
 
 ## Documentation
 
-- [0. Requirements](docs/0_requirements.md)
-- [1. Installation](docs/1_installation.md)
-- [2. Getting started](docs/2_getting_started.md)
-- [3. Concepts](docs/3_concepts.md)
-- [4. Configure media types](docs/4_media_types.md)
-- 4- Using medias
-- 6- Admin medias
-- 7- Integrations
-- [8. Storage options](docs/8_storage_options.md)
-- 9- Name generators
-- 10- Extending bundle
+You have all information in [Armonic Docs-Media Bundle](https://armonic.softspring.es/latest/bundles/media-bundle/install)
 
 ## License
 
