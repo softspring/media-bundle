@@ -11,6 +11,22 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
+    private const string HELP_AVIF = <<<HELP
+Avif format is not supported by your PHP environment. Please add support for it.
+    
+Depending on your system, add the following packages:
+
+    $ apt install libavif-dev # Debian/Ubuntu
+
+You will need to compile GD with avif support: --with-avif
+
+In docker, you can add the following lines to your Dockerfile:
+
+    RUN apk --no-cache add libavif-dev && \
+        docker-php-ext-configure gd --with-avif && \
+        docker-php-ext-install gd
+HELP;
+
     protected function getSupportedMimeTypes(): array
     {
         $supportedTypes = [
@@ -28,6 +44,7 @@ class Configuration implements ConfigurationInterface
         function_exists('imagegif') && function_exists('imagecreatefromgif') && ($supportedTypes['versionTypeExtensions'][] = 'gif') && ($supportedTypes['mime'][] = 'image/gif');
         function_exists('imagejpeg') && function_exists('imagecreatefromjpeg') && ($supportedTypes['versionTypeExtensions'][] = 'jpeg') && ($supportedTypes['mime'][] = 'image/jpeg');
         function_exists('imagewebp') && function_exists('imagecreatefromwebp') && ($supportedTypes['versionTypeExtensions'][] = 'webp') && ($supportedTypes['mime'][] = 'image/webp');
+        function_exists('imageavif') && function_exists('imagecreatefromavif') && ($supportedTypes['versionTypeExtensions'][] = 'avif') && ($supportedTypes['mime'][] = 'image/avif');
         if (function_exists('imagepng') && function_exists('imagecreatefrompng')) {
             $supportedTypes['versionTypeExtensions'][] = 'png';
             $supportedTypes['versionTypeExtensions'][] = 'apng';
@@ -134,6 +151,16 @@ class Configuration implements ConfigurationInterface
                     ->prototype('array')
                         ->validate()
                             ->ifTrue(function ($config) use ($supportedMimeTypes) {
+                                if (in_array('image/avif', $config['upload_requirements']['mimeTypes'] ?? [])) {
+                                    return !in_array('image/avif', $supportedMimeTypes['mime']);
+                                }
+
+                                return false; // is valid
+                            })
+                            ->thenInvalid(Configuration::HELP_AVIF." \n\n%s")
+                        ->end()
+                        ->validate()
+                            ->ifTrue(function ($config) use ($supportedMimeTypes) {
                                 foreach ($config['upload_requirements']['mimeTypes'] ?? [] as $mimeType) {
                                     if (!in_array($mimeType, $supportedMimeTypes['mime'])) {
                                         return true;
@@ -143,6 +170,18 @@ class Configuration implements ConfigurationInterface
                                 return false;
                             })
                             ->thenInvalid('Some configured upload_requirements mimeTypes are not supported. The allowed formats are: '.implode(', ', $this->getSupportedMimeTypes()['mime']).'. Maybe you need to install some libraries to support them.'." \n\n%s")
+                        ->end()
+                        ->validate()
+                            ->ifTrue(function ($config) use ($supportedMimeTypes) {
+                                foreach ($config['versions'] as $version) {
+                                    if ((($version['type'] ?? '') === 'avif') && !in_array('image/avif', $supportedMimeTypes['mime'])) {
+                                        return true;
+                                    }
+                                }
+
+                                return false; // is valid
+                            })
+                            ->thenInvalid(Configuration::HELP_AVIF." \n\n%s")
                         ->end()
                         ->validate()
                             ->ifTrue(function ($config) use ($supportedMimeTypes) {
@@ -259,13 +298,13 @@ class Configuration implements ConfigurationInterface
                 ->normalizeKeys(false)
                 ->children()
                     ->append($this->getUploadRequirementsNode())
-                    ->enumNode('type')->values(['jpeg', 'png', 'webp', 'keep', 'apng'])->end()
+                    ->enumNode('type')->values(['jpeg', 'png', 'webp', 'keep', 'apng', 'avif'])->end()
                     ->integerNode('scale_width')->end()
                     ->integerNode('scale_height')->end()
                     ->integerNode('png_compression_level')->end()
                     ->integerNode('webp_quality')->end()
                     ->integerNode('jpeg_quality')->end()
-                    ->integerNode('webp_quality')->end()
+                    ->integerNode('avif_quality')->end()
                     ->booleanNode('flatten')->end()
                     ->integerNode('resolution-x')->end()
                     ->integerNode('resolution-y')->end()
