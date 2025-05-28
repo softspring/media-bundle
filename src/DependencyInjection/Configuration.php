@@ -54,21 +54,9 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->validate()
                 ->ifTrue(function ($config) {
-                    return 'google_cloud_storage' !== $config['driver'] && !empty($config['google_cloud_storage']);
-                })
-                ->thenInvalid('google_cloud_storage config block is only allowed when driver is google_cloud_storage.')
-            ->end()
-            ->validate()
-                ->ifTrue(function ($config) {
                     return 'filesystem' === $config['driver'] && empty($config['filesystem']);
                 })
                 ->thenInvalid('filesystem config block is required when driver is filesystem.')
-            ->end()
-            ->validate()
-                ->ifTrue(function ($config) {
-                    return 'filesystem' !== $config['driver'] && !empty($config['filesystem']);
-                })
-                ->thenInvalid('filesystem config block is only allowed when driver is filesystem.')
             ->end()
             ->beforeNormalization()
                 ->always(function ($config) {
