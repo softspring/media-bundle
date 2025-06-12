@@ -19,6 +19,7 @@
         "softspring/doctrine-target-entity-resolver": "^5.2",
         "softspring/events": "^5.1",
         "softspring/permissions-bundle": "^5.2",
+        "softspring/time-ago-bundle": "^5.2",
         "symfony/config": "^5.4|^6.0|^7.0",
         "symfony/dependency-injection": "^5.4|^6.0|^7.0",
         "symfony/form": "^5.4|^6.0|^7.0",
