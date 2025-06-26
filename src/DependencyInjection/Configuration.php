@@ -11,7 +11,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    private const string HELP_AVIF = <<<HELP
+    private const HELP_AVIF = <<<HELP
 Avif format is not supported by your PHP environment. Please add support for it.
     
 Depending on your system, add the following packages:
