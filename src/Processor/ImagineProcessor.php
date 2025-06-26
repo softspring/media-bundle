@@ -37,12 +37,12 @@ class ImagineProcessor implements ProcessorInterface
             throw new Exception('Processor support method requires version options are initialized');
         }
 
-        if (!in_array($version->getOriginalVersion()->getFileMimeType(), ['image/jpeg', 'image/png', 'image/apng', 'image/gif', 'image/webp'])) {
+        if (!in_array($version->getOriginalVersion()->getFileMimeType(), ['image/jpeg', 'image/png', 'image/apng', 'image/gif', 'image/webp', 'image/avif'])) {
             // origin type can not be other than an image
             return false;
         }
 
-        if (!in_array($version->getOptions()['type'], ['jpeg', 'png', 'gif', 'webp', 'keep'])) {
+        if (!in_array($version->getOptions()['type'], ['jpeg', 'png', 'gif', 'webp', 'avif', 'keep'])) {
             // target type can not be other than an image
             return false;
         }
@@ -84,7 +84,7 @@ class ImagineProcessor implements ProcessorInterface
         $version->setHeight($gdMedia->getSize()->getHeight());
 
         // https://imagine.readthedocs.io/en/stable/usage/introduction.html#save-medias
-        $validOptions = array_flip(['png_compression_level', 'webp_quality', 'flatten', 'jpeg_quality', 'resolution-units', 'resolution-x', 'resolution-y', 'resampling-filter']);
+        $validOptions = array_flip(['png_compression_level', 'webp_quality', 'flatten', 'jpeg_quality', 'resolution-units', 'resolution-x', 'resolution-y', 'resampling-filter', 'avif_quality']);
         $saveOptions = array_intersect_key($options, $validOptions);
         $saveOptions['format'] = $saveFormat;
 

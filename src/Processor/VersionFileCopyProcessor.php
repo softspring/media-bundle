@@ -41,6 +41,7 @@ class VersionFileCopyProcessor implements ProcessorInterface
             'image/apng' => 'apng',
             'image/gif' => 'gif',
             'image/webp' => 'webp',
+            'image/avif' => 'avif',
         ][$originalVersion->getFileMimeType()] ?? '';
         $tmpPath = sys_get_temp_dir().'/'.uniqid('sfs_media_').($extension ? '.'.$extension : '');
 
