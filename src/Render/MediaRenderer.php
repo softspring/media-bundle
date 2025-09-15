@@ -196,8 +196,12 @@ class MediaRenderer
             'height' => $version->getHeight(),
         ], $attr);
 
+        $media = $version->getMedia();
+
         $attributes['src'] = $this->getFinalUrl($version);
-        $attributes['alt'] = $version->getMedia()->getName() ?: $version->getMedia()->getDescription();
+        $attributes['alt'] = $media->getAltTexts()?->translate() ?:
+            $version->getMedia()->getDescription() ?:
+                $version->getMedia()->getName();
 
         return '<img '.$this->htmlAttributes($attributes).' />';
     }

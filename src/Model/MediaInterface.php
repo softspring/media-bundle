@@ -4,6 +4,7 @@ namespace Softspring\MediaBundle\Model;
 
 use DateTime;
 use Doctrine\Common\Collections\Collection;
+use Softspring\TranslatableBundle\Model\Translation;
 
 interface MediaInterface
 {
@@ -56,4 +57,8 @@ interface MediaInterface
     public function getSha1(): ?string;
 
     public function setSha1(?string $sha1): void;
+
+    public function getAltTexts(): ?Translation;
+
+    public function setAltTexts(?Translation $altTexts): void;
 }

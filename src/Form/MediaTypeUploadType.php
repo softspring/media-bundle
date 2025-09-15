@@ -2,6 +2,7 @@
 
 namespace Softspring\MediaBundle\Form;
 
+use Softspring\CmsBundle\Form\Type\TranslationType;
 use Softspring\MediaBundle\EntityManager\MediaManagerInterface;
 use Softspring\MediaBundle\Exception\InvalidTypeException;
 use Softspring\MediaBundle\Model\MediaInterface;
@@ -32,6 +33,7 @@ class MediaTypeUploadType extends AbstractType
             'required_uploads' => true,
             'allow_name_field' => true,
             'allow_description_field' => true,
+            'allow_alt_text_field' => true,
         ]);
 
         $resolver->setRequired('media_type');
@@ -78,5 +80,9 @@ class MediaTypeUploadType extends AbstractType
             $media->setType($options['media_type']);
             $media->setPrivate($typeConfig['private'] ?? false);
         });
+
+        $options['allow_alt_text_field'] && $builder->add('altTexts', TranslationType::class, [
+            'required' => false,
+        ]);
     }
 }

@@ -96,6 +96,7 @@ admin_medias:
     form:
         name.label: "Name"
         description.label: "Description"
+        altTexts.label: "Alternative texts"
         _original.label: "Main media"
         upload.label: "File"
         instructions: "Drag & drop your file here or upload it using the button."
