@@ -31,6 +31,12 @@
             </li>
         {% endfor %}
     {% endif %}
+
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="alts-tab" data-bs-toggle="pill" data-bs-target="#alt"
+                type="button" role="tab" aria-controls="alt" aria-selected="false"><i class="bi bi-tag"></i> alt</button>
+    </li>
+
     {% if linked_cms_versions is defined %}
         {% if linked_cms_versions|length %}
         <li class="nav-item" role="presentation">

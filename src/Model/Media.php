@@ -6,6 +6,7 @@ use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use InvalidArgumentException;
+use Softspring\TranslatableBundle\Model\Translation;
 
 abstract class Media implements MediaInterface
 {
@@ -24,6 +25,8 @@ abstract class Media implements MediaInterface
     protected ?int $createdAt = null;
 
     protected ?string $sha1 = null;
+
+    protected ?Translation $altTexts = null;
 
     public function __construct()
     {
@@ -195,5 +198,15 @@ abstract class Media implements MediaInterface
     public function setSha1(?string $sha1): void
     {
         $this->sha1 = $sha1;
+    }
+
+    public function getAltTexts(): ?Translation
+    {
+        return $this->altTexts;
+    }
+
+    public function setAltTexts(?Translation $altTexts): void
+    {
+        $this->altTexts = $altTexts;
     }
 }

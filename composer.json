@@ -20,6 +20,7 @@
         "softspring/events": "^5.5@dev",
         "softspring/permissions-bundle": "^5.5@dev",
         "softspring/time-ago-bundle": "^5.5@dev",
+        "softspring/translatable-bundle": "^5.5@dev",
         "symfony/config": "^5.4|^6.0|^7.0",
         "symfony/dependency-injection": "^5.4|^6.0|^7.0",
         "symfony/form": "^5.4|^6.0|^7.0",

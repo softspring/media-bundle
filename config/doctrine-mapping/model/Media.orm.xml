@@ -28,6 +28,8 @@
             </options>
         </field>
         <field name="sha1" column="sha1" type="string" length="40" nullable="true" />
+
+        <field name="altTexts" column="alt_texts" type="sfs_translation" nullable="true" />
     </mapped-superclass>
 
 </doctrine-mapping>

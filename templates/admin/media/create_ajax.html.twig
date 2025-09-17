@@ -1,6 +1,9 @@
 {% trans_default_domain 'sfs_media_admin' %}
 
-{% form_theme form '@SfsMedia/forms/media_type_theme.html.twig' 'bootstrap_5_layout.html.twig' %}
+{% set sfs_components_theme = 'bootstrap5' %}
+
+{% form_theme form '@SfsMedia/forms/media_type_theme.html.twig' 'bootstrap_5_layout.html.twig'
+    '@SfsTranslatable/form/translatable_type.html.twig' %}
 
 <div class="container-fluid bg-white px-4">
     <p class="h5 mb-3"><strong>{{ 'admin_medias.create.form_title'|trans }}</strong></p>
@@ -18,6 +21,8 @@
                 </div>
                 <div class="col-12">
                     {{ form_row(form._original) }}
+                </div>
+                <div class="col-12">
                     {{ form_rest(form) }}
                 </div>
                 <div class="col-12 mb-3">

@@ -27,6 +27,13 @@
         {% endfor %}
     {% endif %}
 
+    <div class="tab-pane fade" id="alt" role="tabpanel" aria-labelledby="alts-tab" tabindex="0">
+        <h3>Alt texts</h3>
+        {% for locale,alt in media.altTexts|default([]) %}
+            <p><strong>{{ locale }}:</strong> {{ media.altTexts.translate(locale) }}</p>
+        {% endfor %}
+    </div>
+
     {% if linked_cms_versions is defined and linked_cms_versions|length %}
         <div class="tab-pane fade" id="linked-cms" role="tabpanel" aria-labelledby="linked-cms-tab" tabindex="0">
             {#            <h3>Linked CMS contents</h3>#}
