@@ -171,7 +171,7 @@ abstract class Media implements MediaInterface
     public function addVersion(MediaVersionInterface $version): void
     {
         if (empty($this->versions[$version->getVersion()])) {
-            $this->versions[$version->getVersion()] = $version;
+            $this->versions->add($version);
             $version->setMedia($this);
         }
     }

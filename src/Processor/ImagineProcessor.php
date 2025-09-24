@@ -30,7 +30,7 @@ class ImagineProcessor implements ProcessorInterface
         }
 
         if (!$version->getOriginalVersion()) {
-            throw new Exception('Processor support method requires version original version is initialized');
+            return false;
         }
 
         if (!$version->getOptions()) {
