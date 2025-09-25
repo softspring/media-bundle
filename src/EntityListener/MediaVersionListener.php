@@ -20,19 +20,11 @@ class MediaVersionListener
 
     public function prePersist(MediaVersionInterface $mediaVersion, LifecycleEventArgs $eventArgs): void
     {
-        if ($this->mediaManager->isMigrating()) {
-            return;
-        }
-
         $this->processorProvider->applyProcessors($mediaVersion);
     }
 
     public function preUpdate(MediaVersionInterface $mediaVersion, LifecycleEventArgs $eventArgs): void
     {
-        if ($this->mediaManager->isMigrating()) {
-            return;
-        }
-
         $this->processorProvider->applyProcessors($mediaVersion);
     }
 
