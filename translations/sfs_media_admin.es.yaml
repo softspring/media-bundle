@@ -75,18 +75,29 @@ admin_medias:
         success_flash: "El media se ha eliminado correctamente."
         failure_flash: "Ha fallado la eliminación del media.<br/><small>%exception%</small><br/><small>%previous%</small>"
         exception_flash: "Ha fallado la eliminación del media.<br/><small>%exception%</small><br/><small>%previous%</small>"
+        error_reason_flash:
+            foreign_key: "No se puede eliminar el media porque está siendo utilizado en otros contenidos."
+            unique_constraint: "No se puede eliminar el media porque existen otros medias con el mismo nombre."
+            not_null: "No se puede eliminar el media porque es un campo obligatorio en otros contenidos."
+            default: "Ha fallado la eliminación del media.<br/><small>%exception%</small><br/><small>%previous%</small>"
 
     update:
         meta.title: "%name%"
         title: "%name%"
-        breadcrumb: "Update media"
+        breadcrumb: "Editar media"
         actions:
-            update.button: "Save changes"
-            cancel.button: "Cancel"
-            delete.button: "Delete"
-        success_flash: "Media updated successfully"
-        failure_flash: "Media update failed.<br/><small>%exception%</small><br/><small>%previous%</small>"
+            update.button: "Guardar cambios"
+            cancel.button: "Cancelar"
+            delete.button: "Eliminar media"
+        success_flash: "El media se ha actualizado correctamente."
+        failure_flash: "Ha fallado la actualización<br/><small>%exception%</small><br/><small>%previous%</small>"
         exception_flash: "Media update failed.<br/><small>%exception%</small><br/><small>%previous%</small>"
+        error_reason_flash:
+            foreign_key: "No se puede actualizar el media porque está siendo utilizado en otros contenidos."
+            unique_constraint: "No se puede actualizar el media porque existen otros medias con el mismo nombre."
+            not_null: "No se puede actualizar el media porque es un campo obligatorio en otros contenidos."
+            default: "Media update failed.<br/><small>%exception%</small><br/><small>%previous%</small"
+
 
     migrate:
         success_flash: "Media migrated successfully"

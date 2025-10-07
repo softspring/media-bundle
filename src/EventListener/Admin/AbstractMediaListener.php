@@ -2,6 +2,9 @@
 
 namespace Softspring\MediaBundle\EventListener\Admin;
 
+use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
+use Doctrine\DBAL\Exception\NotNullConstraintViolationException;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Softspring\Component\CrudlController\Event\CreateEntityEvent;
 use Softspring\Component\CrudlController\Event\ExceptionEvent;
 use Softspring\Component\CrudlController\Event\FailureEvent;
@@ -89,10 +92,12 @@ abstract class AbstractMediaListener implements EventSubscriberInterface
         /** @var MediaInterface $media */
         $media = $event->getEntity();
 
-        $this->flashNotifier->addTrans('error', 'admin_medias.'.get_called_class()::ACTION_NAME.'.failure_flash', [
+        $params = $this->checkException($event, get_called_class()::ACTION_NAME);
+
+        $this->flashNotifier->addTrans('error', $params['reason'], [
             '%name%' => $media->getName(),
-            '%exception%' => $event->getException()->getMessage(),
-            '%previous%' => $event->getException()->getPrevious()?->getMessage(),
+            '%exception%' => $params['exception'],
+            '%previous%' => $params['previous'],
         ], 'sfs_media_admin');
     }
 
@@ -103,9 +108,11 @@ abstract class AbstractMediaListener implements EventSubscriberInterface
 
     public function onExceptionShowFlash(ExceptionEvent $event): void
     {
-        $this->flashNotifier->addTrans('error', 'admin_medias.'.get_called_class()::ACTION_NAME.'.exception_flash', [
-            '%exception%' => $event->getException()->getMessage(),
-            '%previous%' => $event->getException()->getPrevious()?->getMessage(),
+        $params = $this->checkException($event, get_called_class()::ACTION_NAME);
+
+        $this->flashNotifier->addTrans('error', $params['reason'], [
+            '%exception%' => $params['exception'],
+            '%previous%' => $params['previous'],
         ], 'sfs_media_admin');
     }
 
@@ -113,5 +120,24 @@ abstract class AbstractMediaListener implements EventSubscriberInterface
     {
         $mediaId = $event->getRequest()->attributes->get('media');
         $event->setResponse(new RedirectResponse($this->urlGenerator->generate('sfs_media_admin_medias_read', ['media' => $mediaId])));
+    }
+
+    private function checkException(mixed $event, string $action = 'default'): array
+    {
+        $exception = $event->getException();
+
+        $transParams = [
+            'exception' => $exception->getMessage(),
+            'previous' => $exception->getPrevious()?->getMessage(),
+        ];
+
+        $transParams['reason'] = match (true) {
+            $exception instanceof ForeignKeyConstraintViolationException => 'admin_medias.' . $action . '.error_reason_flash.foreign_key',
+            $exception instanceof UniqueConstraintViolationException => 'admin_medias.' . $action . '.error_reason_flash.unique_constraint',
+            $exception instanceof NotNullConstraintViolationException => 'admin_medias.' . $action . '.error_reason_flash.not_null',
+            default => 'admin_medias.' . $action . '.error_reason_flash.default',
+        };
+
+        return $transParams;
     }
 }

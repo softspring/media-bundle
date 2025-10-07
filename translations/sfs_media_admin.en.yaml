@@ -75,7 +75,11 @@ admin_medias:
         success_flash: "Media deleted successfully"
         failure_flash: "Media deletion failed.<br/><small>%exception%</small><br/><small>%previous%</small>"
         exception_flash: "Media deletion failed.<br/><small>%exception%</small><br/><small>%previous%</small>"
-
+        error_reason_flash:
+            foreign_key: "The media cannot be deleted because it is being used in other content."
+            unique_constraint: "The media cannot be deleted because there are other media with the same name."
+            not_null: "The media cannot be deleted because it is a required field in other content."
+            default: "The media cannot be deleted."
     update:
         meta.title: "%name%"
         title: "%name%"
@@ -87,7 +91,11 @@ admin_medias:
         success_flash: "Media updated successfully"
         failure_flash: "Media update failed.<br/><small>%exception%</small><br/><small>%previous%</small>"
         exception_flash: "Media update failed.<br/><small>%exception%</small><br/><small>%previous%</small>"
-
+        error_reason_flash:
+            foreign_key: "The media cannot be updated because it is being used in other content."
+            unique_constraint: "The media cannot be updated because there are other media with the same name."
+            not_null: "The media cannot be updated because it is a required field in other content."
+            default: "The media cannot be updated."
     migrate:
         success_flash: "Media migrated successfully"
         failure_flash: "Media migration failed.<br/><small>%exception%</small><br/><small>%previous%</small>"
