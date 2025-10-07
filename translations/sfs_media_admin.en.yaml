@@ -79,7 +79,7 @@ admin_medias:
             foreign_key: "The media cannot be deleted because it is being used in other content."
             unique_constraint: "The media cannot be deleted because there are other media with the same name."
             not_null: "The media cannot be deleted because it is a required field in other content."
-            default: "The media cannot be deleted."
+            default: "Media deletion failed.<br/><small>%exception%</small><br/><small>%previous%</small>"
     update:
         meta.title: "%name%"
         title: "%name%"
@@ -95,7 +95,7 @@ admin_medias:
             foreign_key: "The media cannot be updated because it is being used in other content."
             unique_constraint: "The media cannot be updated because there are other media with the same name."
             not_null: "The media cannot be updated because it is a required field in other content."
-            default: "The media cannot be updated."
+            default: "Media update failed.<br/><small>%exception%</small><br/><small>%previous%</small>"
     migrate:
         success_flash: "Media migrated successfully"
         failure_flash: "Media migration failed.<br/><small>%exception%</small><br/><small>%previous%</small>"
