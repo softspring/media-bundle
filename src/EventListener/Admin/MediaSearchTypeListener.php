@@ -2,6 +2,7 @@
 
 namespace Softspring\MediaBundle\EventListener\Admin;
 
+use Softspring\Component\CrudlController\Event\FilterEvent;
 use Softspring\MediaBundle\SfsMediaEvents;
 
 class MediaSearchTypeListener extends AbstractMediaListener
@@ -14,11 +15,20 @@ class MediaSearchTypeListener extends AbstractMediaListener
             // SfsMediaEvents::ADMIN_MEDIAS_SEARCH_TYPE_INITIALIZE => [],
             // SfsMediaEvents::ADMIN_MEDIAS_SEARCH_TYPE_FILTER_FORM_PREPARE => [],
             // SfsMediaEvents::ADMIN_MEDIAS_SEARCH_TYPE_FILTER_FORM_INIT => [],
-            // SfsMediaEvents::ADMIN_MEDIAS_SEARCH_TYPE_FILTER => [],
+            SfsMediaEvents::ADMIN_MEDIAS_SEARCH_TYPE_FILTER => [
+                ['onFilter', 0],
+            ],
             SfsMediaEvents::ADMIN_MEDIAS_SEARCH_TYPE_VIEW => [
                 ['onViewAddMediaTypes', 0],
             ],
             // SfsMediaEvents::ADMIN_MEDIAS_SEARCH_TYPE_EXCEPTION => [],
         ];
+    }
+
+    public function onFilter(FilterEvent $event): void
+    {
+        $filters = $event->getFilters();
+        $filters['private'] = false;
+        $event->setFilters($filters);
     }
 }
