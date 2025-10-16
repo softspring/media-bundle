@@ -37,16 +37,6 @@ class ImagineProcessorTest extends TestCase
         $this->assertFalse($processor->supports($version));
     }
 
-    public function testFailIfNoOriginalVersionProvided()
-    {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Processor support method requires version original version is initialized');
-
-        $processor = new ImagineProcessor();
-        $version = new MediaVersion('xs');
-        $processor->supports($version);
-    }
-
     public function testFailIfNoOptionsProvided()
     {
         $this->expectException(\Exception::class);

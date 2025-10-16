@@ -57,7 +57,6 @@ class StoreFileProcessor implements ProcessorInterface
         clearstatcache(); // prevent filesize cache problems returning 0
         $version->setFileSize(filesize($version->getUpload()->getRealPath()));
 
-
         if (!$version->getMedia() || !$version->getMedia()->getType()) {
             throw new InvalidTypeException('Cannot store file for media without type');
         }

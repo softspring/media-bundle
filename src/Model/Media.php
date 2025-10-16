@@ -170,16 +170,19 @@ abstract class Media implements MediaInterface
 
     public function addVersion(MediaVersionInterface $version): void
     {
-        if (empty($this->versions[$version->getVersion()])) {
-            $this->versions->add($version);
+        $exisingVersion = $this->getVersion($version->getVersion());
+        if (!$exisingVersion) {
+            $this->versions->set($version->getVersion(), $version);
             $version->setMedia($this);
         }
     }
 
     public function removeVersion(MediaVersionInterface $version): void
     {
-        if (!empty($this->versions[$version->getVersion()])) {
-            unset($this->versions[$version->getVersion()]);
+        $exisingVersion = $this->getVersion($version->getVersion());
+        if ($exisingVersion) {
+            $this->versions->offsetUnset($version->getVersion());
+            $version->setMedia(null);
         }
     }
 

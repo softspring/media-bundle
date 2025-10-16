@@ -132,10 +132,10 @@ abstract class AbstractMediaListener implements EventSubscriberInterface
         ];
 
         $transParams['reason'] = match (true) {
-            $exception instanceof ForeignKeyConstraintViolationException => 'admin_medias.' . $action . '.error_reason_flash.foreign_key',
-            $exception instanceof UniqueConstraintViolationException => 'admin_medias.' . $action . '.error_reason_flash.unique_constraint',
-            $exception instanceof NotNullConstraintViolationException => 'admin_medias.' . $action . '.error_reason_flash.not_null',
-            default => 'admin_medias.' . $action . '.error_reason_flash.default',
+            $exception instanceof ForeignKeyConstraintViolationException => 'admin_medias.'.$action.'.error_reason_flash.foreign_key',
+            $exception instanceof UniqueConstraintViolationException => 'admin_medias.'.$action.'.error_reason_flash.unique_constraint',
+            $exception instanceof NotNullConstraintViolationException => 'admin_medias.'.$action.'.error_reason_flash.not_null',
+            default => 'admin_medias.'.$action.'.error_reason_flash.default',
         };
 
         return $transParams;
