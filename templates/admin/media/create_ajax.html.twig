@@ -2,8 +2,11 @@
 
 {% set sfs_components_theme = 'bootstrap5' %}
 
-{% form_theme form '@SfsMedia/forms/media_type_theme.html.twig' 'bootstrap_5_layout.html.twig'
-    '@SfsTranslatable/form/translatable_type.html.twig' %}
+{% form_theme form
+    'bootstrap_5_layout.html.twig'
+    '@SfsMedia/forms/media_type_theme.html.twig'
+    '@SfsTranslatable/form/translatable_type.html.twig'
+%}
 
 <div class="container-fluid bg-white px-4">
     <p class="h5 mb-3"><strong>{{ 'admin_medias.create.form_title'|trans }}</strong></p>
