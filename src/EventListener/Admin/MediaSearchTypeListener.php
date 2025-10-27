@@ -29,6 +29,9 @@ class MediaSearchTypeListener extends AbstractMediaListener
     {
         $filters = $event->getFilters();
         $filters['private'] = false;
+        if (!isset($filters['type__in']) && $event->getRequest()->attributes->get('valid_types')) {
+            $filters['type__in'] = explode(',', $event->getRequest()->attributes->get('valid_types'));
+        }
         $event->setFilters($filters);
     }
 }
