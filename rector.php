@@ -2,20 +2,20 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
-use Rector\Doctrine\Set\DoctrineSetList;
+use Rector\Set\ValueObject\SetList;
 use Rector\Symfony\Set\SymfonySetList;
-use Rector\Symfony\Set\SensiolabsSetList;
+use Rector\ValueObject\PhpVersion;
 
 return RectorConfig::configure()
-    ->withImportNames(removeUnusedImports: true)
-    ->withPaths([
-        __DIR__ . '/src',
-    ])
+    ->withPaths(array_merge(
+is_dir(__DIR__ . '/src') ? [__DIR__ . '/src'] : [],
+        is_dir(__DIR__ . '/tests') ? [__DIR__ . '/tests'] : []
+    ))
     ->withSets([
-        DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,
-        SymfonySetList::ANNOTATIONS_TO_ATTRIBUTES,
-//        SensiolabsSetList::ANNOTATIONS_TO_ATTRIBUTES,
-//        SymfonySetList::SYMFONY_62,
-//        SymfonySetList::SYMFONY_CODE_QUALITY,
-//        SymfonySetList::SYMFONY_CONSTRUCTOR_INJECTION,
-    ]);
+        SymfonySetList::SYMFONY_80,
+        SetList::CODE_QUALITY,
+        SetList::DEAD_CODE,
+        SetList::TYPE_DECLARATION,
+    ])
+    ->withPhpVersion(PhpVersion::PHP_84)
+    ->withComposerBased(symfony: true);
