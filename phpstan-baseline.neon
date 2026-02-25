@@ -1,6 +1,18 @@
 parameters:
     ignoreErrors:
         -
+            message: '#Call to an undefined method Symfony\\Component\\Config\\Definition\\Builder\\NodeDefinition::children\(\)#'
+            path: src/DependencyInjection/Configuration.php
+            reportUnmatched: false
+        -
+            message: '#Call to an undefined method Symfony\\Component\\Config\\Definition\\Builder\\NodeDefinition::arrayPrototype\(\)#'
+            path: src/DependencyInjection/Configuration.php
+            reportUnmatched: false
+        -
+            message: '#Call to an undefined method Symfony\\Component\\Config\\Definition\\Builder\\NodeDefinition::useAttributeAsKey\(\)#'
+            path: src/DependencyInjection/Configuration.php
+            reportUnmatched: false
+        -
             message: "#Right side of && is always true.#"
             count: 4
             path: src/DependencyInjection/Configuration.php

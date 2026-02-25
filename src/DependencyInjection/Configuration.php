@@ -10,7 +10,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    private const HELP_AVIF = <<<HELP
+    private const string HELP_AVIF = <<<HELP
 Avif format is not supported by your PHP environment. Please add support for it.
     
 Depending on your system, add the following packages:
@@ -65,6 +65,7 @@ HELP;
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('sfs_media');
+
         $rootNode = $treeBuilder->getRootNode();
 
         $supportedMimeTypes = $this->getSupportedMimeTypes();
