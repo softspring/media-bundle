@@ -15,4 +15,9 @@ class ConfigMediaTypeProvider implements MediaTypeProviderInterface
     {
         return $this->mediaTypesConfig;
     }
+
+    public static function getPriority(): int
+    {
+        return 0;
+    }
 }

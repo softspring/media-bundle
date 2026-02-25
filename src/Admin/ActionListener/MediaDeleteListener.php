@@ -1,6 +1,6 @@
 <?php
 
-namespace Softspring\MediaBundle\EventListener\Admin;
+namespace Softspring\MediaBundle\Admin\ActionListener;
 
 use Softspring\MediaBundle\SfsMediaEvents;
 

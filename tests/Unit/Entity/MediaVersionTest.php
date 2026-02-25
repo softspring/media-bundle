@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class MediaVersionTest extends TestCase
 {
-    public function testConstructorWithArguments()
+    public function testConstructorWithArguments(): void
     {
         $version = new MediaVersion();
         $this->assertNull($version->getVersion());
@@ -27,7 +27,7 @@ class MediaVersionTest extends TestCase
         $this->assertEquals(1, $media->getVersions()->count());
     }
 
-    public function testUrl()
+    public function testUrl(): void
     {
         $version = new MediaVersion();
 
@@ -37,7 +37,7 @@ class MediaVersionTest extends TestCase
         $this->assertEquals('https://example.com/image.jpg', $version->getUrl());
     }
 
-    public function testWidth()
+    public function testWidth(): void
     {
         $version = new MediaVersion();
 
@@ -47,7 +47,7 @@ class MediaVersionTest extends TestCase
         $this->assertEquals(300, $version->getWidth());
     }
 
-    public function testHeight()
+    public function testHeight(): void
     {
         $version = new MediaVersion();
 
@@ -57,7 +57,7 @@ class MediaVersionTest extends TestCase
         $this->assertEquals(300, $version->getHeight());
     }
 
-    public function testFileSize()
+    public function testFileSize(): void
     {
         $version = new MediaVersion();
 
@@ -67,7 +67,7 @@ class MediaVersionTest extends TestCase
         $this->assertEquals(100, $version->getFileSize());
     }
 
-    public function testFileMimeType()
+    public function testFileMimeType(): void
     {
         $version = new MediaVersion();
 
@@ -77,7 +77,7 @@ class MediaVersionTest extends TestCase
         $this->assertEquals('image/jpeg', $version->getFileMimeType());
     }
 
-    public function testOptions()
+    public function testOptions(): void
     {
         $version = new MediaVersion();
 
@@ -87,7 +87,7 @@ class MediaVersionTest extends TestCase
         $this->assertEquals(['option1' => 'value1'], $version->getOptions());
     }
 
-    public function testOriginalVersion()
+    public function testOriginalVersion(): void
     {
         $version = new MediaVersion();
 
@@ -97,7 +97,7 @@ class MediaVersionTest extends TestCase
         $this->assertEquals($originalVersion, $version->getOriginalVersion());
     }
 
-    public function testUpload()
+    public function testUpload(): void
     {
         $version = new MediaVersion();
         $media = new Media();
@@ -113,7 +113,7 @@ class MediaVersionTest extends TestCase
         $this->assertNull($version->getGeneratedAt());
     }
 
-    public function testGenerated()
+    public function testGenerated(): void
     {
         $version = new MediaVersion();
         $media = new Media();
@@ -129,7 +129,7 @@ class MediaVersionTest extends TestCase
         $this->assertEquals(date('H:i:s d-m-Y'), $version->getGeneratedAt()->format('H:i:s d-m-Y'));
     }
 
-    public function testId()
+    public function testId(): void
     {
         $version = new MediaVersion();
         $this->assertNull($version->getId());

@@ -2,9 +2,9 @@ name: CI
 
 on:
     push:
-        branches: [ 6.0 ]
+        branches: [ "6.0" ]
     pull_request:
-        branches: [ 6.0 ]
+        branches: [ "6.0" ]
 
 permissions:
     contents: read
@@ -29,7 +29,6 @@ jobs:
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: ${{ matrix.php-versions }}
-                    #                  extensions: intl #optional
                     ini-values: "post_max_size=256M" #optional
 
             -   name: Check PHP Version
@@ -55,6 +54,15 @@ jobs:
 
             -   name: Run tests
                 run: ./vendor/bin/phpunit --coverage-text --coverage-html=.phpunit.cache/html-report
+
+            -   name: Check config yaml syntax
+                run: ./vendor/bin/yaml-lint config/ -vvv --parse-tags
+
+            -   name: Check translations yaml syntax
+                run: ./vendor/bin/yaml-lint translations/ -vvv --parse-tags
+
+            -   name: Check github workflows yaml syntax
+                run: ./vendor/bin/yaml-lint .github/ -vvv --parse-tags
 
             -   name: Code Style check
                 run: ./vendor/bin/php-cs-fixer fix -v --diff --dry-run

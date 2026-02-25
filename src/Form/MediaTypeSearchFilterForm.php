@@ -44,11 +44,11 @@ class MediaTypeSearchFilterForm extends PaginatorForm
         ]);
         $resolver->setAllowedTypes('valid_types', ['array', 'null']);
 
-        $resolver->setNormalizer('valid_types', function () {
+        $resolver->setNormalizer('valid_types', function (): array {
             return explode(',', $this->requestStack->getCurrentRequest()->attributes->get('valid_types'));
         });
 
-        $resolver->setNormalizer('action', function () {
+        $resolver->setNormalizer('action', function (): string {
             return $this->router->generate('sfs_media_admin_medias_search_type', ['valid_types' => $this->requestStack->getCurrentRequest()->attributes->get('valid_types')]);
         });
     }
@@ -66,7 +66,7 @@ class MediaTypeSearchFilterForm extends PaginatorForm
 
         if (count($filteredTypes) > 1) {
             $builder->add('type', ChoiceType::class, [
-                'choices' => array_flip(array_map(fn ($v) => $v['name'], $filteredTypes)),
+                'choices' => array_flip(array_map(fn (array $v) => $v['name'], $filteredTypes)),
                 'multiple' => true,
                 'property_path' => '[type__in]',
             ]);

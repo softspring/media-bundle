@@ -33,7 +33,7 @@ class TypesMigrationCommand extends Command
             try {
                 $typeConfig = $this->mediaTypesCollection->getType($media->getType());
 
-                if (!$typeConfig) {
+                if ([] === $typeConfig) {
                     $output->writeln(sprintf('<error>Media "%s" has an error. Type "%s" has been deleted</error>', $media->getName(), $media->getType()));
                     continue;
                 }

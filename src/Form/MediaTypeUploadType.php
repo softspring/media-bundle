@@ -67,7 +67,7 @@ class MediaTypeUploadType extends AbstractType
             ]);
         }
 
-        $builder->addEventListener(FormEvents::SUBMIT, function (SubmitEvent $event) use ($options) {
+        $builder->addEventListener(FormEvents::SUBMIT, function (SubmitEvent $event) use ($options): void {
             /** @var ?MediaInterface $media */
             $media = $event->getData();
             $form = $event->getForm();

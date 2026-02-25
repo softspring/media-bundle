@@ -4,8 +4,6 @@ namespace Softspring\MediaBundle;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Softspring\MediaBundle\DependencyInjection\Compiler\AliasDoctrineEntityManagerPass;
-use Softspring\MediaBundle\DependencyInjection\Compiler\MediaTypeProvidersPass;
-use Softspring\MediaBundle\DependencyInjection\Compiler\NameGeneratorsPass;
 use Softspring\MediaBundle\DependencyInjection\Compiler\ResolveDoctrineTargetEntityPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -27,8 +25,6 @@ class SfsMediaBundle extends Bundle
         $this->addRegisterMappingsPass($container, ["$basePath/entities" => 'Softspring\MediaBundle\Entity']);
 
         $container->addCompilerPass(new AliasDoctrineEntityManagerPass());
-        $container->addCompilerPass(new NameGeneratorsPass());
-        $container->addCompilerPass(new MediaTypeProvidersPass());
         $container->addCompilerPass(new ResolveDoctrineTargetEntityPass());
     }
 

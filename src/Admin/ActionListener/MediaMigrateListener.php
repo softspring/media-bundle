@@ -1,6 +1,6 @@
 <?php
 
-namespace Softspring\MediaBundle\EventListener\Admin;
+namespace Softspring\MediaBundle\Admin\ActionListener;
 
 use Softspring\Component\CrudlController\Event\ApplyEvent;
 use Softspring\MediaBundle\Model\MediaInterface;

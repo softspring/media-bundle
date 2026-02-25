@@ -25,19 +25,19 @@ class ImagineProcessorTest extends TestCase
         }
     }
 
-    public function testPriority()
+    public function testPriority(): void
     {
         $this->assertEquals(0, ImagineProcessor::getPriority());
     }
 
-    public function testNothingToDoWithOriginalVersion()
+    public function testNothingToDoWithOriginalVersion(): void
     {
         $processor = new ImagineProcessor();
         $version = new MediaVersion('_original');
         $this->assertFalse($processor->supports($version));
     }
 
-    public function testFailIfNoOptionsProvided()
+    public function testFailIfNoOptionsProvided(): void
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Processor support method requires version options are initialized');
@@ -48,7 +48,7 @@ class ImagineProcessorTest extends TestCase
         $processor->supports($version);
     }
 
-    public function testNothingToDoWithOriginalVersionInvalidMimeType()
+    public function testNothingToDoWithOriginalVersionInvalidMimeType(): void
     {
         $processor = new ImagineProcessor();
         $originalVersion = new MediaVersion('_original');
@@ -59,7 +59,7 @@ class ImagineProcessorTest extends TestCase
         $this->assertFalse($processor->supports($version));
     }
 
-    public function testNothingToDoWithUnsupportedOptionTypeValue()
+    public function testNothingToDoWithUnsupportedOptionTypeValue(): void
     {
         $processor = new ImagineProcessor();
         $originalVersion = new MediaVersion('_original');
@@ -70,7 +70,7 @@ class ImagineProcessorTest extends TestCase
         $this->assertFalse($processor->supports($version));
     }
 
-    public function testSupportedProcessing()
+    public function testSupportedProcessing(): void
     {
         $processor = new ImagineProcessor();
         $originalVersion = new MediaVersion('_original');
@@ -81,7 +81,7 @@ class ImagineProcessorTest extends TestCase
         $this->assertTrue($processor->supports($version));
     }
 
-    public function testNothinToProcessWhenNoUploadFile()
+    public function testNothingToProcessWhenNoUploadFile(): void
     {
         $processor = new ImagineProcessor();
         $originalVersion = new MediaVersion('_original');
@@ -91,10 +91,10 @@ class ImagineProcessorTest extends TestCase
         $version->setOptions(['type' => 'png']);
         $version->setUpload(new UploadedFile('/tmp/uploadedFile', 'name.jpeg', null, 100, true));
         $processor->process($version);
-        $this->assertTrue(true);
+        $this->assertNotNull($version->getUpload());
     }
 
-    public function testJpegToPngConversion()
+    public function testJpegToPngConversion(): void
     {
         $processor = new ImagineProcessor();
 
@@ -104,7 +104,9 @@ class ImagineProcessorTest extends TestCase
         $originFilePath = __DIR__.'/resources/energy.250x141.96ppi.jpg';
         $filePath = "{$this->resultsPath}/testJpegToPngConversion.jpeg";
         $filePathPng = "{$this->resultsPath}/testJpegToPngConversion.png";
-        is_file($filePath) && unlink($filePath);
+        if (is_file($filePath)) {
+            unlink($filePath);
+        }
         copy($originFilePath, $filePath);
 
         $version = new MediaVersion('xs');
@@ -123,7 +125,7 @@ class ImagineProcessorTest extends TestCase
         $this->assertEquals([96, 96], $resolution);
     }
 
-    public function testChangeResolution()
+    public function testChangeResolution(): void
     {
         $processor = new ImagineProcessor();
 
@@ -132,7 +134,9 @@ class ImagineProcessorTest extends TestCase
 
         $originFilePath = __DIR__.'/resources/energy.250x141.96ppi.jpg';
         $filePath = "{$this->resultsPath}/testChangeResolution.jpeg";
-        is_file($filePath) && unlink($filePath);
+        if (is_file($filePath)) {
+            unlink($filePath);
+        }
         copy($originFilePath, $filePath);
 
         $version = new MediaVersion('xs');
@@ -154,12 +158,12 @@ class ImagineProcessorTest extends TestCase
         $this->assertEquals(250, $resultWidth);
         $this->assertEquals(141, $resultHeight);
         $this->assertEquals('image/jpeg', $mime);
-        $resolution = imageresolution(imagecreatefromjpeg($version->getUpload()->getRealPath()));
+        imageresolution(imagecreatefromjpeg($version->getUpload()->getRealPath()));
         // $this->assertEquals([72, 72], $resolution);
         // TODO NOT WORKING WITH GD
     }
 
-    public function testScaleWidth()
+    public function testScaleWidth(): void
     {
         $processor = new ImagineProcessor();
 
@@ -170,7 +174,9 @@ class ImagineProcessorTest extends TestCase
 
         $originFilePath = __DIR__.'/resources/energy.250x141.96ppi.jpg';
         $filePath = "{$this->resultsPath}/testScaleWidth.jpeg";
-        is_file($filePath) && unlink($filePath);
+        if (is_file($filePath)) {
+            unlink($filePath);
+        }
         copy($originFilePath, $filePath);
 
         $version = new MediaVersion('xs');
@@ -191,7 +197,7 @@ class ImagineProcessorTest extends TestCase
         $this->assertEquals('image/jpeg', $mime);
     }
 
-    public function testScaleHeight()
+    public function testScaleHeight(): void
     {
         $processor = new ImagineProcessor();
 
@@ -202,7 +208,9 @@ class ImagineProcessorTest extends TestCase
 
         $originFilePath = __DIR__.'/resources/energy.250x141.96ppi.jpg';
         $filePath = "{$this->resultsPath}/testScaleHeight.jpeg";
-        is_file($filePath) && unlink($filePath);
+        if (is_file($filePath)) {
+            unlink($filePath);
+        }
         copy($originFilePath, $filePath);
 
         $version = new MediaVersion('xs');
@@ -223,7 +231,7 @@ class ImagineProcessorTest extends TestCase
         $this->assertEquals('image/jpeg', $mime);
     }
 
-    public function testScaleBoth()
+    public function testScaleBoth(): void
     {
         $processor = new ImagineProcessor();
 
@@ -234,7 +242,9 @@ class ImagineProcessorTest extends TestCase
 
         $originFilePath = __DIR__.'/resources/energy.250x141.96ppi.jpg';
         $filePath = "{$this->resultsPath}/testScaleBoth.jpeg";
-        is_file($filePath) && unlink($filePath);
+        if (is_file($filePath)) {
+            unlink($filePath);
+        }
         copy($originFilePath, $filePath);
 
         $version = new MediaVersion('xs');
@@ -256,8 +266,8 @@ class ImagineProcessorTest extends TestCase
         $this->assertEquals('image/jpeg', $mime);
     }
 
-    public function testWorkWithPngTransparent()
+    public function testWorkWithPngTransparent(): void
     {
-        $this->assertTrue((bool) 'TODO');
+        $this->markTestSkipped('Not implemented yet');
     }
 }

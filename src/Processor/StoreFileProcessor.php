@@ -37,7 +37,7 @@ class StoreFileProcessor implements ProcessorInterface
      */
     public function process(MediaVersionInterface $version): void
     {
-        if (!$upload = $version->getUpload()) {
+        if (!($upload = $version->getUpload()) instanceof \Symfony\Component\HttpFoundation\File\File) {
             return;
         }
 

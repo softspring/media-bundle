@@ -122,7 +122,7 @@ abstract class Media implements MediaInterface
      * @return ?MediaVersionInterface
      * @throws InvalidArgumentException
      */
-    public function __get($id)
+    public function __get(string $id): mixed
     {
         if (method_exists($this, 'get'.$id)) {
             return $this->{'get'.$id}();
@@ -139,7 +139,7 @@ abstract class Media implements MediaInterface
      * @return ?void
      * @throws InvalidArgumentException
      */
-    public function __set($id, $value)
+    public function __set(string $id, mixed $value)
     {
         if (method_exists($this, 'set'.$id)) {
             $this->{'set'.$id}($value);
@@ -159,19 +159,15 @@ abstract class Media implements MediaInterface
         $this->addVersion($value);
     }
 
-    public function __isset($id): bool
+    public function __isset(string $id): bool
     {
-        if (str_starts_with($id, 'version_')) {
-            return true;
-        }
-
-        return false;
+        return str_starts_with($id, 'version_');
     }
 
     public function addVersion(MediaVersionInterface $version): void
     {
         $exisingVersion = $this->getVersion($version->getVersion());
-        if (!$exisingVersion) {
+        if (!$exisingVersion instanceof MediaVersionInterface) {
             $this->versions->set($version->getVersion(), $version);
             $version->setMedia($this);
         }
@@ -180,7 +176,7 @@ abstract class Media implements MediaInterface
     public function removeVersion(MediaVersionInterface $version): void
     {
         $exisingVersion = $this->getVersion($version->getVersion());
-        if ($exisingVersion) {
+        if ($exisingVersion instanceof MediaVersionInterface) {
             $this->versions->offsetUnset($version->getVersion());
             $version->setMedia(null);
         }
@@ -188,7 +184,7 @@ abstract class Media implements MediaInterface
 
     public function getVersion(string $version): ?MediaVersionInterface
     {
-        return $this->versions->filter(function (MediaVersionInterface $mediaVersion) use ($version) {
+        return $this->versions->filter(function (MediaVersionInterface $mediaVersion) use ($version): bool {
             return $mediaVersion->getVersion() == $version;
         })->first() ?: null;
     }

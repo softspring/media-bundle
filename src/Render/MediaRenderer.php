@@ -32,13 +32,12 @@ class MediaRenderer
             }
 
             return '';
-        } else {
-            if (!$mediaVersion = $media->getVersion($version)) {
-                return '';
-            }
-
-            return $this->getFinalUrl($mediaVersion);
         }
+        if (!($mediaVersion = $media->getVersion($version)) instanceof MediaVersionInterface) {
+            return '';
+        }
+
+        return $this->getFinalUrl($mediaVersion);
     }
 
     /**
@@ -89,49 +88,49 @@ class MediaRenderer
 
         if (is_array($version)) {
             foreach ($version as $singleVersion) {
-                if ($html = $this->renderVideo($media, $singleVersion, $attr)) {
+                $html = $this->renderVideo($media, $singleVersion, $attr);
+                if ('' !== $html && '0' !== $html) {
                     return $html;
                 }
             }
 
             return '';
-        } else {
-            if (!$mediaVersion = $media->getVersion($version)) {
-                return '';
-            }
-
-            // it could be the poster
-            if (str_starts_with($mediaVersion->getFileMimeType(), 'image/')) {
-                return $this->renderImgTag($mediaVersion, $attr);
-            }
-
-            return $this->renderVideoTag($mediaVersion, $attr);
         }
+        if (!($mediaVersion = $media->getVersion($version)) instanceof MediaVersionInterface) {
+            return '';
+        }
+
+        // it could be the poster
+        if (str_starts_with($mediaVersion->getFileMimeType(), 'image/')) {
+            return $this->renderImgTag($mediaVersion, $attr);
+        }
+
+        return $this->renderVideoTag($mediaVersion, $attr);
     }
 
     public function renderImage(MediaInterface|string|null $media, $version, array $attr = []): string
     {
         $media = $this->getMedia($media);
 
-        if (!$media) {
+        if (!$media instanceof MediaInterface) {
             return '';
         }
 
         if (is_array($version)) {
             foreach ($version as $singleVersion) {
-                if ($html = $this->renderImage($media, $singleVersion, $attr)) {
+                $html = $this->renderImage($media, $singleVersion, $attr);
+                if ('' !== $html && '0' !== $html) {
                     return $html;
                 }
             }
 
             return '';
-        } else {
-            if (!$mediaVersion = $media->getVersion($version)) {
-                return '';
-            }
-
-            return $this->renderImgTag($mediaVersion, $attr);
         }
+        if (!($mediaVersion = $media->getVersion($version)) instanceof MediaVersionInterface) {
+            return '';
+        }
+
+        return $this->renderImgTag($mediaVersion, $attr);
     }
 
     /**
@@ -142,7 +141,7 @@ class MediaRenderer
     {
         $media = $this->getMedia($media);
 
-        if (!$media) {
+        if (!$media instanceof MediaInterface) {
             return '';
         }
 
@@ -155,16 +154,15 @@ class MediaRenderer
         $html = '<picture '.$this->htmlAttributes($pictureAttr).'>';
         foreach ($config['pictures'][$picture]['sources'] ?? [] as $source) {
             $sourceAttrs = $source['attrs'] ?? [];
-            $sourceAttrs['srcset'] = implode(', ', array_map(function ($srcset) use ($media) {
+            $sourceAttrs['srcset'] = implode(', ', array_map(function (array $srcset) use ($media): string {
                 return $this->getFinalUrl($media->getVersion($srcset['version'])).($srcset['suffix'] ? " {$srcset['suffix']}" : '');
             }, $source['srcset']));
             $html .= '<source '.$this->htmlAttributes($sourceAttrs).' />';
         }
 
         $html .= $this->renderImgTag($media->getVersion($config['pictures'][$picture]['img']['src_version']), $imgAttr);
-        $html .= '</picture>';
 
-        return $html;
+        return $html.'</picture>';
     }
 
     protected function getMedia(MediaInterface|string|null $media): ?MediaInterface
@@ -178,7 +176,7 @@ class MediaRenderer
 
     protected function htmlAttributes(array $attributes): string
     {
-        array_walk($attributes, function (&$value, $attribute) {
+        array_walk($attributes, function (&$value, $attribute): void {
             $value = "$attribute=\"$value\"";
         });
 
@@ -187,7 +185,7 @@ class MediaRenderer
 
     protected function renderImgTag(?MediaVersionInterface $version, array $attr = []): ?string
     {
-        if (!$version) {
+        if (!$version instanceof MediaVersionInterface) {
             return null;
         }
 
@@ -208,7 +206,7 @@ class MediaRenderer
 
     protected function renderVideoTag(?MediaVersionInterface $version, array $attr = []): ?string
     {
-        if (!$version) {
+        if (!$version instanceof MediaVersionInterface) {
             return null;
         }
 
@@ -247,7 +245,7 @@ class MediaRenderer
         foreach ($config['video_sets'][$video]['sources'] ?? [] as $source) {
             $version = $media->getVersion($source['version']);
 
-            if (!$version) {
+            if (!$version instanceof MediaVersionInterface) {
                 continue;
             }
 
@@ -256,14 +254,13 @@ class MediaRenderer
             $sourceAttrs['type'] = $version->getFileMimeType();
             $html .= '<source '.$this->htmlAttributes($sourceAttrs).' />';
         }
-        $html .= '</video>';
 
-        return $html;
+        return $html.'</video>';
     }
 
     protected function getFinalUrl(?MediaVersionInterface $version): ?string
     {
-        if (!$version) {
+        if (!$version instanceof MediaVersionInterface) {
             return null;
         }
 

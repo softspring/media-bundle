@@ -55,5 +55,22 @@
     },
     "config": {
         "sort-packages": true
+    },
+    "scripts": {
+        "test": [
+            "composer validate --strict --no-check-lock --ansi",
+            "composer install --no-scripts --ansi",
+            "XDEBUG_MODE=coverage vendor/bin/phpunit",
+            "vendor/bin/rector process src tests --dry-run",
+            "vendor/bin/phpstan analyse src tests --level 5",
+            "vendor/bin/php-cs-fixer fix --dry-run --diff",
+            "vendor/bin/yaml-lint .github/ -vvv --parse-tags",
+            "vendor/bin/yaml-lint config/ -vvv --parse-tags",
+            "vendor/bin/yaml-lint translations/ -vvv --parse-tags"
+        ],
+        "fix": [
+            "vendor/bin/rector process src tests",
+            "vendor/bin/php-cs-fixer fix --diff"
+        ]
     }
 }

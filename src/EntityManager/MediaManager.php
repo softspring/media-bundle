@@ -37,11 +37,11 @@ class MediaManager implements MediaManagerInterface
     {
         $typeDefinition = $this->mediaTypesCollection->getType($type);
 
-        if (empty($typeDefinition)) {
+        if ([] === $typeDefinition) {
             throw new Exception(sprintf('Invalid %s media type', $type));
         }
 
-        if (!$media) {
+        if (!$media instanceof MediaInterface) {
             $media = $this->createEntity();
         }
 
@@ -60,14 +60,14 @@ class MediaManager implements MediaManagerInterface
     {
         $typeDefinition = $this->mediaTypesCollection->getType($media->getType());
 
-        if (!$media->getVersion('_original')) {
+        if (!$media->getVersion('_original') instanceof MediaVersionInterface) {
             $originalVersion = $this->mediaVersionManager->createEntity();
             $originalVersion->setVersion('_original');
             $media->addVersion($originalVersion);
         }
 
         foreach ($typeDefinition['versions'] as $key => $versionOptions) {
-            if (!$media->getVersion($key)) {
+            if (!$media->getVersion($key) instanceof MediaVersionInterface) {
                 $this->generateVersionEntity($media, $key);
             }
         }
@@ -123,7 +123,7 @@ class MediaManager implements MediaManagerInterface
                     $output && $output->writeln('<fg=green>CREATED</>');
                 } catch (Exception $e) {
                     $message = sprintf('Error creating version %s', $versionId);
-                    if ($output) {
+                    if ($output instanceof OutputInterface) {
                         $output->writeln("<error>$message</error>");
                         $output->writeln($e->getMessage());
                     } else {
@@ -133,7 +133,7 @@ class MediaManager implements MediaManagerInterface
             }
 
             foreach ($checkVersions['changed'] as $versionId => $changes) {
-                $changedOptionsString = implode(', ', array_map(fn ($v) => $v['string'], $changes));
+                $changedOptionsString = implode(', ', array_map(fn (array $v) => $v['string'], $changes));
                 $output && $output->write(sprintf(' - version "%s" needs to be recreated (%s): ', $versionId, $changedOptionsString));
                 try {
                     $media->removeVersion($oldVersion = $media->getVersion($versionId));
@@ -143,7 +143,7 @@ class MediaManager implements MediaManagerInterface
                     $output && $output->writeln('<fg=green>RECREATED</>');
                 } catch (Exception $e) {
                     $message = sprintf('Error updating version %s', $versionId);
-                    if ($output) {
+                    if ($output instanceof OutputInterface) {
                         $output->writeln("<error>$message</error>");
                         $output->writeln($e->getMessage());
                     } else {
@@ -160,7 +160,7 @@ class MediaManager implements MediaManagerInterface
                     $output && $output->writeln('<fg=green>DELETED</>');
                 } catch (Exception $e) {
                     $message = sprintf('Error deleting version %s', $versionId);
-                    if ($output) {
+                    if ($output instanceof OutputInterface) {
                         $output->writeln("<error>$message</error>");
                         $output->writeln($e->getMessage());
                     } else {
@@ -196,7 +196,7 @@ class MediaManager implements MediaManagerInterface
             }
         } catch (InvalidTypeException $e) {
             $message = sprintf('Missing media type "%s"', $media->getType());
-            if ($output) {
+            if ($output instanceof OutputInterface) {
                 $output->writeln("<error>$message</error>");
                 $output->writeln($e->getMessage());
             } else {

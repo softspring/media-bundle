@@ -29,7 +29,7 @@ class ImagineProcessor implements ProcessorInterface
             return false;
         }
 
-        if (!$version->getOriginalVersion()) {
+        if (!$version->getOriginalVersion() instanceof MediaVersionInterface) {
             return false;
         }
 
@@ -42,12 +42,8 @@ class ImagineProcessor implements ProcessorInterface
             return false;
         }
 
-        if (!in_array($version->getOptions()['type'], ['jpeg', 'png', 'gif', 'webp', 'avif', 'keep'])) {
-            // target type can not be other than an image
-            return false;
-        }
-
-        return true;
+        // target type can not be other than an image
+        return in_array($version->getOptions()['type'], ['jpeg', 'png', 'gif', 'webp', 'avif', 'keep']);
     }
 
     public function process(MediaVersionInterface $version): void
