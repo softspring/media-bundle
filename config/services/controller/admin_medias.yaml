@@ -12,9 +12,6 @@ services:
         autowire: true
         autoconfigure: true
         public: false
-#        bind:
-#            $mediaTypes: '%sfs_media.types%'
-#            $em: '@sfs_media.entity_manager'
 
     Softspring\MediaBundle\Form\Admin\:
         resource: '../../../src/Form/Admin/Media*'

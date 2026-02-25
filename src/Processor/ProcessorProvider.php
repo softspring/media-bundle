@@ -25,7 +25,7 @@ class ProcessorProvider
      */
     public function getProcessors(MediaVersionInterface $version): array
     {
-        return array_filter($this->processors, fn (ProcessorInterface $processor) => $processor->supports($version));
+        return array_filter($this->processors, fn (ProcessorInterface $processor): bool => $processor->supports($version));
     }
 
     public function applyProcessors(MediaVersionInterface $version): void

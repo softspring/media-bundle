@@ -10,7 +10,7 @@ use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends TestCase
 {
-    public function testBasicRequiredConfig()
+    public function testBasicRequiredConfig(): void
     {
         $configs = [
             'sfs_media' => [
@@ -41,7 +41,7 @@ class ConfigurationTest extends TestCase
         $this->assertEquals($expected, $config);
     }
 
-    public function testAdvancedConfig()
+    public function testAdvancedConfig(): void
     {
         $configs = [
             'sfs_media' => [

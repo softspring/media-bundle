@@ -4,7 +4,6 @@ namespace Softspring\MediaBundle\DependencyInjection;
 
 use Imagine\Image\ImageInterface;
 use Softspring\MediaBundle\Media\DefaultNameGenerator;
-use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -41,10 +40,18 @@ HELP;
             ],
         ];
 
-        function_exists('imagegif') && function_exists('imagecreatefromgif') && ($supportedTypes['versionTypeExtensions'][] = 'gif') && ($supportedTypes['mime'][] = 'image/gif');
-        function_exists('imagejpeg') && function_exists('imagecreatefromjpeg') && ($supportedTypes['versionTypeExtensions'][] = 'jpeg') && ($supportedTypes['mime'][] = 'image/jpeg');
-        function_exists('imagewebp') && function_exists('imagecreatefromwebp') && ($supportedTypes['versionTypeExtensions'][] = 'webp') && ($supportedTypes['mime'][] = 'image/webp');
-        function_exists('imageavif') && function_exists('imagecreatefromavif') && ($supportedTypes['versionTypeExtensions'][] = 'avif') && ($supportedTypes['mime'][] = 'image/avif');
+        if (function_exists('imagegif') && function_exists('imagecreatefromgif') && ($supportedTypes['versionTypeExtensions'][] = 'gif')) {
+            $supportedTypes['mime'][] = 'image/gif';
+        }
+        if (function_exists('imagejpeg') && function_exists('imagecreatefromjpeg') && ($supportedTypes['versionTypeExtensions'][] = 'jpeg')) {
+            $supportedTypes['mime'][] = 'image/jpeg';
+        }
+        if (function_exists('imagewebp') && function_exists('imagecreatefromwebp') && ($supportedTypes['versionTypeExtensions'][] = 'webp')) {
+            $supportedTypes['mime'][] = 'image/webp';
+        }
+        if (function_exists('imageavif') && function_exists('imagecreatefromavif') && ($supportedTypes['versionTypeExtensions'][] = 'avif')) {
+            $supportedTypes['mime'][] = 'image/avif';
+        }
         if (function_exists('imagepng') && function_exists('imagecreatefrompng')) {
             $supportedTypes['versionTypeExtensions'][] = 'png';
             $supportedTypes['versionTypeExtensions'][] = 'apng';
@@ -64,25 +71,21 @@ HELP;
 
         $rootNode
             ->validate()
-                ->ifTrue(function ($config) {
+                ->ifTrue(function (array $config): bool {
                     return 'google_cloud_storage' === $config['driver'] && empty($config['google_cloud_storage']);
                 })
                 ->thenInvalid('google_cloud_storage config block is required when driver is google_cloud_storage.')
             ->end()
             ->validate()
-                ->ifTrue(function ($config) {
+                ->ifTrue(function (array $config): bool {
                     return 'filesystem' === $config['driver'] && empty($config['filesystem']);
                 })
                 ->thenInvalid('filesystem config block is required when driver is filesystem.')
             ->end()
             ->beforeNormalization()
-                ->always(function ($config) {
+                ->always(function (array $config): array {
                     if (empty($config['driver'])) {
-                        if (!empty($config['google_cloud_storage'])) {
-                            $config['driver'] = 'google_cloud_storage';
-                        } else {
-                            $config['driver'] = 'filesystem';
-                        }
+                        $config['driver'] = empty($config['google_cloud_storage']) ? 'filesystem' : 'google_cloud_storage';
                     }
 
                     if ('filesystem' === $config['driver'] && empty($config['filesystem'])) {
@@ -138,7 +141,7 @@ HELP;
                     ->useAttributeAsKey('key')
                     ->prototype('array')
                         ->validate()
-                            ->ifTrue(function ($config) use ($supportedMimeTypes) {
+                            ->ifTrue(function (array $config) use ($supportedMimeTypes): bool {
                                 if (in_array('image/avif', $config['upload_requirements']['mimeTypes'] ?? [])) {
                                     return !in_array('image/avif', $supportedMimeTypes['mime']);
                                 }
@@ -148,7 +151,7 @@ HELP;
                             ->thenInvalid(Configuration::HELP_AVIF." \n\n%s")
                         ->end()
                         ->validate()
-                            ->ifTrue(function ($config) use ($supportedMimeTypes) {
+                            ->ifTrue(function (array $config) use ($supportedMimeTypes): bool {
                                 foreach ($config['upload_requirements']['mimeTypes'] ?? [] as $mimeType) {
                                     if (!in_array($mimeType, $supportedMimeTypes['mime'])) {
                                         return true;
@@ -160,7 +163,7 @@ HELP;
                             ->thenInvalid('Some configured upload_requirements mimeTypes are not supported. The allowed formats are: '.implode(', ', $this->getSupportedMimeTypes()['mime']).'. Maybe you need to install some libraries to support them.'." \n\n%s")
                         ->end()
                         ->validate()
-                            ->ifTrue(function ($config) use ($supportedMimeTypes) {
+                            ->ifTrue(function (array $config) use ($supportedMimeTypes): bool {
                                 foreach ($config['versions'] as $version) {
                                     if ((($version['type'] ?? '') === 'avif') && !in_array('image/avif', $supportedMimeTypes['mime'])) {
                                         return true;
@@ -172,7 +175,7 @@ HELP;
                             ->thenInvalid(Configuration::HELP_AVIF." \n\n%s")
                         ->end()
                         ->validate()
-                            ->ifTrue(function ($config) use ($supportedMimeTypes) {
+                            ->ifTrue(function (array $config) use ($supportedMimeTypes): bool {
                                 foreach ($config['versions'] as $version) {
                                     if (!empty($version['type']) && !in_array($version['type'], $supportedMimeTypes['versionTypeExtensions'])) {
                                         return true;
@@ -184,7 +187,7 @@ HELP;
                             ->thenInvalid('Some configured version types are not supported. The allowed formats are: '.implode(', ', $this->getSupportedMimeTypes()['versionTypeExtensions']).'. Maybe you need to install some libraries to support them.'." \n\n%s")
                         ->end()
                         ->validate()
-                            ->ifTrue(function ($config) use ($supportedMimeTypes) {
+                            ->ifTrue(function (array $config) use ($supportedMimeTypes): bool {
                                 foreach ($config['versions'] as $version) {
                                     foreach ($version['upload_requirements']['mimeTypes'] ?? [] as $mimeType) {
                                         if (!in_array($mimeType, $supportedMimeTypes['mime'])) {
@@ -198,7 +201,7 @@ HELP;
                             ->thenInvalid('Some configured version upload_requirements mimeTypes are not supported. The allowed formats are: '.implode(', ', $this->getSupportedMimeTypes()['mime']).'. Maybe you need to install some libraries to support them.'." \n\n%s")
                         ->end()
                         ->validate()
-                            ->ifTrue(function ($config) { /* use ($supportedMimeTypes) */
+                            ->ifTrue(function (array $config): bool { /* use ($supportedMimeTypes) */
                                 $type = $config['type'];
 
                                 foreach ($config['upload_requirements']['mimeTypes'] ?? [] as $mimeType) {
@@ -234,7 +237,7 @@ HELP;
                             ->append($this->getUploadRequirementsNode())
                             ->append($this->getVersionsNode())
                             ->append($this->getPicturesNode())
-                            ->append($this->getVideoSetssNode())
+                            ->append($this->getVideoSetsNode())
                         ->end()
                     ->end()
                 ->end()
@@ -248,8 +251,7 @@ HELP;
     {
         $treeBuilder = new TreeBuilder('upload_requirements');
 
-        /** @var ArrayNodeDefinition $connectionNode */
-        $node = method_exists(TreeBuilder::class, 'getRootNode') ? $treeBuilder->getRootNode() : $treeBuilder->root('upload_requirements');
+        $node = $treeBuilder->getRootNode();
 
         $node
             ->children()
@@ -278,8 +280,7 @@ HELP;
     {
         $treeBuilder = new TreeBuilder('versions');
 
-        /** @var ArrayNodeDefinition $connectionNode */
-        $node = method_exists(TreeBuilder::class, 'getRootNode') ? $treeBuilder->getRootNode() : $treeBuilder->root('versions');
+        $node = $treeBuilder->getRootNode();
 
         $node
             ->arrayPrototype()
@@ -310,8 +311,7 @@ HELP;
     {
         $treeBuilder = new TreeBuilder('pictures');
 
-        /** @var ArrayNodeDefinition $connectionNode */
-        $node = method_exists(TreeBuilder::class, 'getRootNode') ? $treeBuilder->getRootNode() : $treeBuilder->root('pictures');
+        $node = $treeBuilder->getRootNode();
 
         $node
             ->useAttributeAsKey('key')
@@ -347,12 +347,11 @@ HELP;
         return $node;
     }
 
-    public function getVideoSetssNode(): NodeDefinition
+    public function getVideoSetsNode(): NodeDefinition
     {
         $treeBuilder = new TreeBuilder('video_sets');
 
-        /** @var ArrayNodeDefinition $connectionNode */
-        $node = method_exists(TreeBuilder::class, 'getRootNode') ? $treeBuilder->getRootNode() : $treeBuilder->root('video_sets');
+        $node = $treeBuilder->getRootNode();
 
         $node
             ->useAttributeAsKey('key')
@@ -393,9 +392,16 @@ HELP;
             if ('image' === $config['type']) {
                 foreach ($config['versions'] as $version => $versionConfig) {
                     if (!isset($versionConfig['upload_requirements'])) {
-                        empty($versionConfig['type']) && $types[$type]['versions'][$version]['type'] = 'keep'; // default keep
-                        empty($versionConfig['resampling-filter']) && $types[$type]['versions'][$version]['resampling-filter'] = ImageInterface::FILTER_LANCZOS;
-                        empty($versionConfig['resolution-units']) && $types[$type]['versions'][$version]['resolution-units'] = ImageInterface::RESOLUTION_PIXELSPERINCH;
+                        if (empty($versionConfig['type'])) {
+                            $types[$type]['versions'][$version]['type'] = 'keep';
+                        }
+                        // default keep
+                        if (empty($versionConfig['resampling-filter'])) {
+                            $types[$type]['versions'][$version]['resampling-filter'] = ImageInterface::FILTER_LANCZOS;
+                        }
+                        if (empty($versionConfig['resolution-units'])) {
+                            $types[$type]['versions'][$version]['resolution-units'] = ImageInterface::RESOLUTION_PIXELSPERINCH;
+                        }
                     }
                 }
             }

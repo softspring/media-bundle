@@ -2,6 +2,7 @@
 
 namespace Softspring\MediaBundle\Form;
 
+use Closure;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Exception;
@@ -41,17 +42,17 @@ class MediaChoiceType extends AbstractType
             'image_attr' => [],
             'video_attr' => [],
             'picture_attr' => [],
-            'query_builder' => fn (EntityRepository $entityRepository) => $entityRepository->createQueryBuilder('i'),
-            'choice_label' => function (MediaInterface $media) {
+            'query_builder' => fn (EntityRepository $entityRepository): \Doctrine\ORM\QueryBuilder => $entityRepository->createQueryBuilder('i'),
+            'choice_label' => function (MediaInterface $media): ?string {
                 return $media->getName();
             },
-            'choice_filter' => function (?MediaInterface $media = null) {
+            'choice_filter' => function (?MediaInterface $media = null): true {
                 return true;
             },
         ]);
 
-        $resolver->setDefault('query_builder', function (Options $options) {
-            return function (EntityRepository $er) use ($options) {
+        $resolver->setDefault('query_builder', function (Options $options): Closure {
+            return function (EntityRepository $er) use ($options): \Doctrine\ORM\QueryBuilder {
                 return $er->createQueryBuilder('i')
                     ->orderBy('i.id', 'ASC')
                     ->andWhere('i.type IN (:types)')
@@ -59,8 +60,8 @@ class MediaChoiceType extends AbstractType
             };
         });
 
-        $resolver->setDefault('choice_attr', function (Options $options) {
-            return function (?MediaInterface $media = null) use ($options) {
+        $resolver->setDefault('choice_attr', function (Options $options): Closure {
+            return function (?MediaInterface $media = null) use ($options): array {
                 if (empty($options['attr']['data-media-preview-input'])) {
                     return [];
                 }

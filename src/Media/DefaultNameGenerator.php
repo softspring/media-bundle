@@ -18,9 +18,14 @@ class DefaultNameGenerator implements NameGeneratorInterface
         }
 
         if ($media->getId()) {
-            return $media->getId().'/'.sha1(time().microtime()).($versionName ? ".$versionName" : '').'.'.$file->guessExtension();
+            return $media->getId().'/'.sha1(time().microtime()).('' !== $versionName && '0' !== $versionName ? ".$versionName" : '').'.'.$file->guessExtension();
         }
 
-        return sha1(time().$file->getRealPath()).($versionName ? ".$versionName" : '').'.'.$file->guessExtension();
+        return sha1(time().$file->getRealPath()).('' !== $versionName && '0' !== $versionName ? ".$versionName" : '').'.'.$file->guessExtension();
+    }
+
+    public static function getPriority(): int
+    {
+        return 0;
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Softspring\MediaBundle\EventListener\Admin;
+namespace Softspring\MediaBundle\Admin\ActionListener;
 
 use Softspring\Component\CrudlController\Event\ExceptionEvent;
 use Softspring\Component\CrudlController\Event\FailureEvent;
@@ -45,6 +45,6 @@ class MediaCreateListener extends AbstractMediaListener
 
     public function onCreateException(ExceptionEvent $event): void
     {
-        $message = $event->getException()->getMessage();
+        $event->getException()->getMessage();
     }
 }

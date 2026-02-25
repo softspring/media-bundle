@@ -27,11 +27,11 @@ class VersionFileCopyProcessor implements ProcessorInterface
 
     public function process(MediaVersionInterface $version): void
     {
-        if ($version->getUpload()) {
+        if ($version->getUpload() instanceof File) {
             return;
         }
 
-        if (!$originalVersion = $version->getOriginalVersion()) {
+        if (!($originalVersion = $version->getOriginalVersion()) instanceof MediaVersionInterface) {
             return; // exception???
         }
 
@@ -43,9 +43,9 @@ class VersionFileCopyProcessor implements ProcessorInterface
             'image/webp' => 'webp',
             'image/avif' => 'avif',
         ][$originalVersion->getFileMimeType()] ?? '';
-        $tmpPath = sys_get_temp_dir().'/'.uniqid('sfs_media_').($extension ? '.'.$extension : '');
+        $tmpPath = sys_get_temp_dir().'/'.uniqid('sfs_media_').('' !== $extension ? '.'.$extension : '');
 
-        if ($originalVersion->getUpload()) {
+        if ($originalVersion->getUpload() instanceof File) {
             // copy file
             copy($originalVersion->getUpload()->getRealPath(), $tmpPath);
             $version->setUpload(new File($tmpPath));

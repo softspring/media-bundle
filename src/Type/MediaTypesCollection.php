@@ -9,11 +9,11 @@ class MediaTypesCollection
     protected array $types = [];
 
     /**
-     * @param MediaTypeProviderInterface[] $providers
+     * @param MediaTypeProviderInterface[] $typeProviders
      */
-    public function __construct(array $providers)
+    public function __construct(array $typeProviders)
     {
-        foreach ($providers as $provider) {
+        foreach ($typeProviders as $provider) {
             $this->types += $provider->getTypes();
         }
     }
@@ -21,7 +21,7 @@ class MediaTypesCollection
     public function getTypes(?bool $private = null): array
     {
         if (is_bool($private)) {
-            return array_filter($this->types, function ($type) use ($private) {
+            return array_filter($this->types, function (array $type) use ($private): bool {
                 return $type['private'] === $private;
             });
         }

@@ -53,14 +53,6 @@ class MediaListFilterForm extends PaginatorForm implements MediaListFilterFormIn
     {
         parent::buildForm($builder, $options);
 
-        //        $builder->add('name', TextType::class, [
-        //            'property_path' => '[name__like]',
-        //        ]);
-        //
-        //        $builder->add('description', TextType::class, [
-        //            'property_path' => '[description__like]',
-        //        ]);
-
         $builder->add('text', TextType::class, [
             'property_path' => '[name__like___or___description__like]',
         ]);
@@ -68,7 +60,7 @@ class MediaListFilterForm extends PaginatorForm implements MediaListFilterFormIn
         $builder->add('type', ChoiceType::class, [
             'required' => false,
             'choice_translation_domain' => false,
-            'choices' => array_flip(array_map(fn ($v) => $v['name'], $this->mediaTypesCollection->getTypes())),
+            'choices' => array_flip(array_map(fn (array $v) => $v['name'], $this->mediaTypesCollection->getTypes())),
             'multiple' => true,
             'property_path' => '[type__in]',
             'expanded' => true,
@@ -78,14 +70,14 @@ class MediaListFilterForm extends PaginatorForm implements MediaListFilterFormIn
         $builder->add($options['order_field_name'], ChoiceType::class, [
             'mapped' => false,
             'choices' => array_combine($options['order_valid_fields'], $options['order_valid_fields']),
-            'choice_label' => fn ($label) => "admin_medias.list.filter_form.order_field.$label",
+            'choice_label' => fn ($label): string => "admin_medias.list.filter_form.order_field.$label",
             'default_value' => $options['order_default_value'],
         ]);
 
         $builder->add($options['order_direction_field_name'], ChoiceType::class, [
             'mapped' => false,
             'choices' => array_combine($options['order_direction_valid_fields'], $options['order_direction_valid_fields']),
-            'choice_label' => fn ($label) => "admin_medias.list.filter_form.ordir_field.$label",
+            'choice_label' => fn ($label): string => "admin_medias.list.filter_form.ordir_field.$label",
             'default_value' => $options['order_direction_default_value'],
         ]);
 
@@ -133,7 +125,7 @@ class MediaListFilterForm extends PaginatorForm implements MediaListFilterFormIn
                 return $content->getId();
             }, $filters['content__in'] instanceof Collection ? $filters['content__in']->toArray() : [$filters['content__in']]);
 
-            if (!empty($contentIds)) {
+            if ([] !== $contentIds) {
                 $query = $qb->getEntityManager()->createQuery('SELECT cvm_in FROM '.ContentVersion::class.' cv_in LEFT JOIN cv_in.medias cvm_in WHERE cv_in.content IN (:contentIds)')->getDQL();
                 $qb->andWhere($qb->expr()->in('m', $query))
                     ->setParameter('contentIds', $contentIds);

@@ -9,7 +9,5 @@ parameters:
     bootstrapFiles:
         - vendor/autoload.php
     ignoreErrors:
-        - '#Call to an undefined method Symfony\\Component\\Config\\Definition\\Builder\\NodeDefinition::children\(\)#'
-        - '#Call to an undefined method Symfony\\Component\\Config\\Definition\\Builder\\TreeBuilder::root\(\)#'
         - '#Call to an undefined method Symfony\\Component\\HttpFoundation\\Session\\SessionInterface::getFlashBag\(\).#'
         - '#Call to an undefined method Doctrine\\ORM\\EntityRepository.*::findOneBy#'

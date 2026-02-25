@@ -50,7 +50,7 @@ class MediaRendererTest extends TestCase
         ],
     ];
 
-    public function testRenderImages()
+    public function testRenderImages(): void
     {
         $storageDriver = new FilesystemStorageDriver('path', 'url');
         $em = $this->createMock(EntityManagerInterface::class);
@@ -97,7 +97,7 @@ class MediaRendererTest extends TestCase
         $this->assertEquals($expectedPicture, $renderer->renderPicture($media, '_default', ['class' => 'img-fluid'], ['data-example' => true]));
     }
 
-    public function testPictureException()
+    public function testPictureException(): void
     {
         $storageDriver = new FilesystemStorageDriver('path', 'url');
         $em = $this->createMock(EntityManagerInterface::class);

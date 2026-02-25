@@ -41,7 +41,7 @@ class TypeChecker
                 }
             }
             // TODO search for old configuration values
-            if (!empty($changedOptions)) {
+            if ([] !== $changedOptions) {
                 $checkResult['changed'][$version->getVersion()] = $changedOptions;
                 continue;
             }
@@ -49,7 +49,7 @@ class TypeChecker
             $checkResult['ok'][] = $version->getVersion();
         }
 
-        $dbVersions = $media->getVersions()->map(fn (MediaVersionInterface $version) => $version->getVersion())->toArray();
+        $dbVersions = $media->getVersions()->map(fn (MediaVersionInterface $version): ?string => $version->getVersion())->toArray();
         $configuredVersions = array_keys($typeConfig['versions']);
         $newVersions = array_diff($configuredVersions, $dbVersions);
         foreach ($newVersions as $version) {

@@ -9,7 +9,7 @@ use Softspring\MediaBundle\Model\MediaInterface;
 
 class MediaTest extends TestCase
 {
-    public function testMediaType()
+    public function testMediaType(): void
     {
         $media = new Media();
 
@@ -28,7 +28,7 @@ class MediaTest extends TestCase
         $this->assertFalse($media->isImage());
     }
 
-    public function testType()
+    public function testType(): void
     {
         $media = new Media();
 
@@ -38,7 +38,7 @@ class MediaTest extends TestCase
         $this->assertEquals('test', $media->getType());
     }
 
-    public function testName()
+    public function testName(): void
     {
         $media = new Media();
 
@@ -48,7 +48,7 @@ class MediaTest extends TestCase
         $this->assertEquals('Test media name', $media->getName());
     }
 
-    public function testDescription()
+    public function testDescription(): void
     {
         $media = new Media();
 
@@ -58,7 +58,7 @@ class MediaTest extends TestCase
         $this->assertEquals('Test media description', $media->getDescription());
     }
 
-    public function testVersions()
+    public function testVersions(): void
     {
         $media = new Media();
 
@@ -87,7 +87,7 @@ class MediaTest extends TestCase
         $this->assertEquals(1, $media->getVersions()->count());
     }
 
-    public function testId()
+    public function testId(): void
     {
         $media = new Media();
         $this->assertNull($media->getId());

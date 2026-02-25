@@ -9,7 +9,7 @@ use Softspring\MediaBundle\Helper\TypeChecker;
 
 class TypeCheckerTest extends TestCase
 {
-    public function testCheckMedia()
+    public function testCheckMedia(): void
     {
         $media = new Media();
 
@@ -22,12 +22,12 @@ class TypeCheckerTest extends TestCase
             ],
         ];
 
-        $originalVersion = new MediaVersion('_original', $media);
+        new MediaVersion('_original', $media);
 
         $versionOk = new MediaVersion('v1', $media);
         $versionOk->setOptions(['scale_width' => 100]);
 
-        $versionDeleted = new MediaVersion('v100', $media);
+        new MediaVersion('v100', $media);
 
         $versionChanged = new MediaVersion('v2', $media);
         $versionChanged->setOptions(['scale_width' => 150]);
