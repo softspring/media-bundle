@@ -28,10 +28,7 @@ class SfsMediaBundle extends Bundle
         $container->addCompilerPass(new ResolveDoctrineTargetEntityPass());
     }
 
-    /**
-     * @param string|bool $enablingParameter
-     */
-    private function addRegisterMappingsPass(ContainerBuilder $container, array $mappings, $enablingParameter = false): void
+    private function addRegisterMappingsPass(ContainerBuilder $container, array $mappings, string|bool $enablingParameter = false): void
     {
         $container->addCompilerPass(DoctrineOrmMappingsPass::createXmlMappingDriver($mappings, ['sfs_media.entity_manager_name'], $enablingParameter));
     }

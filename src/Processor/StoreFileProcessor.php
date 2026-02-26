@@ -8,6 +8,7 @@ use Softspring\MediaBundle\Model\MediaVersionInterface;
 use Softspring\MediaBundle\Storage\StorageDriverInterface;
 use Softspring\MediaBundle\Tools\Apng;
 use Softspring\MediaBundle\Type\MediaTypesCollection;
+use Symfony\Component\HttpFoundation\File\File;
 
 class StoreFileProcessor implements ProcessorInterface
 {
@@ -37,7 +38,7 @@ class StoreFileProcessor implements ProcessorInterface
      */
     public function process(MediaVersionInterface $version): void
     {
-        if (!($upload = $version->getUpload()) instanceof \Symfony\Component\HttpFoundation\File\File) {
+        if (!($upload = $version->getUpload()) instanceof File) {
             return;
         }
 

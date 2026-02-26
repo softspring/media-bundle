@@ -2,6 +2,7 @@
 
 namespace Softspring\MediaBundle\Tests\Unit\Processor;
 
+use Exception;
 use Imagine\Image\ImageInterface;
 use PHPUnit\Framework\TestCase;
 use Softspring\MediaBundle\Entity\MediaVersion;
@@ -39,7 +40,7 @@ class ImagineProcessorTest extends TestCase
 
     public function testFailIfNoOptionsProvided(): void
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Processor support method requires version options are initialized');
 
         $processor = new ImagineProcessor();

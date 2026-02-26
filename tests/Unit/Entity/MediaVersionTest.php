@@ -2,6 +2,7 @@
 
 namespace Softspring\MediaBundle\Tests\Unit\Entity;
 
+use ReflectionClass;
 use PHPUnit\Framework\TestCase;
 use Softspring\MediaBundle\Entity\Media;
 use Softspring\MediaBundle\Entity\MediaVersion;
@@ -136,7 +137,7 @@ class MediaVersionTest extends TestCase
         $this->assertEquals('', "$version");
 
         // write protected property
-        $reflectionClass = new \ReflectionClass($version);
+        $reflectionClass = new ReflectionClass($version);
         $reflectionProperty = $reflectionClass->getProperty('id');
         $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($version, 'id1');

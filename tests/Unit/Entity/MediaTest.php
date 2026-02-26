@@ -2,6 +2,7 @@
 
 namespace Softspring\MediaBundle\Tests\Unit\Entity;
 
+use ReflectionClass;
 use PHPUnit\Framework\TestCase;
 use Softspring\MediaBundle\Entity\Media;
 use Softspring\MediaBundle\Entity\MediaVersion;
@@ -94,7 +95,7 @@ class MediaTest extends TestCase
         $this->assertEquals('', "$media");
 
         // write protected property
-        $reflectionClass = new \ReflectionClass($media);
+        $reflectionClass = new ReflectionClass($media);
         $reflectionProperty = $reflectionClass->getProperty('id');
         $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($media, 'id1');

@@ -19,6 +19,7 @@ return RectorConfig::configure()
         SetList::DEAD_CODE,
         SetList::TYPE_DECLARATION,
     ])
+    ->withImportNames()
     ->withPhpVersion(PhpVersion::PHP_84)
     ->withComposerBased(symfony: true)
     ->withSkip([

@@ -2,6 +2,7 @@
 
 namespace Softspring\MediaBundle\Tests\Unit\Render;
 
+use Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Softspring\MediaBundle\Entity\Media;
@@ -107,7 +108,7 @@ class MediaRendererTest extends TestCase
         $media->setMediaType(MediaInterface::MEDIA_TYPE_IMAGE);
         $media->setType('background');
 
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $renderer->renderPicture($media, 'bad_picture_not_in_config');
     }
 }
