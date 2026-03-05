@@ -2,16 +2,16 @@
 
 namespace Softspring\MediaBundle\Media;
 
-class NameGenerators
+class NameGeneratorProvider
 {
     /**
      * @var NameGeneratorInterface[]
      */
     protected array $nameGenerators;
 
-    public function __construct(array $nameGenerators = [])
+    public function __construct(iterable $nameGenerators = [])
     {
-        $this->nameGenerators = $nameGenerators;
+        $this->nameGenerators = (array) $nameGenerators;
     }
 
     public function getGenerator(string $name): ?NameGeneratorInterface

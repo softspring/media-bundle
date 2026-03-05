@@ -3,7 +3,7 @@
 namespace Softspring\MediaBundle\Processor;
 
 use Softspring\MediaBundle\Exception\InvalidTypeException;
-use Softspring\MediaBundle\Media\NameGenerators;
+use Softspring\MediaBundle\Media\NameGeneratorProvider;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
 use Softspring\MediaBundle\Storage\StorageDriverInterface;
 use Softspring\MediaBundle\Tools\Apng;
@@ -13,13 +13,13 @@ use Symfony\Component\HttpFoundation\File\File;
 class StoreFileProcessor implements ProcessorInterface
 {
     protected MediaTypesCollection $mediaTypesCollection;
-    protected NameGenerators $nameGenerators;
+    protected NameGeneratorProvider $nameGeneratorProvider;
     protected StorageDriverInterface $storage;
 
-    public function __construct(MediaTypesCollection $mediaTypesCollection, NameGenerators $nameGenerators, StorageDriverInterface $storage)
+    public function __construct(MediaTypesCollection $mediaTypesCollection, NameGeneratorProvider $nameGeneratorProvider, StorageDriverInterface $storage)
     {
         $this->mediaTypesCollection = $mediaTypesCollection;
-        $this->nameGenerators = $nameGenerators;
+        $this->nameGeneratorProvider = $nameGeneratorProvider;
         $this->storage = $storage;
     }
 
@@ -64,7 +64,7 @@ class StoreFileProcessor implements ProcessorInterface
 
         // call generator
         $generator = $this->mediaTypesCollection->getType($version->getMedia()->getType())['generator'];
-        $name = $this->nameGenerators->getGenerator($generator)->generateName($version->getMedia(), $version->getVersion(), $upload);
+        $name = $this->nameGeneratorProvider->getGenerator($generator)->generateName($version->getMedia(), $version->getVersion(), $upload);
 
         $version->setSha1(sha1_file($upload->getRealPath()));
         $version->setUrl($this->storage->store($upload, $name));

@@ -8,10 +8,7 @@ class MediaTypesCollection
 {
     protected array $types = [];
 
-    /**
-     * @param MediaTypeProviderInterface[] $typeProviders
-     */
-    public function __construct(array $typeProviders)
+    public function __construct(iterable $typeProviders)
     {
         foreach ($typeProviders as $provider) {
             $this->types += $provider->getTypes();
