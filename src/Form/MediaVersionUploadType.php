@@ -40,7 +40,7 @@ class MediaVersionUploadType extends AbstractType
     {
         $builder->add('upload', FileType::class, [
             'required' => $options['required_upload'],
-            'constraints' => new Image($options['upload_requirements']),
+            'constraints' => new Image(...$options['upload_requirements']),
         ]);
     }
 
