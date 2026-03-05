@@ -21,6 +21,7 @@
         "softspring/translatable-bundle": "^6.0@dev",
         "symfony/config": "^6.4 || ^7.4 || ^8.0",
         "symfony/dependency-injection": "^6.4 || ^7.4 || ^8.0",
+        "symfony/expression-language": "^6.4 || ^7.4 || ^8.0",
         "symfony/form": "^6.4 || ^7.4 || ^8.0",
         "symfony/http-kernel": "^6.4 || ^7.4 || ^8.0",
         "symfony/routing": "^6.4 || ^7.4 || ^8.0",
