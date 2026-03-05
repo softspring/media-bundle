@@ -16,8 +16,8 @@ services:
     Softspring\MediaBundle\Form\Admin\:
         resource: '../../../src/Form/Admin/Media*'
 
-    Softspring\MediaBundle\EventListener\Admin\:
-        resource: '../../../src/EventListener/Admin/Media*'
+    Softspring\MediaBundle\Admin\ActionListener\:
+        resource: '../../../src/Admin/ActionListener/Media*'
 
     sfs_media.admin.media.controller:
         class: Softspring\Component\CrudlController\Controller\CrudlController
