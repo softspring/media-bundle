@@ -11,7 +11,9 @@ class NameGeneratorProvider
 
     public function __construct(iterable $nameGenerators = [])
     {
-        $this->nameGenerators = (array) $nameGenerators;
+        foreach ($nameGenerators as $generator) {
+            $this->nameGenerators[get_class($generator)] = $generator;
+        }
     }
 
     public function getGenerator(string $name): ?NameGeneratorInterface
