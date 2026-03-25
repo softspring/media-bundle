@@ -1,4 +1,4 @@
-# Media bundle
+# Media Bundle
 
 ![Latest Stable](https://img.shields.io/packagist/v/softspring/media-bundle?label=stable&style=flat-square)
 ![Latest Unstable](https://img.shields.io/packagist/v/softspring/media-bundle?label=unstable&style=flat-square&include_prereleases)
@@ -8,21 +8,28 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/softspring/media-bundle/ci.yml?branch=6.0&style=flat-square&label=CI)](https://github.com/softspring/media-bundle/actions/workflows/ci.yml)
 ![Coverage](https://raw.githubusercontent.com/softspring/media-bundle/6.0/.github/badges/coverage.svg)
 
-This is a Symfony bundle that provides a robust and easy-to-use solution for image management and manipulation in your applications.
+Media library, media versioning, and rendering bundle for Symfony applications.
 
 ## Armonic
 
-This bundle is part of [Armonic](https://softspring.es/en/armonic).
+This package is part of [Armonic](https://softspring.es/en/armonic).
 
 ## Documentation
 
-[Documentation](https://armonic.softspring.es/latest/bundles/media-bundle/install)
+[Armonic Documentation](https://armonic.softspring.es/latest/bundles/media-bundle)
 
 ## Contributing
+
+Use the standard package commands before sending changes:
+
+```bash
+composer fix
+composer test
+composer test-bc
+```
 
 [Report issues](https://github.com/softspring/media-bundle/issues) and [send Pull Requests](https://github.com/softspring/media-bundle/pulls)
 
 ## License
 
 This package is free and released under the [AGPL-3.0 license](LICENSE).
-
