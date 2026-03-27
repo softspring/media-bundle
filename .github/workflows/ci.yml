@@ -2,9 +2,9 @@ name: CI
 
 on:
     push:
-        branches: [ "6.0" ]
+        branches: [ 6.0 ]
     pull_request:
-        branches: [ "6.0" ]
+        branches: [ 6.0 ]
 
 permissions:
     contents: read
@@ -15,12 +15,15 @@ env:
 jobs:
     build:
         runs-on: ubuntu-latest
-        permissions:
-            contents: write
         strategy:
             matrix:
-                php-versions: [ '8.4' ]
-                composer-prefer: [ '', '--prefer-lowest' ]
+                include:
+                    -   php-versions: '8.4'
+                        composer-prefer: ''
+                        symfony-require: ''
+                    -   php-versions: '8.4'
+                        composer-prefer: '--prefer-lowest'
+                        symfony-require: '6.4.*'
 
         steps:
             -   uses: actions/checkout@v6
@@ -29,7 +32,9 @@ jobs:
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: ${{ matrix.php-versions }}
-                    ini-values: "post_max_size=256M" #optional
+                    coverage: xdebug
+                    extensions: gd
+                    ini-values: "post_max_size=256M"
 
             -   name: Check PHP Version
                 run: php -v
@@ -37,39 +42,44 @@ jobs:
             -   name: Validate composer.json and composer.lock
                 run: composer validate --strict
 
+            -   name: Get Composer cache directory
+                id: composer-cache-dir
+                run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
             -   name: Cache Composer packages
                 id: composer-cache
                 uses: actions/cache@v5
                 with:
-                    path: vendor
-                    key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+                    path: ${{ steps.composer-cache-dir.outputs.dir }}
+                    key: ${{ runner.os }}-php-${{ matrix.php-versions }}-${{ matrix.composer-prefer }}-${{ hashFiles('composer.json') }}
                     restore-keys: |
-                        ${{ runner.os }}-php-
+                        ${{ runner.os }}-php-${{ matrix.php-versions }}-
 
             -   name: Install dependencies
-                run: composer update --prefer-dist --no-interaction --no-progress ${{ matrix.composer-prefer }}
+                run: |
+                    if [ -n "${{ matrix.symfony-require }}" ]; then
+                        composer global config --no-plugins allow-plugins.symfony/flex true
+                        composer global require symfony/flex:^2.8 --prefer-dist --no-interaction --no-progress --prefer-stable
+                        export SYMFONY_REQUIRE="${{ matrix.symfony-require }}"
+                    fi
 
-            -   name: Run phpstan
-                run: ./vendor/bin/phpstan analyse
+                    COMPOSER_ROOT_VERSION=6.0.x-dev composer update --prefer-dist --no-interaction --no-progress --prefer-stable ${{ matrix.composer-prefer }}
 
-            -   name: Run tests
-                run: ./vendor/bin/phpunit --coverage-text --coverage-html=.phpunit.cache/html-report
+            -   name: Run package validation
+                run: composer run-tests
 
-            -   name: Check config yaml syntax
-                run: ./vendor/bin/yaml-lint config/ -vvv --parse-tags
+            -   name: Check coverage report
+                id: coverage_report
+                run: |
+                    if [ -f clover.xml ]; then
+                        echo "has_clover=true" >> "$GITHUB_OUTPUT"
+                    else
+                        echo "has_clover=false" >> "$GITHUB_OUTPUT"
+                    fi
 
-            -   name: Check translations yaml syntax
-                run: ./vendor/bin/yaml-lint translations/ -vvv --parse-tags
-
-            -   name: Check github workflows yaml syntax
-                run: ./vendor/bin/yaml-lint .github/ -vvv --parse-tags
-
-            -   name: Code Style check
-                run: ./vendor/bin/php-cs-fixer fix -v --diff --dry-run
-
-            -   name: phpunit-coverage-badge
-                uses: timkrase/phpunit-coverage-badge@v1.2.1
+            -   name: Upload coverage to Codecov
+                if: matrix.composer-prefer == '' && steps.coverage_report.outputs.has_clover == 'true'
+                uses: codecov/codecov-action@v5
                 with:
-                    push_badge: true
-                    coverage_badge_path: .github/badges/coverage.svg
-                    repo_token: ${{ secrets.GITHUB_TOKEN }}
+                    token: ${{ secrets.CODECOV_TOKEN }}
+                    files: clover.xml

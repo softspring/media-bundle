@@ -20,10 +20,6 @@ class ImagineProcessorTest extends TestCase
         if (!is_dir($this->resultsPath)) {
             mkdir($this->resultsPath);
         }
-
-        if (isset($_ENV['GITHUB_ACTION'])) {
-            $this->markTestSkipped('Test skipped in GitHubActions');
-        }
     }
 
     public function testPriority(): void
@@ -90,7 +86,9 @@ class ImagineProcessorTest extends TestCase
         $version = new MediaVersion('xs');
         $version->setOriginalVersion($originalVersion);
         $version->setOptions(['type' => 'png']);
-        $version->setUpload(new UploadedFile('/tmp/uploadedFile', 'name.jpeg', null, 100, true));
+        $tempFile = tempnam(sys_get_temp_dir(), 'media-uploaded-');
+        file_put_contents($tempFile, 'uploaded');
+        $version->setUpload(new UploadedFile($tempFile, 'name.jpeg', null, 100, true));
         $processor->process($version);
         $this->assertNotNull($version->getUpload());
     }

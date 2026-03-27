@@ -19,7 +19,6 @@ on:
     push:
         branches: [ "6.0" ]
     pull_request:
-        # The branches below must be a subset of the branches above
         branches: [ "6.0" ]
     schedule:
         -   cron: '35 13 * * 4'
@@ -51,11 +50,21 @@ jobs:
                     tools: phpmd
 
             -   name: Run PHPMD
-                run: phpmd . sarif codesize --reportfile phpmd-results.sarif
+                run: phpmd src sarif .phpmd.xml.dist --reportfile phpmd-results.sarif
                 continue-on-error: true
 
+            -   name: Validate SARIF output
+                id: validate_sarif
+                run: |
+                    if [ -f phpmd-results.sarif ] && jq empty phpmd-results.sarif >/dev/null 2>&1; then
+                      echo "has_sarif=true" >> "$GITHUB_OUTPUT"
+                    else
+                      echo "has_sarif=false" >> "$GITHUB_OUTPUT"
+                    fi
+
             -   name: Upload analysis results to GitHub
-                uses: github/codeql-action/upload-sarif@v4
+                if: steps.validate_sarif.outputs.has_sarif == 'true'
+                uses: github/codeql-action/upload-sarif@v3
                 with:
                     sarif_file: phpmd-results.sarif
                     wait-for-processing: true

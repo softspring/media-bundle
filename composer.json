@@ -1,6 +1,6 @@
 {
     "name": "softspring/media-bundle",
-    "description": "An media management bundle",
+    "description": "A media management bundle",
     "license": "AGPL-3.0-or-later",
     "type": "symfony-bundle",
     "require": {
@@ -24,6 +24,7 @@
         "symfony/expression-language": "^6.4 || ^7.4 || ^8.0",
         "symfony/form": "^6.4 || ^7.4 || ^8.0",
         "symfony/http-kernel": "^6.4 || ^7.4 || ^8.0",
+        "symfony/mime": "^6.4 || ^7.4 || ^8.0",
         "symfony/routing": "^6.4 || ^7.4 || ^8.0",
         "symfony/security-bundle": "^6.4 || ^7.4 || ^8.0",
         "symfony/translation": "^6.4 || ^7.4 || ^8.0",
@@ -39,7 +40,8 @@
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^12.5",
         "rector/rector": "^2.3",
-        "softspring/cms-bundle": "^6.0@dev"
+        "softspring/cms-bundle": "^6.0@dev",
+        "symfony/yaml": "^6.4 || ^7.4 || ^8.0"
     },
     "suggest": {
         "google/cloud-storage": "Required to integrate media storage in GCS",

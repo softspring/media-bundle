@@ -6,20 +6,17 @@ use Softspring\MediaBundle\EntityManager\MediaManagerInterface;
 use Softspring\MediaBundle\Exception\InvalidTypeException;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Type\MediaTypesCollection;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(name: 'sfs:media:types-migration')]
 class TypesMigrationCommand extends Command
 {
     public function __construct(protected MediaManagerInterface $mediaManager, protected MediaTypesCollection $mediaTypesCollection)
     {
         parent::__construct();
-    }
-
-    protected function configure(): void
-    {
-        $this->setName('sfs:media:types-migration');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
