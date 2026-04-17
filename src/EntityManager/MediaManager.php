@@ -243,8 +243,8 @@ class MediaManager implements MediaManagerInterface
     {
         $sql = 'SELECT m.type_key, m.sha1, COUNT(*) duplicated, MIN(m.id) media_id FROM media m
 WHERE m.sha1 IS NOT NULL
-GROUP BY m.type_key, m.sha1 
-HAVING duplicated > 1
+GROUP BY m.type_key, m.sha1
+HAVING COUNT(*) > 1
 ORDER BY duplicated DESC';
 
         return $this->em->getConnection()->executeQuery($sql)->fetchAllAssociative();

@@ -18,7 +18,7 @@ final class Version20250204000000 extends AbstractMigration
     public function up(Schema $schema): void
     {
         if ($this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
-            $this->addSql('ALTER TABLE media ALTER COLUMN type_private SET DEFAULT 0');
+            $this->addSql('ALTER TABLE media ALTER COLUMN type_private SET DEFAULT FALSE');
 
             return;
         }

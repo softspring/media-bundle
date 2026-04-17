@@ -19,8 +19,8 @@ final class Version20241119075103 extends AbstractMigration
     {
         if ($this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
             $this->addSql('ALTER TABLE media ALTER COLUMN name DROP NOT NULL');
-            $this->addSql('ALTER TABLE media ADD type_private SMALLINT NOT NULL DEFAULT 0');
-            $this->addSql('UPDATE media SET type_private = 0');
+            $this->addSql('ALTER TABLE media ADD type_private BOOLEAN NOT NULL DEFAULT FALSE');
+            $this->addSql('UPDATE media SET type_private = FALSE');
 
             return;
         }
