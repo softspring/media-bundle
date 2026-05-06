@@ -118,7 +118,7 @@ jobs:
 
             -   name: Install npm dependencies
                 working-directory: assets
-                run: npm ci
+                run: npm install --no-package-lock --no-audit --no-fund
 
             -   name: Run build script
                 working-directory: assets
@@ -156,7 +156,7 @@ jobs:
 
             -   name: Install npm dependencies
                 working-directory: assets
-                run: npm ci
+                run: npm install --no-package-lock --no-audit --no-fund
 
             -   name: Build dist
                 working-directory: assets
