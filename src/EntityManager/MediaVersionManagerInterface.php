@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Softspring\MediaBundle\EntityManager;
 
 use Softspring\Component\CrudlController\Manager\CrudlEntityManagerInterface;
