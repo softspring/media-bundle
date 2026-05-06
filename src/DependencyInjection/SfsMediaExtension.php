@@ -86,11 +86,22 @@ class SfsMediaExtension extends Extension implements PrependExtensionInterface
             ],
         ]);
 
+        if (interface_exists(\Symfony\Component\AssetMapper\AssetMapperInterface::class)) {
+            $container->prependExtensionConfig('framework', [
+                'asset_mapper' => [
+                    'paths' => [
+                        \dirname(__DIR__, 2).'/assets/dist' => '@softspring/media-bundle',
+                    ],
+                ],
+            ]);
+        }
+
         $doctrineConfig = $container->getExtensionConfig('doctrine_migrations');
         $container->prependExtensionConfig('doctrine_migrations', [
             'migrations_paths' => array_merge(array_pop($doctrineConfig)['migrations_paths'] ?? [], [
                 'Softspring\MediaBundle\Migrations' => '@SfsMediaBundle/src/Migrations',
             ]),
         ]);
+
     }
 }

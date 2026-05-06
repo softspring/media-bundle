@@ -13,7 +13,7 @@ env:
     XDEBUG_MODE: coverage
 
 jobs:
-    build:
+    backend:
         runs-on: ubuntu-latest
         strategy:
             matrix:
@@ -83,3 +83,86 @@ jobs:
                 with:
                     token: ${{ secrets.CODECOV_TOKEN }}
                     files: clover.xml
+
+    frontend:
+        needs: backend
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-versions: [ '20' ]
+                npm-versions: [ '10' ]
+
+        steps:
+            -   uses: actions/checkout@v6
+
+            -   name: Install Node.js
+                uses: actions/setup-node@v6
+                with:
+                    node-version: ${{ matrix.node-versions }}
+
+            -   name: Check Node.js Version
+                run: node -v
+
+            -   name: Check npm Version
+                run: npm -v
+
+            -   name: Cache npm packages
+                id: npm-cache
+                uses: actions/cache@v5
+                with:
+                    path: node_modules
+                    key: ${{ runner.os }}-node-${{ hashFiles('package.json') }}
+                    restore-keys: |
+                        ${{ runner.os }}-node-
+
+            -   name: Install npm dependencies
+                run: npm install --no-package-lock --no-audit --no-fund
+
+            -   name: Run build script
+                run: npm run build
+
+    build-dist:
+        needs: frontend
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+
+        env:
+            CI_COMMIT_MESSAGE: Continuous Integration Assets Build Artifacts
+            CI_COMMIT_AUTHOR: Continuous Integration
+            BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+
+        steps:
+            -   uses: actions/checkout@v6
+                with:
+                    ref: ${{ env.BRANCH_NAME }}
+
+            -   name: Install Node.js
+                uses: actions/setup-node@v6
+                with:
+                    node-version: '20'
+
+            -   name: Build dist
+                run: npm run build
+
+            -   name: Check dist is clean on pull requests
+                if: github.event_name == 'pull_request'
+                run: |
+                    if [ -n "$(git status --porcelain -- assets/dist)" ]; then
+                        git status --short -- assets/dist
+                        exit 1
+                    fi
+
+            -   name: Commit dist changes
+                if: github.event_name == 'push'
+                run: |
+                    if [ -z "$(git status --porcelain -- assets/dist)" ]; then
+                        exit 0
+                    fi
+
+                    git config user.name "${{ env.CI_COMMIT_AUTHOR }}"
+                    git config user.email "username@users.noreply.github.com"
+                    git add assets/dist
+                    git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
+                    git push origin HEAD:${{ env.BRANCH_NAME }}
