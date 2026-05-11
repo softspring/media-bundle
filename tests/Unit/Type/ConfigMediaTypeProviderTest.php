@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Softspring\MediaBundle\Tests\Unit\Type;
 
 use PHPUnit\Framework\TestCase;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Softspring\MediaBundle\Entity;
 
 use Softspring\MediaBundle\Model\Media as MediaModel;
