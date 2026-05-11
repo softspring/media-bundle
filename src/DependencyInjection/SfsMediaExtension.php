@@ -6,6 +6,7 @@ use Composer\InstalledVersions;
 use Exception;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
+use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -85,6 +86,16 @@ class SfsMediaExtension extends Extension implements PrependExtensionInterface
                 ],
             ],
         ]);
+
+        if (interface_exists(AssetMapperInterface::class)) {
+            $container->prependExtensionConfig('framework', [
+                'asset_mapper' => [
+                    'paths' => [
+                        \dirname(__DIR__, 2).'/assets/dist' => '@softspring/media-bundle',
+                    ],
+                ],
+            ]);
+        }
 
         $doctrineConfig = $container->getExtensionConfig('doctrine_migrations');
         $container->prependExtensionConfig('doctrine_migrations', [

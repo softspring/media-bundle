@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Softspring\MediaBundle\EntityListener;
 
 use Doctrine\ORM\Event\PreFlushEventArgs;

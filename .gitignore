@@ -6,3 +6,5 @@ composer.lock
 .phpunit.result.cache
 .phpunit.cache
 clover.xml
+node_modules
+assets/node_modules

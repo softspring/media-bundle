@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Softspring\MediaBundle\Admin\ActionListener;
 
 use Softspring\Component\CrudlController\Event\FilterEvent;
