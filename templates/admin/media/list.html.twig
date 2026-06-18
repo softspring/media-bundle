@@ -107,9 +107,9 @@
          id="mediaPreview" aria-labelledby="mediaPreviewLabel">
         {#    <div class="offcanvas offcanvas-end" data-bs-backdrop="static" tabindex="-1" id="mediaPreview" aria-labelledby="mediaPreviewLabel"> #}
         <div class="offcanvas-header">
-            <h5 class="offcanvas-title me-auto" id="mediaPreviewLabel">Offcanvas</h5>
-            <div class="offcanvas-header-actions d-flex">
-                <div class="offcanvas-header-buttons"></div>
+            <h5 class="offcanvas-title flex-grow-1 text-break me-3" style="min-width: 0;" id="mediaPreviewLabel">Offcanvas</h5>
+            <div class="offcanvas-header-actions d-flex flex-shrink-0 align-items-center text-nowrap">
+                <div class="offcanvas-header-buttons d-flex flex-shrink-0 align-items-center text-nowrap"></div>
                 <button type="button" class="btn-close p-4" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
         </div>
@@ -122,8 +122,8 @@
             const detailsUrl = event.relatedTarget.dataset.offcanvasHref;
             const offcanvas = event.target;
 
-            offcanvas.querySelector('#mediaPreviewLabel').innerHTML = event.relatedTarget.dataset.title + '<br/>' +
-                '<small class="small fw-normal">' + event.relatedTarget.dataset.description + '</small>';
+            offcanvas.querySelector('#mediaPreviewLabel').innerHTML = event.relatedTarget.dataset.title +
+                '<small class="small fw-normal fst-italic fs-6 d-block lh-sm mt-1">' + event.relatedTarget.dataset.description + '</small>';
 
             fetch(detailsUrl)
                 .then(response => response.text())

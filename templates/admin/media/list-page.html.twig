@@ -10,7 +10,8 @@
                     data-bs-target="#mediaPreview" aria-controls="mediaPreview"
                     data-bs-toggle="offcanvas" role="button"
                     data-title="{{ media.name }}"
-                    data-description="{{ media.description }}"
+                    data-description="{{ media.description|default(media.metadata.sfs_cms_ai.image_description.description|default) }}"
+                    title="{{ media.description|default(media.metadata.sfs_cms_ai.image_description.description|default(media.name)) }}"
                     data-offcanvas-href="{{ url('sfs_media_admin_medias_read_ajax', {'media':media.id}) }}"
                     href="{{ url('sfs_media_admin_medias_read', {'media':media.id}) }}"
                 {% endif %}

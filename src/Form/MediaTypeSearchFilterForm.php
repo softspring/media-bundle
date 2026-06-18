@@ -58,7 +58,7 @@ class MediaTypeSearchFilterForm extends PaginatorForm
         parent::buildForm($builder, $options);
 
         $builder->add('text', TextType::class, [
-            'property_path' => '[name__like]',
+            'property_path' => '[name__ilike___or___description__ilike]',
         ]);
 
         $validTypes = $options['valid_types'];
