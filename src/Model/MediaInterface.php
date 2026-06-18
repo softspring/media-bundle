@@ -63,4 +63,14 @@ interface MediaInterface
     public function getAltTexts(): ?Translation;
 
     public function setAltTexts(?Translation $altTexts): void;
+
+    public function getMetadata(): ?array;
+
+    public function setMetadata(?array $metadata): void;
+
+    public function setMetadataField(string $field, mixed $value): void;
+
+    public function getMetadataField(string $field, mixed $default = null): mixed;
+
+    public function removeMetadataField(string $field): void;
 }

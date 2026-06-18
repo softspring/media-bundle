@@ -28,6 +28,8 @@ abstract class Media implements MediaInterface
 
     protected ?Translation $altTexts = null;
 
+    protected ?array $metadata = null;
+
     public function __construct()
     {
         $this->versions = new ArrayCollection();
@@ -207,5 +209,34 @@ abstract class Media implements MediaInterface
     public function setAltTexts(?Translation $altTexts): void
     {
         $this->altTexts = $altTexts;
+    }
+
+    public function getMetadata(): ?array
+    {
+        return $this->metadata;
+    }
+
+    public function setMetadata(?array $metadata): void
+    {
+        $this->metadata = $metadata;
+    }
+
+    public function setMetadataField(string $field, mixed $value): void
+    {
+        $metadata = $this->getMetadata() ?? [];
+        $metadata[$field] = $value;
+        $this->setMetadata($metadata);
+    }
+
+    public function getMetadataField(string $field, mixed $default = null): mixed
+    {
+        return $this->getMetadata()[$field] ?? $default;
+    }
+
+    public function removeMetadataField(string $field): void
+    {
+        $metadata = $this->getMetadata() ?? [];
+        unset($metadata[$field]);
+        $this->setMetadata([] !== $metadata ? $metadata : null);
     }
 }
