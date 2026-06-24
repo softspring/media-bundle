@@ -4,6 +4,7 @@ namespace Softspring\MediaBundle\Tests\Unit\Render;
 
 use Exception;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use PHPUnit\Framework\TestCase;
 use Softspring\MediaBundle\Entity\Media;
 use Softspring\MediaBundle\Entity\MediaVersion;
@@ -45,6 +46,25 @@ class MediaRendererTest extends TestCase
                     ],
                     'img' => [
                         'src_version' => 'xl',
+                    ],
+                ],
+            ],
+            'video_sets' => [
+                '_default' => [
+                    'attrs' => [
+                        'preload' => 'metadata',
+                    ],
+                    'poster_version' => 'poster',
+                    'sources' => [
+                        [
+                            'version' => 'mp4',
+                            'attrs' => [
+                                'media' => '(min-width: 600px)',
+                            ],
+                        ],
+                        [
+                            'version' => 'missing',
+                        ],
                     ],
                 ],
             ],
@@ -110,5 +130,124 @@ class MediaRendererTest extends TestCase
 
         $this->expectException(Exception::class);
         $renderer->renderPicture($media, 'bad_picture_not_in_config');
+    }
+
+    public function testRenderMediaDispatcherAndArrays(): void
+    {
+        $renderer = $this->createRenderer();
+        $media = $this->createMediaWithImageVersions();
+
+        $expected = '<img width="1800" height="1600" src="https://example.com/image.xl.jpeg" alt="" />';
+
+        $this->assertSame($expected, $renderer->render($media, 'image#xl'));
+        $this->assertSame($expected, $renderer->renderMediaOrArray($media, 'image#xl'));
+        $this->assertSame($expected, $renderer->renderMediaOrArray(['media' => $media, 'version' => 'image#xl']));
+        $this->assertSame('', $renderer->render(null, 'image#xl'));
+        $this->assertSame('', $renderer->render($media, null));
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Invalid $versionString');
+        $renderer->render($media, 'invalid#xl');
+    }
+
+    public function testImageUrlReturnsFirstAvailableVersion(): void
+    {
+        $renderer = $this->createRenderer();
+        $media = $this->createMediaWithImageVersions();
+
+        $this->assertSame('https://example.com/image.xl.jpeg', $renderer->imageUrl($media, ['missing', 'xl']));
+        $this->assertSame('', $renderer->imageUrl($media, ['missing']));
+        $this->assertSame('', $renderer->imageUrl($media, 'missing'));
+    }
+
+    public function testRenderVideos(): void
+    {
+        $renderer = $this->createRenderer();
+        $media = $this->createMediaWithVideoVersions();
+
+        $this->assertSame(
+            '<video class="player" controls="" src="https://example.com/video.mp4" />',
+            $renderer->renderVideo($media, 'mp4', ['class' => 'player', 'controls' => true])
+        );
+        $this->assertSame(
+            '<video class="player" src="https://example.com/video.mp4" />',
+            $renderer->renderVideo($media, 'mp4', ['class' => 'player', 'controls' => false])
+        );
+        $this->assertSame(
+            '<img width="640" height="360" class="poster" src="https://example.com/poster.jpg" alt="Poster" />',
+            $renderer->renderVideo($media, 'poster', ['class' => 'poster'])
+        );
+        $this->assertSame(
+            '<video preload="metadata" controls="1" poster="https://example.com/poster.jpg"><source media="(min-width: 600px)" src="https://example.com/video.mp4" type="video/mp4" /></video>',
+            $renderer->renderVideoWithSources($media, '_default', ['controls' => true])
+        );
+        $this->assertSame('', $renderer->renderVideo($media, ['missing']));
+        $this->assertSame('<video class="player" controls="" src="https://example.com/video.mp4" />', $renderer->renderVideo($media, ['missing', 'mp4'], ['class' => 'player', 'controls' => true]));
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('video_sets config is not set for background');
+        $renderer->renderVideoWithSources($media, 'missing');
+    }
+
+    public function testResolvesMediaById(): void
+    {
+        $media = $this->createMediaWithImageVersions();
+        $repository = $this->createMock(EntityRepository::class);
+        $repository->expects($this->once())
+            ->method('findOneBy')
+            ->with(['id' => 'media-id'])
+            ->willReturn($media);
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->once())
+            ->method('getRepository')
+            ->with(Media::class)
+            ->willReturn($repository);
+
+        $renderer = new MediaRenderer(new MediaTypesCollection([new ConfigMediaTypeProvider(self::TYPES)]), new FilesystemStorageDriver('path', 'url'), $em);
+
+        $this->assertSame('https://example.com/image.xl.jpeg', $renderer->imageUrl('media-id', 'xl'));
+    }
+
+    private function createRenderer(): MediaRenderer
+    {
+        return new MediaRenderer(
+            new MediaTypesCollection([new ConfigMediaTypeProvider(self::TYPES)]),
+            new FilesystemStorageDriver('path', 'url'),
+            $this->createMock(EntityManagerInterface::class),
+        );
+    }
+
+    private function createMediaWithImageVersions(): Media
+    {
+        $media = new Media();
+        $media->setMediaType(MediaInterface::MEDIA_TYPE_IMAGE);
+        $media->setType('background');
+
+        $versionXl = new MediaVersion('xl', $media);
+        $versionXl->setUrl('https://example.com/image.xl.jpeg');
+        $versionXl->setWidth(1800);
+        $versionXl->setHeight(1600);
+
+        return $media;
+    }
+
+    private function createMediaWithVideoVersions(): Media
+    {
+        $media = $this->createMediaWithImageVersions();
+        $media->setName('Video');
+
+        $poster = new MediaVersion('poster', $media);
+        $poster->setUrl('https://example.com/poster.jpg');
+        $poster->setFileMimeType('image/jpeg');
+        $poster->setWidth(640);
+        $poster->setHeight(360);
+        $poster->getMedia()->setName('Poster');
+
+        $mp4 = new MediaVersion('mp4', $media);
+        $mp4->setUrl('https://example.com/video.mp4');
+        $mp4->setFileMimeType('video/mp4');
+
+        return $media;
     }
 }

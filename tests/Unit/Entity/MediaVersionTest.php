@@ -33,9 +33,17 @@ class MediaVersionTest extends TestCase
         $version = new MediaVersion();
 
         $this->assertNull($version->getUrl());
+        $this->assertNull($version->getPublicUrl());
 
         $version->setUrl('https://example.com/image.jpg');
         $this->assertEquals('https://example.com/image.jpg', $version->getUrl());
+        $this->assertSame('https://example.com/image.jpg', $version->getPublicUrl());
+
+        $version->setUrl('gs://bucket/path/image.jpg');
+        $this->assertSame('https://storage.googleapis.com/bucket/path/image.jpg', $version->getPublicUrl());
+
+        $version->setUrl('sfs-media-filesystem://path/image.jpg');
+        $this->assertSame('/media/path/image.jpg', $version->getPublicUrl());
     }
 
     public function testWidth(): void
@@ -76,6 +84,12 @@ class MediaVersionTest extends TestCase
 
         $version->setFileMimeType('image/jpeg');
         $this->assertEquals('image/jpeg', $version->getFileMimeType());
+        $this->assertTrue($version->isImageFile());
+        $this->assertFalse($version->isVideoFile());
+
+        $version->setFileMimeType('video/mp4');
+        $this->assertTrue($version->isVideoFile());
+        $this->assertFalse($version->isImageFile());
     }
 
     public function testOptions(): void
@@ -128,6 +142,30 @@ class MediaVersionTest extends TestCase
         $this->assertEquals($file, $version->getUpload());
         $this->assertNull($version->getUploadedAt());
         $this->assertEquals(date('H:i:s d-m-Y'), $version->getGeneratedAt()->format('H:i:s d-m-Y'));
+    }
+
+    public function testKeepTmpFileFlag(): void
+    {
+        $version = new MediaVersion();
+        $this->assertFalse($version->isKeepTmpFile());
+
+        $version->setUpload(new File('example', false), true);
+
+        $this->assertTrue($version->isKeepTmpFile());
+    }
+
+    public function testOriginalSha1IsPropagatedToMedia(): void
+    {
+        $media = new Media();
+        $originalVersion = new MediaVersion('_original', $media);
+        $thumbnailVersion = new MediaVersion('thumbnail', $media);
+
+        $originalVersion->setSha1('original-sha');
+        $thumbnailVersion->setSha1('thumbnail-sha');
+
+        $this->assertSame('original-sha', $originalVersion->getSha1());
+        $this->assertSame('thumbnail-sha', $thumbnailVersion->getSha1());
+        $this->assertSame('original-sha', $media->getSha1());
     }
 
     public function testId(): void

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Softspring\MediaBundle\Tests\Unit\Entity;
 
+use InvalidArgumentException;
 use ReflectionClass;
 use PHPUnit\Framework\TestCase;
 use Softspring\MediaBundle\Entity\Media;
@@ -88,6 +89,77 @@ class MediaTest extends TestCase
         // test remove version
         $media->removeVersion($version1);
         $this->assertEquals(1, $media->getVersions()->count());
+        $this->assertNull($version1->getMedia());
+    }
+
+    public function testMagicVersionAccessors(): void
+    {
+        $media = new Media();
+        $version = new MediaVersion();
+
+        $this->assertTrue($media->__isset('version_thumbnail'));
+
+        $media->__set('version_thumbnail', $version);
+
+        $this->assertSame($version, $media->__get('version_thumbnail'));
+        $this->assertSame('thumbnail', $version->getVersion());
+        $this->assertSame($media, $version->getMedia());
+    }
+
+    public function testMagicAccessorsRejectUnknownProperties(): void
+    {
+        $media = new Media();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Property unknown not found');
+
+        $media->__get('unknown');
+    }
+
+    public function testMagicVersionSetterRejectsInvalidValues(): void
+    {
+        $media = new Media();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Property version_thumbnail must be an instance of MediaVersionInterface');
+
+        $media->__set('version_thumbnail', 'invalid');
+    }
+
+    public function testMetadataHelpers(): void
+    {
+        $media = new Media();
+
+        $this->assertNull($media->getMetadata());
+        $this->assertSame('fallback', $media->getMetadataField('missing', 'fallback'));
+
+        $media->setMetadataField('author', 'Ada');
+        $media->setMetadataField('sizes', ['small', 'large']);
+
+        $this->assertSame('Ada', $media->getMetadataField('author'));
+        $this->assertSame(['small', 'large'], $media->getMetadataField('sizes'));
+
+        $media->removeMetadataField('author');
+        $this->assertNull($media->getMetadataField('author'));
+        $this->assertSame(['sizes' => ['small', 'large']], $media->getMetadata());
+
+        $media->removeMetadataField('sizes');
+        $this->assertNull($media->getMetadata());
+    }
+
+    public function testCreatedAtAndPrivateFlag(): void
+    {
+        $media = new Media();
+
+        $this->assertNull($media->getPrivate());
+        $media->setPrivate(true);
+        $this->assertTrue($media->getPrivate());
+
+        $media->setCreatedAt(1_700_000_000);
+        $this->assertSame('1700000000', $media->getCreatedAt()->format('U'));
+
+        $media->markCreatedAtNow();
+        $this->assertSame(gmdate('Y-m-d'), $media->getCreatedAt()->format('Y-m-d'));
     }
 
     public function testId(): void

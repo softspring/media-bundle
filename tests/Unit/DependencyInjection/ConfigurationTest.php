@@ -5,7 +5,6 @@ namespace Softspring\MediaBundle\Tests\Unit\DependencyInjection;
 use PHPUnit\Framework\TestCase;
 use Softspring\MediaBundle\DependencyInjection\Configuration;
 use Softspring\MediaBundle\Media\DefaultNameGenerator;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends TestCase

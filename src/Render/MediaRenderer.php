@@ -26,7 +26,7 @@ class MediaRenderer
 
         if (is_array($version)) {
             foreach ($version as $singleVersion) {
-                if ($url = $this->getFinalUrl($singleVersion)) {
+                if ($url = $this->getFinalUrl($media->getVersion($singleVersion))) {
                     return $url;
                 }
             }
