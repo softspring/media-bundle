@@ -146,9 +146,9 @@
 
         let loadingNextPage = false;
 
-        document.addEventListener('scroll', function () {
+        const loadNextMediaPage = function () {
             const scrollElement = document.querySelector('a[data-pagination="scroll"]');
-            if (scrollElement && window.scrollY + window.innerHeight >= scrollElement.offsetTop) {
+            if (scrollElement && scrollElement.getBoundingClientRect().top <= window.innerHeight) {
                 if (loadingNextPage) {
                     return;
                 }
@@ -170,7 +170,11 @@
                 };
                 xhr.send();
             }
-        })
+        };
+
+        document.addEventListener('scroll', loadNextMediaPage, true);
+        window.addEventListener('resize', loadNextMediaPage);
+        loadNextMediaPage();
 
         document.addEventListener('click', function (e) {
             if (!e.target.matches('[data-bulk-select]')) {
