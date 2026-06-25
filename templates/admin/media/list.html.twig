@@ -29,6 +29,7 @@
             <h1 class="h3">{{ 'admin_medias.list.title'|trans }}</h1>
 
             <div class="float-end">
+                {% block admin_medias_list_actions %}
                 {% if is_granted('PERMISSION_SFS_MEDIA_ADMIN_MEDIAS_CREATE') and media_types|length %}
                     <div class="dropdown">
                         <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownCreateMedia"
@@ -43,6 +44,7 @@
                         </ul>
                     </div>
                 {% endif %}
+                {% endblock admin_medias_list_actions %}
             </div>
         </div>
 
