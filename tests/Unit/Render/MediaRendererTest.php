@@ -68,6 +68,11 @@ class MediaRendererTest extends TestCase
         $expectedXlImg = '<img width="1800" height="1600" class="img-fluid" src="https://example.com/image.xl.jpeg" alt="" />';
         $this->assertEquals($expectedXlImg, $renderer->renderImage($media, 'xl', ['class' => 'img-fluid']));
 
+        $media->setDescription('A "quoted" image & <tag>');
+        $expectedXlImg = '<img width="1800" height="1600" class="img-fluid" src="https://example.com/image.xl.jpeg" alt="A &quot;quoted&quot; image &amp; &lt;tag&gt;" />';
+        $this->assertEquals($expectedXlImg, $renderer->renderImage($media, 'xl', ['class' => 'img-fluid']));
+        $media->setDescription(null);
+
         $versionL = new MediaVersion('l', $media);
         $versionL->setUrl('https://example.com/image.l.jpeg');
         $versionL->setWidth(800);
