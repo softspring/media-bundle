@@ -177,7 +177,7 @@ class MediaRenderer
     protected function htmlAttributes(array $attributes): string
     {
         array_walk($attributes, function (&$value, $attribute): void {
-            $value = "$attribute=\"$value\"";
+            $value = sprintf('%s="%s"', $attribute, htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'));
         });
 
         return implode(' ', $attributes);
