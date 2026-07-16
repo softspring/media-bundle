@@ -148,4 +148,23 @@ class ConfigurationTest extends TestCase
         $config['types'] = Configuration::fixConfigTypes($config['types'] ?? null);
         $this->assertEquals($expected, $config);
     }
+
+    public function testGoogleCloudStorageConfigWithoutPublicBaseUrl()
+    {
+        $configs = [
+            'sfs_media' => [
+                'google_cloud_storage' => [
+                    'bucket' => 'media-bucket',
+                ],
+            ],
+        ];
+
+        $processor = new Processor();
+        $configuration = new Configuration();
+        $config = $processor->processConfiguration($configuration, $configs);
+
+        $this->assertSame('google_cloud_storage', $config['driver']);
+        $this->assertSame('media-bucket', $config['google_cloud_storage']['bucket']);
+        $this->assertNull($config['google_cloud_storage']['public_base_url']);
+    }
 }
