@@ -13,7 +13,7 @@ class Configuration implements ConfigurationInterface
 {
     private const HELP_AVIF = <<<HELP
 Avif format is not supported by your PHP environment. Please add support for it.
-    
+
 Depending on your system, add the following packages:
 
     $ apt install libavif-dev # Debian/Ubuntu
@@ -107,6 +107,7 @@ HELP;
                 ->arrayNode('google_cloud_storage')
                     ->children()
                         ->scalarNode('bucket')->end()
+                        ->scalarNode('public_base_url')->defaultNull()->end()
                     ->end()
                 ->end()
 

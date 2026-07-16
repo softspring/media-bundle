@@ -44,6 +44,7 @@ class SfsMediaExtension extends Extension implements PrependExtensionInterface
 
         if ('google_cloud_storage' === $config['driver']) {
             $container->setParameter('sfs_media.storage.google_cloud_storage.bucket', $config['google_cloud_storage']['bucket']);
+            $container->setParameter('sfs_media.storage.google_cloud_storage.public_base_url', $config['google_cloud_storage']['public_base_url']);
             $loader->load('drivers/google_cloud_storage.yaml');
         }
 

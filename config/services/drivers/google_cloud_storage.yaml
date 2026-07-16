@@ -6,6 +6,7 @@ services:
         bind:
             $storageClient: '@sfs_media.storage.google_cloud.storage_client'
             $bucket: '%sfs_media.storage.google_cloud_storage.bucket%'
+            $publicBaseUrl: '%sfs_media.storage.google_cloud_storage.public_base_url%'
 
     sfs_media.storage.google_cloud.storage_client:
         class: Google\Cloud\Storage\StorageClient

@@ -7,14 +7,8 @@ use Symfony\Component\HttpFoundation\File\File;
 
 class GoogleCloudStorageDriver implements StorageDriverInterface
 {
-    protected StorageClient $storageClient;
-
-    protected string $bucket;
-
-    public function __construct(StorageClient $storageClient, string $bucket)
+    public function __construct(protected StorageClient $storageClient, protected string $bucket, protected ?string $publicBaseUrl = null)
     {
-        $this->storageClient = $storageClient;
-        $this->bucket = $bucket;
     }
 
     public function store(File $file, string $destName): string
@@ -29,7 +23,7 @@ class GoogleCloudStorageDriver implements StorageDriverInterface
 
     public function remove(string $fileName): void
     {
-        if ('gs://' !== substr($fileName, 0, 5)) {
+        if (!str_starts_with($fileName, 'gs://')) {
             return;
         }
 
@@ -45,7 +39,7 @@ class GoogleCloudStorageDriver implements StorageDriverInterface
 
     public function download(string $fileName, string $destPath): void
     {
-        if ('gs://' !== substr($fileName, 0, 5)) {
+        if (!str_starts_with($fileName, 'gs://')) {
             return;
         }
 
@@ -61,10 +55,26 @@ class GoogleCloudStorageDriver implements StorageDriverInterface
 
     public function url(string $fileName): string
     {
-        if (str_starts_with($fileName, 'gs://')) {
-            return 'https://storage.googleapis.com/'.substr($fileName, 5);
+        if (!str_starts_with($fileName, 'gs://')) {
+            return $fileName;
         }
 
-        return $fileName;
+        $fileName = substr($fileName, 5);
+        $parts = explode('/', $fileName, 2);
+
+        $bucket = $parts[0];
+        $filePath = $parts[1] ?? null;
+
+        $publicBaseUrl = null !== $this->publicBaseUrl ? trim($this->publicBaseUrl) : null;
+        if ($filePath && '' === $publicBaseUrl) {
+            return "/$filePath";
+        }
+
+        if ($filePath && null !== $publicBaseUrl && 'null' !== strtolower($publicBaseUrl)) {
+            $publicBaseUrl = rtrim($publicBaseUrl, '/');
+            return "$publicBaseUrl/$filePath";
+        }
+
+        return "https://storage.googleapis.com/$bucket".($filePath ? "/$filePath" : '');
     }
 }
