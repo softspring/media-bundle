@@ -149,7 +149,7 @@ class ConfigurationTest extends TestCase
         $this->assertEquals($expected, $config);
     }
 
-    public function testGoogleCloudStorageConfigWithoutPublicBaseUrl()
+    public function testGoogleCloudStorageConfigWithoutPublicBaseUrl(): void
     {
         $configs = [
             'sfs_media' => [
