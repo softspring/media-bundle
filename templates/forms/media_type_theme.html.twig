@@ -1,15 +1,16 @@
 {% trans_default_domain 'sfs_media_admin' %}
 
 {% block media_version_upload_row %}
+    {% set mediaVersionPublicUrl = form.vars.value|sfs_media_version_url|default('') %}
     {{ form_label(form) }}
     <div data-drop-media-zone class="border border-3 rounded-3 bg-light mb-3 p-3" style="border-style: dashed !important;">
         <div class="d-flex align-items justify-content-between flex-wrap">
             <div class="d-flex align-items-center pe-3 col">
                 <div class="d-flex justify-content-center align-items-center rounded me-3 h-100 px-2" data-drop-media-zone-preview style="width: 125px;">
-                    <i class="icon bi bi-image{{ (form.vars.value.publicUrl is empty) ? '' : ' d-none' }}"></i>
-                    <img src="{{ form.vars.value.publicUrl|default('') }}" class="img-thumbnail preview-image{{ (form.vars.value.publicUrl is not empty and form.vars.value.isImageFile) ? '' : ' d-none' }}" alt="Image Preview" style="max-width: 120px; max-height: 120px;">
-                    <video controls class="preview-video{{ (form.vars.value.publicUrl is not empty and form.vars.value.isVideoFile) ? '' : ' d-none' }}" style="max-width: 120px; max-height: 120px;">
-                        <source src="{{ form.vars.value.publicUrl|default('') }}" type="">
+                    <i class="icon bi bi-image{{ (mediaVersionPublicUrl is empty) ? '' : ' d-none' }}"></i>
+                    <img src="{{ mediaVersionPublicUrl }}" class="img-thumbnail preview-image{{ (mediaVersionPublicUrl is not empty and form.vars.value.isImageFile) ? '' : ' d-none' }}" alt="Image Preview" style="max-width: 120px; max-height: 120px;">
+                    <video controls class="preview-video{{ (mediaVersionPublicUrl is not empty and form.vars.value.isVideoFile) ? '' : ' d-none' }}" style="max-width: 120px; max-height: 120px;">
+                        <source src="{{ mediaVersionPublicUrl }}" type="">
                         Your browser does not support the video tag.
                     </video>
                 </div>

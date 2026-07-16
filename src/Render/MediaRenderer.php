@@ -40,6 +40,11 @@ class MediaRenderer
         return $this->getFinalUrl($mediaVersion);
     }
 
+    public function mediaVersionUrl(?MediaVersionInterface $version): ?string
+    {
+        return $this->getFinalUrl($version);
+    }
+
     /**
      * @throws Exception
      */
