@@ -37,6 +37,7 @@ class RenderMediaExtensionTest extends TestCase
             'sfs_media_render_picture',
             'sfs_media_render',
             'sfs_media_image_url',
+            'sfs_media_version_url',
             'sfs_media_type_config',
         ], array_map(static fn (TwigFilter $filter): string => $filter->getName(), $extension->getFilters()));
 
@@ -47,6 +48,7 @@ class RenderMediaExtensionTest extends TestCase
             'sfs_media_render_picture',
             'sfs_media_render',
             'sfs_media_image_url',
+            'sfs_media_version_url',
             'sfs_media_type_config',
         ], array_map(static fn (TwigFunction $function): string => $function->getName(), $extension->getFunctions()));
     }

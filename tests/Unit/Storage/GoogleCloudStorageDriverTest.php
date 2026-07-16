@@ -3,14 +3,13 @@
 namespace Softspring\MediaBundle\Tests\Unit\Storage;
 
 use Google\Cloud\Storage\StorageClient;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Softspring\MediaBundle\Storage\GoogleCloudStorageDriver;
 
 class GoogleCloudStorageDriverTest extends TestCase
 {
-    /**
-     * @dataProvider urlProvider
-     */
+    #[DataProvider('urlProvider')]
     public function testUrl(string $storedUrl, ?string $publicBaseUrl, string $expectedUrl): void
     {
         $driver = new GoogleCloudStorageDriver($this->createMock(StorageClient::class), 'media-bucket', $publicBaseUrl);
@@ -18,7 +17,7 @@ class GoogleCloudStorageDriverTest extends TestCase
         $this->assertSame($expectedUrl, $driver->url($storedUrl));
     }
 
-    public function urlProvider(): iterable
+    public static function urlProvider(): iterable
     {
         yield 'non gcs url' => [
             'https://example.com/image.jpg',
