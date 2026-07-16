@@ -31,6 +31,7 @@ class RenderMediaExtension extends AbstractExtension
             new TwigFilter('sfs_media_render_picture', [$this->mediaRenderer, 'renderPicture'], ['is_safe' => ['html']]),
             new TwigFilter('sfs_media_render', [$this->mediaRenderer, 'renderMediaOrArray'], ['is_safe' => ['html']]),
             new TwigFilter('sfs_media_image_url', [$this->mediaRenderer, 'imageUrl']),
+            new TwigFilter('sfs_media_version_url', [$this->mediaRenderer, 'mediaVersionUrl']),
             new TwigFilter('sfs_media_type_config', [$this, 'getMediaTypeConfig']),
         ];
     }
@@ -44,6 +45,7 @@ class RenderMediaExtension extends AbstractExtension
             new TwigFunction('sfs_media_render_picture', [$this->mediaRenderer, 'renderPicture'], ['is_safe' => ['html']]),
             new TwigFunction('sfs_media_render', [$this->mediaRenderer, 'renderMediaOrArray'], ['is_safe' => ['html']]),
             new TwigFunction('sfs_media_image_url', [$this->mediaRenderer, 'imageUrl']),
+            new TwigFunction('sfs_media_version_url', [$this->mediaRenderer, 'mediaVersionUrl']),
             new TwigFunction('sfs_media_type_config', [$this, 'getMediaTypeConfig']),
         ];
     }

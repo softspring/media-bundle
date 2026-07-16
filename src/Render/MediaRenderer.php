@@ -41,6 +41,11 @@ class MediaRenderer
         }
     }
 
+    public function mediaVersionUrl(?MediaVersionInterface $version): ?string
+    {
+        return $this->getFinalUrl($version);
+    }
+
     /**
      * @throws Exception
      */

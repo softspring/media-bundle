@@ -23,6 +23,7 @@
 {%- endmacro -%}
 
 {%- macro renderVersion(media, version, media_types) -%}
+    {% set versionUrl = version|sfs_media_version_url %}
     <div class="text-small text-black-50 mb-1">
         {% if media_types[media.type].name|default(null) %}
             <span class="me-2">{{ media_types[media.type].name }}</span>
@@ -46,10 +47,10 @@
 {% endfor %}">Automatically generated</abbr> at: {{ version.generatedAt|date_span('H:i:s d-m-Y') }}
                 {% endif %}
             </span>
-            {# <a class="btn btn-link btn-sm" href="{{ version.publicUrl }}" download>
+            {# <a class="btn btn-link btn-sm" href="{{ versionUrl }}" download>
                 <i class="bi bi-download"></i>
             </a> #}
-            <a class="btn btn-link btn-sm" href="{{ version.publicUrl }}" target="_blank">
+            <a class="btn btn-link btn-sm" href="{{ versionUrl }}" target="_blank">
                 <i class="bi bi-box-arrow-up-right"></i>
             </a>
         </div>
@@ -111,7 +112,7 @@
                 <strong>Directly using the URL</strong>
                 <a href="#" onclick="navigator.clipboard.writeText(document.querySelector('#media_version_url_{{ version.version }}').textContent); return false" title="Copy to clipboard"><i class="bi bi-copy"></i></a>
                 <br/>
-                <a href="{{ version.publicUrl }}" target="_blank" id="media_version_url_{{ version.version }}">{{ version.publicUrl }}</a>
+                <a href="{{ versionUrl }}" target="_blank" id="media_version_url_{{ version.version }}">{{ versionUrl }}</a>
             </p>
         </div>
     </div>
