@@ -97,7 +97,7 @@ jobs:
             -   uses: actions/checkout@v7
 
             -   name: Install Node.js
-                uses: actions/setup-node@v6
+                uses: actions/setup-node@v7
                 with:
                     node-version: ${{ matrix.node-versions }}
 
@@ -141,7 +141,7 @@ jobs:
                     ref: ${{ env.BRANCH_NAME }}
 
             -   name: Install Node.js
-                uses: actions/setup-node@v6
+                uses: actions/setup-node@v7
                 with:
                     node-version: '20'
 
