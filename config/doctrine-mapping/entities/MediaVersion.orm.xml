@@ -7,6 +7,10 @@
     <entity name="Softspring\MediaBundle\Entity\MediaVersion" table="media_version">
         <cache usage="NONSTRICT_READ_WRITE" region="default" />
 
+        <unique-constraints>
+            <unique-constraint name="uniq_media_version_media_id_version" columns="media_id,version" />
+        </unique-constraints>
+
         <id name="id" type="string" length="36" column="id">
             <options><option name="fixed">true</option></options>
             <generator strategy="CUSTOM" />
