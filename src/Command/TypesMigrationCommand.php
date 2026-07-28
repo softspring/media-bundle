@@ -9,6 +9,7 @@ use Softspring\MediaBundle\Type\MediaTypesCollection;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
 
 class TypesMigrationCommand extends Command
 {
@@ -45,6 +46,13 @@ class TypesMigrationCommand extends Command
                 $output->writeln('');
             } catch (InvalidTypeException $e) {
                 $output->writeln(sprintf('<error>Media "%s" has an error. Type "%s" is invalid</error>', $media->getName(), $media->getType()));
+            } catch (Throwable $e) {
+                $output->writeln(sprintf(
+                    '<error>Media "%s" of type "%s" could not be migrated: %s</error>',
+                    $media->getName(),
+                    $media->getType(),
+                    $e->getMessage(),
+                ));
             }
         }
 
