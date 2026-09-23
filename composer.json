@@ -39,7 +39,8 @@
         "guzzlehttp/promises": "^2.0",
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^12.5",
-        "rector/rector": "^2.3",
+        "rector/rector": "^2.6.7",
+        "symfony/polyfill-php85": "^1.33",
         "softspring/cms-bundle": "^6.0@dev",
         "symfony/yaml": "^6.4 || ^7.4 || ^8.0"
     },

@@ -72,7 +72,7 @@ class MediaRenderer
     {
         $media = $this->getMedia($media);
 
-        if (!$media || !$versionString) {
+        if (!$media instanceof MediaInterface || !$versionString) {
             return '';
         }
 

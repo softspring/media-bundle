@@ -47,8 +47,12 @@ class MediaTypeUploadType extends AbstractType
     {
         $typeDefinition = $this->mediaTypesCollection->getType($options['media_type']);
 
-        $options['allow_name_field'] && $builder->add('name');
-        $options['allow_description_field'] && $builder->add('description');
+        if ($options['allow_name_field']) {
+            $builder->add('name');
+        }
+        if ($options['allow_description_field']) {
+            $builder->add('description');
+        }
 
         $builder->add('_original', MediaVersionUploadType::class, [
             'property_path' => 'version__original',
@@ -81,8 +85,10 @@ class MediaTypeUploadType extends AbstractType
             $media->setPrivate($typeConfig['private'] ?? false);
         });
 
-        $options['allow_alt_text_field'] && $builder->add('altTexts', TranslationType::class, [
-            'required' => false,
-        ]);
+        if ($options['allow_alt_text_field']) {
+            $builder->add('altTexts', TranslationType::class, [
+                'required' => false,
+            ]);
+        }
     }
 }
