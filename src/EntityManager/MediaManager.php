@@ -111,16 +111,22 @@ class MediaManager implements MediaManagerInterface
 
             foreach ($checkVersions['ok'] as $versionId) {
                 if ('_original' !== $versionId) {
-                    $output && $output->writeln(sprintf(' - version "%s" is <fg=green>OK</>', $versionId));
+                    if ($output instanceof OutputInterface) {
+                        $output->writeln(sprintf(' - version "%s" is <fg=green>OK</>', $versionId));
+                    }
                 }
             }
 
             foreach ($checkVersions['new'] as $versionId) {
-                $output && $output->write(sprintf(' - version "%s" is new in config, needs to be created: ', $versionId));
+                if ($output instanceof OutputInterface) {
+                    $output->write(sprintf(' - version "%s" is new in config, needs to be created: ', $versionId));
+                }
                 try {
                     $version = $this->generateVersionEntity($media, $versionId);
                     $this->mediaVersionManager->saveEntity($version);
-                    $output && $output->writeln('<fg=green>CREATED</>');
+                    if ($output instanceof OutputInterface) {
+                        $output->writeln('<fg=green>CREATED</>');
+                    }
                 } catch (Exception $e) {
                     $message = sprintf('Error creating version %s', $versionId);
                     if ($output instanceof OutputInterface) {
@@ -134,13 +140,17 @@ class MediaManager implements MediaManagerInterface
 
             foreach ($checkVersions['changed'] as $versionId => $changes) {
                 $changedOptionsString = implode(', ', array_map(fn (array $v) => $v['string'], $changes));
-                $output && $output->write(sprintf(' - version "%s" needs to be recreated (%s): ', $versionId, $changedOptionsString));
+                if ($output instanceof OutputInterface) {
+                    $output->write(sprintf(' - version "%s" needs to be recreated (%s): ', $versionId, $changedOptionsString));
+                }
                 try {
                     $media->removeVersion($oldVersion = $media->getVersion($versionId));
                     $this->mediaVersionManager->deleteEntity($oldVersion);
                     $version = $this->generateVersionEntity($media, $versionId);
                     $this->mediaVersionManager->saveEntity($version);
-                    $output && $output->writeln('<fg=green>RECREATED</>');
+                    if ($output instanceof OutputInterface) {
+                        $output->writeln('<fg=green>RECREATED</>');
+                    }
                 } catch (Exception $e) {
                     $message = sprintf('Error updating version %s', $versionId);
                     if ($output instanceof OutputInterface) {
@@ -153,11 +163,15 @@ class MediaManager implements MediaManagerInterface
             }
 
             foreach ($checkVersions['delete'] as $versionId) {
-                $output && $output->write(sprintf(' - version "%s" to be deleted from database (has been deleted from config) ', $versionId));
+                if ($output instanceof OutputInterface) {
+                    $output->write(sprintf(' - version "%s" to be deleted from database (has been deleted from config) ', $versionId));
+                }
                 try {
                     $media->removeVersion($version = $media->getVersion($versionId));
                     $this->mediaVersionManager->deleteEntity($version);
-                    $output && $output->writeln('<fg=green>DELETED</>');
+                    if ($output instanceof OutputInterface) {
+                        $output->writeln('<fg=green>DELETED</>');
+                    }
                 } catch (Exception $e) {
                     $message = sprintf('Error deleting version %s', $versionId);
                     if ($output instanceof OutputInterface) {
@@ -183,13 +197,17 @@ class MediaManager implements MediaManagerInterface
                     $this->storageDriver->download($version->getUrl(), $tmpFile);
                     $version->setSha1(sha1_file($tmpFile));
                     unlink($tmpFile);
-                    $output && $output->writeln('<fg=green>Updated sha1</>');
+                    if ($output instanceof OutputInterface) {
+                        $output->writeln('<fg=green>Updated sha1</>');
+                    }
                 }
 
                 if (!$version->getFileSize()) {
                     clearstatcache(); // prevent filesize cache problems returning 0
                     $version->setFileSize(filesize($version->getUrl()));
-                    $output && $output->writeln('<fg=green>Updated file size</>');
+                    if ($output instanceof OutputInterface) {
+                        $output->writeln('<fg=green>Updated file size</>');
+                    }
                 }
 
                 $this->mediaVersionManager->saveEntity($version);

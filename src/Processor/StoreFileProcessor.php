@@ -4,6 +4,7 @@ namespace Softspring\MediaBundle\Processor;
 
 use Softspring\MediaBundle\Exception\InvalidTypeException;
 use Softspring\MediaBundle\Media\NameGeneratorProvider;
+use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
 use Softspring\MediaBundle\Storage\StorageDriverInterface;
 use Softspring\MediaBundle\Tools\Apng;
@@ -58,7 +59,7 @@ class StoreFileProcessor implements ProcessorInterface
         clearstatcache(); // prevent filesize cache problems returning 0
         $version->setFileSize(filesize($version->getUpload()->getRealPath()));
 
-        if (!$version->getMedia() || !$version->getMedia()->getType()) {
+        if (!$version->getMedia() instanceof MediaInterface || !$version->getMedia()->getType()) {
             throw new InvalidTypeException('Cannot store file for media without type');
         }
 

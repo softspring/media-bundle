@@ -8,6 +8,7 @@ use Softspring\MediaBundle\EntityManager\MediaManagerInterface;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
 use Softspring\MediaBundle\Processor\ProcessorProvider;
 use Softspring\MediaBundle\Storage\StorageDriverInterface;
+use Symfony\Component\HttpFoundation\File\File;
 
 class MediaVersionListener
 {
@@ -47,7 +48,7 @@ class MediaVersionListener
             if (!$entity instanceof MediaVersionInterface) {
                 continue;
             }
-            if ('_original' !== $entity->getVersion() || !$entity->getUpload()) {
+            if ('_original' !== $entity->getVersion() || !$entity->getUpload() instanceof File) {
                 continue;
             }
 
