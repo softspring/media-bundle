@@ -112,6 +112,13 @@ HELP;
                     ->children()
                         ->scalarNode('bucket')->end()
                         ->scalarNode('public_base_url')->defaultNull()->end()
+                        ->integerNode('delayed_deletion_days')
+                            ->defaultNull()
+                            ->validate()
+                                ->ifTrue(static fn (?int $days): bool => null !== $days && $days <= 0)
+                                ->thenInvalid('delayed_deletion_days must be a positive integer or null.')
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
 

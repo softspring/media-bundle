@@ -19,6 +19,40 @@ Media library, media versioning, media rendering, and admin media management for
 - admin media library screens
 - migration tools when type definitions change
 
+### Delayed Google Cloud Storage deletion
+
+Set `sfs_media.google_cloud_storage.delayed_deletion_days` to a positive integer to keep a removed object available at its existing URL until the configured delay has elapsed:
+
+```yaml
+sfs_media:
+    google_cloud_storage:
+        bucket: media-bucket
+        delayed_deletion_days: 90
+```
+
+The driver sets the object's `Custom-Time` to the delayed deletion date. Configure the bucket with this Google Cloud Storage lifecycle rule, without a `matchesPrefix` condition:
+
+```json
+{
+  "rule": [
+    {
+      "action": {"type": "Delete"},
+      "condition": {"daysSinceCustomTime": 0}
+    }
+  ]
+}
+```
+
+For example, save it as `lifecycle.json` and apply it with:
+
+```bash
+gcloud storage buckets update gs://media-bucket --lifecycle-file=lifecycle.json
+```
+
+Without that lifecycle rule, marked objects are not deleted automatically.
+
+This rule only affects objects with `Custom-Time` set. Ensure that no other process using the same bucket sets `Custom-Time`, or its objects will also be eligible for deletion when that time is reached.
+
 ## Armonic
 
 This package is part of [Armonic](https://softspring.es/en/armonic).

@@ -7,6 +7,7 @@ services:
             $storageClient: '@sfs_media.storage.google_cloud.storage_client'
             $bucket: '%sfs_media.storage.google_cloud_storage.bucket%'
             $publicBaseUrl: '%sfs_media.storage.google_cloud_storage.public_base_url%'
+            $delayedDeletionDays: '%sfs_media.storage.google_cloud_storage.delayed_deletion_days%'
 
     sfs_media.storage.google_cloud.storage_client:
         class: Google\Cloud\Storage\StorageClient

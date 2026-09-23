@@ -65,10 +65,12 @@ class SfsMediaExtensionTest extends TestCase
             'driver' => 'google_cloud_storage',
             'google_cloud_storage' => [
                 'bucket' => 'media-bucket',
+                'delayed_deletion_days' => 90,
             ],
         ]], $container);
 
         $this->assertSame('media-bucket', $container->getParameter('sfs_media.storage.google_cloud_storage.bucket'));
+        $this->assertSame(90, $container->getParameter('sfs_media.storage.google_cloud_storage.delayed_deletion_days'));
         $this->assertNull($container->getParameter('sfs_media.storage.filesystem.path'));
         $this->assertNull($container->getParameter('sfs_media.storage.filesystem.url'));
     }
