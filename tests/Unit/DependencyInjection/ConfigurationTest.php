@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Softspring\MediaBundle\DependencyInjection\Configuration;
 use Softspring\MediaBundle\Media\DefaultNameGenerator;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class ConfigurationTest extends TestCase
 {
@@ -22,6 +23,11 @@ class ConfigurationTest extends TestCase
             ],
             'entity_manager' => 'default',
             'driver' => 'filesystem',
+            'ffmpeg' => [
+                'binary' => 'ffmpeg',
+                'probe_binary' => 'ffprobe',
+                'timeout' => 300,
+            ],
             'media' => [
                 'class' => 'Softspring\MediaBundle\Entity\Media',
                 'find_field_name' => 'id',
@@ -100,6 +106,11 @@ class ConfigurationTest extends TestCase
             ],
             'entity_manager' => 'other_em',
             'driver' => 'filesystem',
+            'ffmpeg' => [
+                'binary' => 'ffmpeg',
+                'probe_binary' => 'ffprobe',
+                'timeout' => 300,
+            ],
             'media' => [
                 'class' => 'App\Entity\Media',
                 'find_field_name' => 'identificator',
@@ -166,5 +177,101 @@ class ConfigurationTest extends TestCase
         $this->assertSame('google_cloud_storage', $config['driver']);
         $this->assertSame('media-bucket', $config['google_cloud_storage']['bucket']);
         $this->assertNull($config['google_cloud_storage']['public_base_url']);
+    }
+
+    public function testAnimatedVersionConfig(): void
+    {
+        $configs = [
+            'sfs_media' => [
+                'ffmpeg' => [
+                    'binary' => '/usr/local/bin/ffmpeg',
+                    'probe_binary' => '/usr/local/bin/ffprobe',
+                    'timeout' => 600,
+                ],
+                'types' => [
+                    'animation' => [
+                        'upload_requirements' => [
+                            'mimeTypes' => ['image/gif'],
+                        ],
+                        'versions' => [
+                            'small' => [
+                                'type' => 'avif',
+                                'animated' => true,
+                                'scale_width' => 320,
+                                'avif_quality' => 82,
+                                'animation' => [
+                                    'fps' => 25,
+                                    'loop' => 0,
+                                    'crf' => 18,
+                                    'speed' => 6,
+                                    'keyframe_interval' => 25,
+                                    'max_duration' => 3.0,
+                                    'max_frames' => 75,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new FfmpegAvailableConfiguration(), $configs);
+
+        $this->assertSame('/usr/local/bin/ffmpeg', $config['ffmpeg']['binary']);
+        $this->assertSame('/usr/local/bin/ffprobe', $config['ffmpeg']['probe_binary']);
+        $this->assertSame(600, $config['ffmpeg']['timeout']);
+        $this->assertTrue($config['types']['animation']['versions']['small']['animated']);
+        $this->assertSame(75, $config['types']['animation']['versions']['small']['animation']['max_frames']);
+    }
+
+    public function testAnimatedVersionRequiresFfmpegAndFfprobeBinaries(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('ffmpeg (ffmpeg), ffprobe (ffprobe)');
+
+        (new Processor())->processConfiguration(new FfmpegUnavailableConfiguration(), [
+            'sfs_media' => [
+                'types' => [
+                    'animation' => [
+                        'versions' => [
+                            'small' => [
+                                'type' => 'webp',
+                                'animated' => true,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testStaticTypesDoNotRequireFfmpegBinaries(): void
+    {
+        $config = (new Processor())->processConfiguration(new FfmpegUnavailableConfiguration(), [
+            'sfs_media' => [
+                'types' => [
+                    'static' => [],
+                ],
+            ],
+        ]);
+
+        $this->assertArrayHasKey('static', $config['types']);
+    }
+}
+
+class FfmpegAvailableConfiguration extends Configuration
+{
+    protected function isExecutableAvailable(string $binary): bool
+    {
+        return true;
+    }
+}
+
+class FfmpegUnavailableConfiguration extends Configuration
+{
+    protected function isExecutableAvailable(string $binary): bool
+    {
+        return false;
     }
 }

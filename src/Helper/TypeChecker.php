@@ -31,12 +31,13 @@ class TypeChecker
 
             $changedOptions = [];
             foreach ($version->getOptions() as $option => $value) {
-                if (empty($typeConfig['versions'][$version->getVersion()][$option]) || $typeConfig['versions'][$version->getVersion()][$option] !== $value) {
-                    $configuredOption = $typeConfig['versions'][$version->getVersion()][$option] ?? null;
+                $configuredVersion = $typeConfig['versions'][$version->getVersion()];
+                $configuredOption = $configuredVersion[$option] ?? null;
+                if (!array_key_exists($option, $configuredVersion) || !self::optionsAreEqual($configuredOption, $value)) {
                     $changedOptions[$option] = [
                         'config' => $configuredOption,
                         'db' => $value,
-                        'string' => "$option: $value => $configuredOption",
+                        'string' => sprintf('%s: %s => %s', $option, self::optionToString($value), self::optionToString($configuredOption)),
                     ];
                 }
             }
@@ -61,5 +62,46 @@ class TypeChecker
         }
 
         return $checkResult;
+    }
+
+    private static function optionsAreEqual(mixed $configuredOption, mixed $databaseOption): bool
+    {
+        return self::normalizeOption($configuredOption) === self::normalizeOption($databaseOption);
+    }
+
+    private static function normalizeOption(mixed $option): mixed
+    {
+        if (!is_array($option)) {
+            return $option;
+        }
+
+        if (!array_is_list($option)) {
+            ksort($option);
+        }
+
+        return array_map(self::normalizeOption(...), $option);
+    }
+
+    private static function optionToString(mixed $option): string
+    {
+        if (is_string($option)) {
+            return $option;
+        }
+
+        if (null === $option) {
+            return 'null';
+        }
+
+        if (is_bool($option)) {
+            return $option ? 'true' : 'false';
+        }
+
+        if (is_int($option) || is_float($option)) {
+            return (string) $option;
+        }
+
+        $json = json_encode(self::normalizeOption($option), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+        return false === $json ? get_debug_type($option) : $json;
     }
 }

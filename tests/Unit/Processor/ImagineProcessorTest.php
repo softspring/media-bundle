@@ -78,6 +78,18 @@ class ImagineProcessorTest extends TestCase
         $this->assertTrue($processor->supports($version));
     }
 
+    public function testAnimatedVersionIsProcessedByFfmpegInstead(): void
+    {
+        $processor = new ImagineProcessor();
+        $originalVersion = new MediaVersion('_original');
+        $originalVersion->setFileMimeType('image/gif');
+        $version = new MediaVersion('xs');
+        $version->setOriginalVersion($originalVersion);
+        $version->setOptions(['type' => 'avif', 'animated' => true]);
+
+        $this->assertFalse($processor->supports($version));
+    }
+
     public function testNothingToProcessWhenNoUploadFile(): void
     {
         $processor = new ImagineProcessor();

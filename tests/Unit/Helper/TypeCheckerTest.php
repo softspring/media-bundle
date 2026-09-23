@@ -61,4 +61,58 @@ class TypeCheckerTest extends TestCase
             ],
         ], $result);
     }
+
+    public function testNestedOptionsAreComparedIndependentOfAssociativeKeyOrder(): void
+    {
+        $media = new Media();
+        $version = new MediaVersion('animated', $media);
+        $version->setOptions([
+            'animation' => [
+                'max_frames' => 240,
+                'max_duration' => 10,
+            ],
+        ]);
+
+        $result = TypeChecker::checkMedia($media, [
+            'versions' => [
+                'animated' => [
+                    'animation' => [
+                        'max_duration' => 10,
+                        'max_frames' => 240,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame(['animated'], $result['ok']);
+        $this->assertSame([], $result['changed']);
+    }
+
+    public function testNestedChangedOptionsHaveAReadableDescription(): void
+    {
+        $media = new Media();
+        $version = new MediaVersion('animated', $media);
+        $version->setOptions([
+            'animation' => [
+                'max_frames' => 240,
+                'max_duration' => 12,
+            ],
+        ]);
+
+        $result = TypeChecker::checkMedia($media, [
+            'versions' => [
+                'animated' => [
+                    'animation' => [
+                        'max_duration' => 10,
+                        'max_frames' => 240,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame(
+            'animation: {"max_duration":12,"max_frames":240} => {"max_duration":10,"max_frames":240}',
+            $result['changed']['animated']['animation']['string'],
+        );
+    }
 }

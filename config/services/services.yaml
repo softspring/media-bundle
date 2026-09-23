@@ -9,6 +9,9 @@ services:
             $processors: !tagged_iterator { tag: sfs_media.media_processor, default_priority_method: getPriority }
             $nameGenerators: !tagged_iterator { tag: sfs_media.name_generator, default_priority_method: getPriority }
             $typeProviders: !tagged_iterator { tag: sfs_media.media_type_provider, default_priority_method: getPriority }
+            $ffmpegBinary: '%sfs_media.ffmpeg.binary%'
+            $ffprobeBinary: '%sfs_media.ffmpeg.probe_binary%'
+            $ffmpegTimeout: '%sfs_media.ffmpeg.timeout%'
 
     _instanceof:
         Softspring\MediaBundle\Media\NameGeneratorInterface:

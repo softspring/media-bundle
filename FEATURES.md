@@ -13,7 +13,7 @@ Functional definition for `softspring/media-bundle`.
 - Registers media and media version model contracts, default entities, Doctrine mappings, and target entity resolution.
 - Supports media types for images and videos, including upload requirements, generated versions, uploaded versions, pictures, and video sets.
 - Provides storage drivers for local filesystem and Google Cloud Storage.
-- Ships processors for file copying, image resizing and conversion, file storage, and upload metadata extraction.
+- Ships processors for file copying, static image resizing and conversion, FFmpeg-backed animated image resizing and conversion, file storage, and upload metadata extraction.
 - Exposes Twig helpers to render images, pictures, videos, video sets, and media URLs.
 - Provides forms and admin screens to upload, browse, migrate, and select media entries.
 - Includes migration support when media type definitions change.
