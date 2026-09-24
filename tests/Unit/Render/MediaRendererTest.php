@@ -46,6 +46,7 @@ class MediaRendererTest extends TestCase
                     ],
                     'img' => [
                         'src_version' => 'xl',
+                        'dimensions_version' => 'l',
                     ],
                 ],
             ],
@@ -119,8 +120,11 @@ class MediaRendererTest extends TestCase
         $expectedLImg = '<img width="800" height="600" class="img-fluid" src="image.s.jpeg" alt="" />';
         $this->assertEquals($expectedLImg, $renderer->renderImage($media, 's', ['class' => 'img-fluid']));
 
-        $expectedPicture = '<picture class="img-fluid"><source media="(min-width: 200w)" srcset="https://example.com/image.l.jpeg 1x, https://example.com/image.xl.jpeg 2x" /><source media="(min-width: 200w)" srcset="image.s.jpeg" /><img width="1800" height="1600" data-example="1" src="https://example.com/image.xl.jpeg" alt="" /></picture>';
+        $expectedPicture = '<picture class="img-fluid"><source media="(min-width: 200w)" srcset="https://example.com/image.l.jpeg 1x, https://example.com/image.xl.jpeg 2x" /><source media="(min-width: 200w)" srcset="image.s.jpeg" /><img width="800" height="600" data-example="1" src="https://example.com/image.xl.jpeg" alt="" /></picture>';
         $this->assertEquals($expectedPicture, $renderer->renderPicture($media, '_default', ['class' => 'img-fluid'], ['data-example' => true]));
+
+        $expectedPicture = '<picture ><source media="(min-width: 200w)" srcset="https://example.com/image.l.jpeg 1x, https://example.com/image.xl.jpeg 2x" /><source media="(min-width: 200w)" srcset="image.s.jpeg" /><img width="400" height="300" src="https://example.com/image.xl.jpeg" alt="" /></picture>';
+        $this->assertEquals($expectedPicture, $renderer->renderPicture($media, '_default', [], ['width' => 400, 'height' => 300]));
     }
 
     public function testPictureException(): void

@@ -165,7 +165,18 @@ class MediaRenderer
             $html .= '<source '.$this->htmlAttributes($sourceAttrs).' />';
         }
 
-        $html .= $this->renderImgTag($media->getVersion($config['pictures'][$picture]['img']['src_version']), $imgAttr);
+        $imgConfig = $config['pictures'][$picture]['img'];
+        if (isset($imgConfig['dimensions_version'])) {
+            $dimensionsVersion = $media->getVersion($imgConfig['dimensions_version']);
+            if ($dimensionsVersion instanceof MediaVersionInterface) {
+                $imgAttr = array_merge([
+                    'width' => $dimensionsVersion->getWidth(),
+                    'height' => $dimensionsVersion->getHeight(),
+                ], $imgAttr);
+            }
+        }
+
+        $html .= $this->renderImgTag($media->getVersion($imgConfig['src_version']), $imgAttr);
 
         return $html.'</picture>';
     }

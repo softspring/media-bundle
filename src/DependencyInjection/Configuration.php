@@ -427,6 +427,7 @@ HELP;
                         ->addDefaultsIfNotSet()
                         ->children()
                             ->scalarNode('src_version')->defaultValue('_original')->end()
+                            ->scalarNode('dimensions_version')->end()
                         ->end()
                     ->end()
                     ->arrayNode('sources')

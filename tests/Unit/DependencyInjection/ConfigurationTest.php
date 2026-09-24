@@ -277,6 +277,29 @@ class ConfigurationTest extends TestCase
 
         $this->assertArrayHasKey('static', $config['types']);
     }
+
+    public function testPictureCanUseAnotherVersionForDisplayDimensions(): void
+    {
+        $config = (new Processor())->processConfiguration(new Configuration(), [
+            'sfs_media' => [
+                'types' => [
+                    'card' => [
+                        'pictures' => [
+                            '_default' => [
+                                'img' => [
+                                    'src_version' => 'fallback',
+                                    'dimensions_version' => 'card_avif',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame('fallback', $config['types']['card']['pictures']['_default']['img']['src_version']);
+        $this->assertSame('card_avif', $config['types']['card']['pictures']['_default']['img']['dimensions_version']);
+    }
 }
 
 class FfmpegAvailableConfiguration extends Configuration
