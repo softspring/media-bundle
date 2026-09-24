@@ -61,6 +61,22 @@ This package is part of [Armonic](https://softspring.es/en/armonic).
 
 [Armonic Documentation](https://armonic.softspring.es/latest/bundles/media-bundle)
 
+## Picture display dimensions
+
+By default, a rendered `<picture>` takes its `<img>` width and height from `img.src_version`. When that fallback has different dimensions from the responsive sources, use `img.dimensions_version` to provide the intrinsic display size without changing the fallback URL:
+
+```yaml
+pictures:
+    card:
+        sources:
+            - { srcset: [ { version: card, suffix: '1x' }, { version: card_retina, suffix: '2x' } ] }
+        img:
+            src_version: fallback
+            dimensions_version: card
+```
+
+Explicit image attributes passed to the renderer still take precedence over the configured dimensions version.
+
 ## Animated image versions
 
 Generated animated versions use `ffprobe` to validate the source and `ffmpeg` to resize and encode every frame. Both binaries must be installed in the application runtime. Processing is synchronous; applications should keep duration and frame limits conservative until background generation is available.
