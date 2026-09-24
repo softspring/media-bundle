@@ -177,6 +177,25 @@ class ConfigurationTest extends TestCase
         $this->assertSame('google_cloud_storage', $config['driver']);
         $this->assertSame('media-bucket', $config['google_cloud_storage']['bucket']);
         $this->assertNull($config['google_cloud_storage']['public_base_url']);
+        $this->assertNull($config['google_cloud_storage']['delayed_deletion_days']);
+    }
+
+    public function testGoogleCloudStorageConfigWithDelayedDeletion(): void
+    {
+        $configs = [
+            'sfs_media' => [
+                'google_cloud_storage' => [
+                    'bucket' => 'media-bucket',
+                    'delayed_deletion_days' => 90,
+                ],
+            ],
+        ];
+
+        $processor = new Processor();
+        $configuration = new Configuration();
+        $config = $processor->processConfiguration($configuration, $configs);
+
+        $this->assertSame(90, $config['google_cloud_storage']['delayed_deletion_days']);
     }
 
     public function testAnimatedVersionConfig(): void

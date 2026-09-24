@@ -2,7 +2,10 @@
 
 namespace Softspring\MediaBundle\Tests\Unit\Storage;
 
+use DateTimeImmutable;
+use Google\Cloud\Storage\Bucket;
 use Google\Cloud\Storage\StorageClient;
+use Google\Cloud\Storage\StorageObject;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Softspring\MediaBundle\Storage\GoogleCloudStorageDriver;
@@ -60,5 +63,49 @@ class GoogleCloudStorageDriverTest extends TestCase
             'https://cdn.example.com/media',
             'https://storage.googleapis.com/media-bucket',
         ];
+    }
+
+    public function testRemoveDeletesObjectImmediatelyByDefault(): void
+    {
+        $object = $this->createMock(StorageObject::class);
+        $object->expects($this->once())->method('exists')->willReturn(true);
+        $object->expects($this->once())->method('delete');
+        $object->expects($this->never())->method('update');
+
+        $bucket = $this->createMock(Bucket::class);
+        $bucket->expects($this->once())->method('object')->with('path/to/image.jpg')->willReturn($object);
+
+        $storageClient = $this->createMock(StorageClient::class);
+        $storageClient->expects($this->once())->method('bucket')->with('media-bucket')->willReturn($bucket);
+
+        $driver = new GoogleCloudStorageDriver($storageClient, 'unused-bucket');
+        $driver->remove('gs://media-bucket/path/to/image.jpg');
+    }
+
+    public function testRemoveSchedulesObjectDeletionWhenConfigured(): void
+    {
+        $before = new DateTimeImmutable();
+
+        $object = $this->createMock(StorageObject::class);
+        $object->expects($this->once())->method('exists')->willReturn(true);
+        $object->expects($this->never())->method('delete');
+        $object->expects($this->once())->method('update')->with($this->callback(function (array $metadata) use ($before): bool {
+            if (!isset($metadata['customTime'])) {
+                return false;
+            }
+
+            $customTime = new DateTimeImmutable($metadata['customTime']);
+
+            return $customTime >= $before->modify('+30 days') && $customTime <= (new DateTimeImmutable())->modify('+30 days');
+        }));
+
+        $bucket = $this->createMock(Bucket::class);
+        $bucket->expects($this->once())->method('object')->with('path/to/image.jpg')->willReturn($object);
+
+        $storageClient = $this->createMock(StorageClient::class);
+        $storageClient->expects($this->once())->method('bucket')->with('media-bucket')->willReturn($bucket);
+
+        $driver = new GoogleCloudStorageDriver($storageClient, 'unused-bucket', null, 30);
+        $driver->remove('gs://media-bucket/path/to/image.jpg');
     }
 }

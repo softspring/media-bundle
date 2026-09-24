@@ -2,12 +2,20 @@
 
 namespace Softspring\MediaBundle\Storage;
 
+use DateInterval;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Google\Cloud\Storage\StorageClient;
 use Symfony\Component\HttpFoundation\File\File;
 
 class GoogleCloudStorageDriver implements StorageDriverInterface
 {
-    public function __construct(protected StorageClient $storageClient, protected string $bucket, protected ?string $publicBaseUrl = null)
+    public function __construct(
+        protected StorageClient $storageClient,
+        protected string $bucket,
+        protected ?string $publicBaseUrl = null,
+        protected ?int $delayedDeletionDays = null,
+    )
     {
     }
 
@@ -32,9 +40,19 @@ class GoogleCloudStorageDriver implements StorageDriverInterface
         $bucket = $this->storageClient->bucket($bucket);
         $object = $bucket->object($fileName);
 
-        if ($object->exists()) {
-            $object->delete();
+        if (!$object->exists()) {
+            return;
         }
+
+        if (null === $this->delayedDeletionDays) {
+            $object->delete();
+
+            return;
+        }
+
+        $object->update([
+            'customTime' => (new DateTimeImmutable())->add(new DateInterval("P{$this->delayedDeletionDays}D"))->format(DateTimeInterface::RFC3339),
+        ]);
     }
 
     public function download(string $fileName, string $destPath): void
