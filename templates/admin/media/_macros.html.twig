@@ -42,8 +42,8 @@
                 {% if version.uploadedAt %}
                     Uploaded at: {{ version.uploadedAt|date_span('H:i:s d-m-Y') }}
                 {% elseif version.generatedAt %}
-                    <abbr title="PARAMETERS:
-{% for option,value in version.options %}{{ option }}: {{ value }}
+                        <abbr title="PARAMETERS:
+{% for option,value in version.options %}{{ option }}: {% if value is iterable %}{{ value|json_encode }}{% else %}{{ value }}{% endif %}
 {% endfor %}">Automatically generated</abbr> at: {{ version.generatedAt|date_span('H:i:s d-m-Y') }}
                 {% endif %}
             </span>

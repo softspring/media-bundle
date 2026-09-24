@@ -7,6 +7,8 @@ use Softspring\MediaBundle\Media\DefaultNameGenerator;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Process\ExecutableFinder;
 
 class Configuration implements ConfigurationInterface
 {
@@ -24,6 +26,17 @@ In docker, you can add the following lines to your Dockerfile:
     RUN apk --no-cache add libavif-dev && \
         docker-php-ext-configure gd --with-avif && \
         docker-php-ext-install gd
+HELP;
+
+    private const string HELP_FFMPEG = <<<'HELP'
+Animated media versions require executable FFmpeg and FFprobe binaries. The following configured binaries were not found or are not executable: %s.
+
+Install FFmpeg in the application runtime, for example:
+
+    $ apt install ffmpeg # Debian/Ubuntu
+    $ apk add --no-cache ffmpeg # Alpine
+
+In Docker, add the ffmpeg package to the runtime image.
 HELP;
 
     protected function getSupportedMimeTypes(): array
@@ -83,6 +96,12 @@ HELP;
                 })
                 ->thenInvalid('filesystem config block is required when driver is filesystem.')
             ->end()
+            ->validate()
+                ->ifTrue(fn (array $config): bool => [] !== $this->getMissingAnimationBinaries($config))
+                ->then(function (array $config): array {
+                    throw new InvalidConfigurationException(sprintf(self::HELP_FFMPEG, implode(', ', $this->getMissingAnimationBinaries($config))));
+                })
+            ->end()
             ->beforeNormalization()
                 ->always(function (array $config): array {
                     if (empty($config['driver'])) {
@@ -119,6 +138,15 @@ HELP;
                     ->children()
                         ->scalarNode('path')->defaultValue('%kernel.project_dir%/public/media')->end()
                         ->scalarNode('url')->defaultValue('/media')->end()
+                    ->end()
+                ->end()
+
+                ->arrayNode('ffmpeg')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('binary')->defaultValue('ffmpeg')->cannotBeEmpty()->end()
+                        ->scalarNode('probe_binary')->defaultValue('ffprobe')->cannotBeEmpty()->end()
+                        ->integerNode('timeout')->defaultValue(300)->min(1)->end()
                     ->end()
                 ->end()
 
@@ -249,6 +277,49 @@ HELP;
         return $treeBuilder;
     }
 
+    /**
+     * @return list<string>
+     */
+    protected function getMissingAnimationBinaries(array $config): array
+    {
+        if (!$this->hasAnimatedVersions($config)) {
+            return [];
+        }
+
+        $binaries = [
+            'ffmpeg' => $config['ffmpeg']['binary'] ?? 'ffmpeg',
+            'ffprobe' => $config['ffmpeg']['probe_binary'] ?? 'ffprobe',
+        ];
+
+        $missingBinaries = array_filter(
+            $binaries,
+            fn (string $binary): bool => !$this->isExecutableAvailable($binary),
+        );
+
+        return array_map(
+            fn (string $name): string => sprintf('%s (%s)', $name, $binaries[$name]),
+            array_keys($missingBinaries),
+        );
+    }
+
+    protected function isExecutableAvailable(string $binary): bool
+    {
+        return null !== (new ExecutableFinder())->find($binary);
+    }
+
+    private function hasAnimatedVersions(array $config): bool
+    {
+        foreach ($config['types'] ?? [] as $type) {
+            foreach ($type['versions'] ?? [] as $version) {
+                if ($version['animated'] ?? false) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public function getUploadRequirementsNode(): NodeDefinition
     {
         $treeBuilder = new TreeBuilder('upload_requirements');
@@ -287,9 +358,35 @@ HELP;
         $node
             ->arrayPrototype()
                 ->normalizeKeys(false)
+                ->validate()
+                    ->ifTrue(function (array $version): bool {
+                        if (empty($version['animated'])) {
+                            return isset($version['animation']);
+                        }
+
+                        if (isset($version['upload_requirements'])) {
+                            return true;
+                        }
+
+                        return isset($version['type']) && !in_array($version['type'], ['avif', 'webp', 'apng', 'keep'], true);
+                    })
+                    ->thenInvalid('Animated versions must be generated, use avif, webp, apng or keep, and set animation options only together with animated: true.')
+                ->end()
                 ->children()
                     ->append($this->getUploadRequirementsNode())
                     ->enumNode('type')->values(['jpeg', 'png', 'webp', 'keep', 'apng', 'avif'])->end()
+                    ->booleanNode('animated')->end()
+                    ->arrayNode('animation')
+                        ->children()
+                            ->integerNode('fps')->min(1)->max(120)->end()
+                            ->integerNode('loop')->min(0)->max(65535)->end()
+                            ->integerNode('crf')->min(0)->max(63)->end()
+                            ->integerNode('speed')->min(0)->max(8)->end()
+                            ->integerNode('keyframe_interval')->min(1)->end()
+                            ->floatNode('max_duration')->min(0.001)->end()
+                            ->integerNode('max_frames')->min(2)->end()
+                        ->end()
+                    ->end()
                     ->integerNode('scale_width')->end()
                     ->integerNode('scale_height')->end()
                     ->integerNode('png_compression_level')->end()

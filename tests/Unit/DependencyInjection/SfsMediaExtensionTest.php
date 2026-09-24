@@ -53,6 +53,9 @@ class SfsMediaExtensionTest extends TestCase
         $this->assertSame('uuid', $container->getParameter('sfs_media.version.find_field_name'));
         $this->assertSame('/tmp/media', $container->getParameter('sfs_media.storage.filesystem.path'));
         $this->assertSame('/uploads', $container->getParameter('sfs_media.storage.filesystem.url'));
+        $this->assertSame('ffmpeg', $container->getParameter('sfs_media.ffmpeg.binary'));
+        $this->assertSame('ffprobe', $container->getParameter('sfs_media.ffmpeg.probe_binary'));
+        $this->assertSame(300, $container->getParameter('sfs_media.ffmpeg.timeout'));
         $this->assertArrayHasKey('image', $container->getParameter('sfs_media.types'));
         $this->assertFalse($container->hasDefinition('sfs_media.admin.media.list_controller'));
     }

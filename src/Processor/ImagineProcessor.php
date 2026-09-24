@@ -37,6 +37,10 @@ class ImagineProcessor implements ProcessorInterface
             throw new Exception('Processor support method requires version options are initialized');
         }
 
+        if ($version->getOptions()['animated'] ?? false) {
+            return false;
+        }
+
         if (!in_array($version->getOriginalVersion()->getFileMimeType(), ['image/jpeg', 'image/png', 'image/apng', 'image/gif', 'image/webp', 'image/avif'])) {
             // origin type can not be other than an image
             return false;
