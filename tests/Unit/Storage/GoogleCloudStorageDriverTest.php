@@ -96,7 +96,8 @@ class GoogleCloudStorageDriverTest extends TestCase
 
             $customTime = new DateTimeImmutable($metadata['customTime']);
 
-            return $customTime >= $before->modify('+30 days') && $customTime <= (new DateTimeImmutable())->modify('+30 days');
+            return $customTime->getTimestamp() >= $before->modify('+30 days')->getTimestamp()
+                && $customTime->getTimestamp() <= (new DateTimeImmutable())->modify('+30 days')->getTimestamp();
         }));
 
         $bucket = $this->createMock(Bucket::class);

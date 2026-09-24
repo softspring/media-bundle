@@ -15,8 +15,7 @@ class GoogleCloudStorageDriver implements StorageDriverInterface
         protected string $bucket,
         protected ?string $publicBaseUrl = null,
         protected ?int $delayedDeletionDays = null,
-    )
-    {
+    ) {
     }
 
     public function store(File $file, string $destName): string
