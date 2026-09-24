@@ -88,6 +88,26 @@ class StoreFileProcessorTest extends TestCase
         $this->assertFileExists($sourcePath);
     }
 
+    public function testStoresUploadWithNullDatabaseOptions(): void
+    {
+        $storage = new StoreFileStorageDriver();
+        $sourcePath = sys_get_temp_dir().'/media-store-upload-'.uniqid().'.png';
+        copy(__DIR__.'/../../example.png', $sourcePath);
+
+        $media = new Media();
+        $media->setType('image');
+
+        $version = new MediaVersion('poster', $media);
+        $version->setUpload(new UploadedFile($sourcePath, 'example.png', null, null, true), true);
+
+        $processor = $this->createProcessor($storage);
+        $processor->process($version);
+
+        $this->assertSame([], $version->getOptions());
+        $this->assertSame('stored://generated-poster-'.basename($sourcePath), $version->getUrl());
+        $this->assertFileExists($sourcePath);
+    }
+
     private function createProcessor(StoreFileStorageDriver $storage): StoreFileProcessor
     {
         $mediaTypes = new MediaTypesCollection([new StoreFileMediaTypeProvider()]);

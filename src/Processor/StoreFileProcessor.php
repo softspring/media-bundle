@@ -44,7 +44,7 @@ class StoreFileProcessor implements ProcessorInterface
         }
 
         // clean database options
-        $databaseOptions = $version->getOptions();
+        $databaseOptions = $version->getOptions() ?? [];
         unset($databaseOptions['upload_requirements']);
         unset($databaseOptions['from']);
         $version->setOptions($databaseOptions);

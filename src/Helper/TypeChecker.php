@@ -30,7 +30,7 @@ class TypeChecker
             }
 
             $changedOptions = [];
-            foreach ($version->getOptions() as $option => $value) {
+            foreach ($version->getOptions() ?? [] as $option => $value) {
                 $configuredVersion = $typeConfig['versions'][$version->getVersion()];
                 $configuredOption = $configuredVersion[$option] ?? null;
                 if (!array_key_exists($option, $configuredVersion) || !self::optionsAreEqual($configuredOption, $value)) {

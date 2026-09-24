@@ -88,6 +88,25 @@ class TypeCheckerTest extends TestCase
         $this->assertSame([], $result['changed']);
     }
 
+    public function testVersionWithNullOptionsIsValid(): void
+    {
+        $media = new Media();
+        new MediaVersion('poster', $media);
+
+        $result = TypeChecker::checkMedia($media, [
+            'versions' => [
+                'poster' => [
+                    'upload_requirements' => [
+                        'mimeType' => ['image/jpeg'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame(['poster'], $result['ok']);
+        $this->assertSame([], $result['changed']);
+    }
+
     public function testNestedChangedOptionsHaveAReadableDescription(): void
     {
         $media = new Media();
