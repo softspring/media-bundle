@@ -114,7 +114,7 @@ class FfmpegProcessor implements ProcessorInterface
     }
 
     /**
-     * @return array{width: int, height: int, frames: int, duration: float|null, alpha: 'packed'|'stream'|null}
+     * @return array{width: int, height: int, frames: int, duration: float|null, alpha: 'packed'|'stream'|null, stream: int, alpha_stream: int|null}
      */
     protected function probeAnimation(string $path): array
     {
@@ -138,34 +138,72 @@ class FfmpegProcessor implements ProcessorInterface
     }
 
     /**
-     * @return array{width: int, height: int, frames: int, duration: float|null, alpha: 'packed'|'stream'|null}
+     * @return array{width: int, height: int, frames: int, duration: float|null, alpha: 'packed'|'stream'|null, stream: int, alpha_stream: int|null}
      *
      * @throws JsonException
      */
     protected function parseProbeOutput(string $output): array
     {
         $probe = json_decode($output, true, 512, JSON_THROW_ON_ERROR);
-        $stream = $probe['streams'][0] ?? null;
-
-        if (!is_array($stream)) {
+        $streams = $probe['streams'] ?? [];
+        if (!is_array($streams) || [] === $streams) {
             throw new RuntimeException('FFprobe did not find an image stream.');
         }
 
-        $width = filter_var($stream['width'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
-        $height = filter_var($stream['height'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
-        $frames = filter_var($stream['nb_read_frames'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+        $validStreams = [];
+        foreach ($streams as $streamIndex => $stream) {
+            if (!is_array($stream)) {
+                continue;
+            }
 
-        if (false === $frames) {
-            $frames = filter_var($stream['nb_frames'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+            $width = filter_var($stream['width'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+            $height = filter_var($stream['height'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+            $frames = filter_var($stream['nb_read_frames'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+            if (false === $frames) {
+                $frames = filter_var($stream['nb_frames'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+            }
+
+            if (in_array(false, [$width, $height, $frames], true)) {
+                continue;
+            }
+
+            $validStreams[] = [
+                'position' => $streamIndex,
+                'stream' => $stream,
+                'width' => $width,
+                'height' => $height,
+                'frames' => $frames,
+            ];
         }
 
-        if (in_array(false, [$width, $height, $frames], true)) {
+        if ([] === $validStreams) {
             throw new RuntimeException('FFprobe returned incomplete animation metadata.');
         }
 
+        $colorStreams = array_values(array_filter($validStreams, fn (array $candidate): bool => !$this->pixelFormatIsMonochrome($candidate['stream']['pix_fmt'] ?? null)));
+        $mainStream = $this->selectLongestStream([] !== $colorStreams ? $colorStreams : $validStreams);
+        $stream = $mainStream['stream'];
+        $width = $mainStream['width'];
+        $height = $mainStream['height'];
+        $frames = $mainStream['frames'];
         $durationValue = $stream['duration'] ?? $probe['format']['duration'] ?? null;
         $duration = is_numeric($durationValue) && (float) $durationValue > 0 ? (float) $durationValue : null;
-        $alpha = count($probe['streams']) > 1 ? 'stream' : null;
+
+        $alphaStream = null;
+        foreach ($validStreams as $candidate) {
+            if ($candidate['position'] === $mainStream['position']
+                || !$this->pixelFormatIsMonochrome($candidate['stream']['pix_fmt'] ?? null)
+                || $candidate['width'] !== $width
+                || $candidate['height'] !== $height
+                || $candidate['frames'] !== $frames) {
+                continue;
+            }
+
+            $alphaStream = $candidate;
+            break;
+        }
+
+        $alpha = null !== $alphaStream ? 'stream' : null;
         if (null === $alpha && $this->pixelFormatHasAlpha($stream['pix_fmt'] ?? null)) {
             $alpha = 'packed';
         }
@@ -176,7 +214,25 @@ class FfmpegProcessor implements ProcessorInterface
             'frames' => $frames,
             'duration' => $duration,
             'alpha' => $alpha,
+            'stream' => $mainStream['position'],
+            'alpha_stream' => $alphaStream['position'] ?? null,
         ];
+    }
+
+    protected function pixelFormatIsMonochrome(?string $pixelFormat): bool
+    {
+        return str_starts_with($pixelFormat ?? '', 'gray');
+    }
+
+    private function selectLongestStream(array $streams): array
+    {
+        return array_reduce($streams, static function (?array $selected, array $candidate): array {
+            if (null === $selected || $candidate['frames'] > $selected['frames']) {
+                return $candidate;
+            }
+
+            return $selected;
+        });
     }
 
     protected function pixelFormatHasAlpha(?string $pixelFormat): bool
@@ -195,7 +251,7 @@ class FfmpegProcessor implements ProcessorInterface
     }
 
     /**
-     * @param array{width: int, height: int, frames: int, duration: float|null, alpha: 'packed'|'stream'|null} $metadata
+     * @param array{width: int, height: int, frames: int, duration: float|null, alpha: 'packed'|'stream'|null, stream?: int, alpha_stream?: int|null} $metadata
      */
     protected function validateAnimation(array $metadata, array $animationOptions): void
     {
@@ -219,7 +275,7 @@ class FfmpegProcessor implements ProcessorInterface
     }
 
     /**
-     * @param array{width: int, height: int, frames: int, duration: float|null, alpha: 'packed'|'stream'|null} $metadata
+     * @param array{width: int, height: int, frames: int, duration: float|null, alpha: 'packed'|'stream'|null, stream?: int, alpha_stream?: int|null} $metadata
      *
      * @return array{int, int}
      */
@@ -254,7 +310,7 @@ class FfmpegProcessor implements ProcessorInterface
     }
 
     /**
-     * @param array{width: int, height: int, frames: int, duration: float|null, alpha: 'packed'|'stream'|null} $metadata
+     * @param array{width: int, height: int, frames: int, duration: float|null, alpha: 'packed'|'stream'|null, stream?: int, alpha_stream?: int|null} $metadata
      */
     protected function buildCommand(string $inputPath, string $outputPath, string $targetFormat, int $width, int $height, array $options, array $animationOptions, array $metadata): array
     {
@@ -275,9 +331,10 @@ class FfmpegProcessor implements ProcessorInterface
             '-sn',
         ];
         $filter = implode(',', $filters);
+        $colorInput = sprintf('0:v:%d', $metadata['stream'] ?? 0);
 
         if ('avif' === $targetFormat && 'packed' === $metadata['alpha']) {
-            $filterGraph = sprintf('[0:v:0]split=2[color_source][alpha_source];[color_source]%s,format=yuv420p,setparams=colorspace=bt709[color];[alpha_source]alphaextract,%s,format=gray,setparams=colorspace=unknown[alpha]', $filter, $filter);
+            $filterGraph = sprintf('[%s]split=2[color_source][alpha_source];[color_source]%s,format=yuv420p,setparams=colorspace=bt709[color];[alpha_source]alphaextract,%s,format=gray,setparams=colorspace=unknown[alpha]', $colorInput, $filter, $filter);
             $command[] = '-filter_complex';
             $command[] = $filterGraph;
             $command[] = '-map';
@@ -285,7 +342,8 @@ class FfmpegProcessor implements ProcessorInterface
             $command[] = '-map';
             $command[] = '[alpha]';
         } elseif ('avif' === $targetFormat && 'stream' === $metadata['alpha']) {
-            $filterGraph = sprintf('[0:v:0]%s,format=yuv420p,setparams=colorspace=bt709[color];[0:v:1]%s,format=gray,setparams=colorspace=unknown[alpha]', $filter, $filter);
+            $alphaInput = sprintf('0:v:%d', $metadata['alpha_stream'] ?? 1);
+            $filterGraph = sprintf('[%s]%s,format=yuv420p,setparams=colorspace=bt709[color];[%s]%s,format=gray,setparams=colorspace=unknown[alpha]', $colorInput, $filter, $alphaInput, $filter);
             $command[] = '-filter_complex';
             $command[] = $filterGraph;
             $command[] = '-map';
@@ -293,14 +351,15 @@ class FfmpegProcessor implements ProcessorInterface
             $command[] = '-map';
             $command[] = '[alpha]';
         } elseif ('stream' === $metadata['alpha']) {
-            $filterGraph = sprintf('[0:v:0]%s[color];[0:v:1]%s[alpha];[color][alpha]alphamerge[output]', $filter, $filter);
+            $alphaInput = sprintf('0:v:%d', $metadata['alpha_stream'] ?? 1);
+            $filterGraph = sprintf('[%s]%s[color];[%s]%s[alpha];[color][alpha]alphamerge[output]', $colorInput, $filter, $alphaInput, $filter);
             $command[] = '-filter_complex';
             $command[] = $filterGraph;
             $command[] = '-map';
             $command[] = '[output]';
         } else {
             $command[] = '-map';
-            $command[] = '0:v:0';
+            $command[] = $colorInput;
             $command[] = '-filter:v';
             $command[] = $filter;
         }

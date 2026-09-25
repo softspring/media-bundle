@@ -217,6 +217,8 @@ class FfmpegProcessorTest extends TestCase
             'frames' => 50,
             'duration' => 2.0,
             'alpha' => 'packed',
+            'stream' => 0,
+            'alpha_stream' => null,
         ], $metadata);
     }
 
@@ -251,7 +253,60 @@ class FfmpegProcessorTest extends TestCase
             'frames' => 2,
             'duration' => 0.5,
             'alpha' => 'stream',
+            'stream' => 0,
+            'alpha_stream' => 1,
         ], $metadata);
+    }
+
+    public function testSelectsAnimatedColorStreamAfterStaticPrimaryImage(): void
+    {
+        $processor = $this->createProcessor();
+        $metadata = $processor->parseProbeJson(json_encode([
+            'streams' => [
+                [
+                    'width' => 512,
+                    'height' => 512,
+                    'nb_read_frames' => '1',
+                    'pix_fmt' => 'yuv420p',
+                    'duration' => '0.040000',
+                ],
+                [
+                    'width' => 512,
+                    'height' => 512,
+                    'nb_read_frames' => '24',
+                    'pix_fmt' => 'yuv444p',
+                    'duration' => '0.960000',
+                ],
+                [
+                    'width' => 512,
+                    'height' => 512,
+                    'nb_read_frames' => '24',
+                    'pix_fmt' => 'gray',
+                    'duration' => '0.960000',
+                ],
+            ],
+            'format' => ['duration' => '0.960000'],
+        ], JSON_THROW_ON_ERROR));
+
+        $this->assertSame([
+            'width' => 512,
+            'height' => 512,
+            'frames' => 24,
+            'duration' => 0.96,
+            'alpha' => 'stream',
+            'stream' => 1,
+            'alpha_stream' => 2,
+        ], $metadata);
+
+        $processor = $this->createProcessor(metadata: $metadata);
+        $version = $this->createVersion(['type' => 'avif', 'animated' => true], 'image/avif');
+        $inputPath = $this->temporaryDirectory.'/input-with-primary-image.avif';
+        file_put_contents($inputPath, 'animated input after static primary image');
+        $version->setUpload(new File($inputPath));
+
+        $processor->process($version);
+
+        $this->assertContains('[0:v:1]scale=512:512:flags=lanczos,format=yuv420p,setparams=colorspace=bt709[color];[0:v:2]scale=512:512:flags=lanczos,format=gray,setparams=colorspace=unknown[alpha]', $processor->command);
     }
 
     private function createProcessor(?string $outputPath = null, ?array $metadata = null): TestingFfmpegProcessor
