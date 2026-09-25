@@ -118,7 +118,26 @@ class FfmpegProcessorTest extends TestCase
 
         $this->assertCommandOption($processor->command, '-map', '[color]');
         $this->assertContains('[alpha]', $processor->command);
-        $this->assertContains('[0:v:0]split=2[color_source][alpha_source];[color_source]scale=200:100:flags=lanczos,format=yuv420p[color];[alpha_source]alphaextract,scale=200:100:flags=lanczos,format=gray[alpha]', $processor->command);
+        $this->assertContains('[0:v:0]split=2[color_source][alpha_source];[color_source]scale=200:100:flags=lanczos,format=yuv420p,setparams=colorspace=bt709[color];[alpha_source]alphaextract,scale=200:100:flags=lanczos,format=gray,setparams=colorspace=unknown[alpha]', $processor->command);
+    }
+
+    public function testSanitizesColorMetadataWhenEncodingAvifWithSeparateAlphaStream(): void
+    {
+        $processor = $this->createProcessor(metadata: [
+            'width' => 200,
+            'height' => 100,
+            'frames' => 50,
+            'duration' => 2.0,
+            'alpha' => 'stream',
+        ]);
+        $version = $this->createVersion(['type' => 'avif', 'animated' => true], 'image/avif');
+        $inputPath = $this->temporaryDirectory.'/input.avif';
+        file_put_contents($inputPath, 'animated input with separate alpha stream');
+        $version->setUpload(new File($inputPath));
+
+        $processor->process($version);
+
+        $this->assertContains('[0:v:0]scale=200:100:flags=lanczos,format=yuv420p,setparams=colorspace=bt709[color];[0:v:1]scale=200:100:flags=lanczos,format=gray,setparams=colorspace=unknown[alpha]', $processor->command);
     }
 
     public function testEncodesWebpAsIndependentFullFrames(): void
@@ -198,6 +217,40 @@ class FfmpegProcessorTest extends TestCase
             'frames' => 50,
             'duration' => 2.0,
             'alpha' => 'packed',
+        ], $metadata);
+    }
+
+    public function testParsesAnimatedAvifWithSeparateAlphaStream(): void
+    {
+        $processor = $this->createProcessor();
+        $metadata = $processor->parseProbeJson(json_encode([
+            'streams' => [
+                [
+                    'width' => 256,
+                    'height' => 256,
+                    'nb_frames' => '2',
+                    'nb_read_frames' => '2',
+                    'pix_fmt' => 'yuv444p',
+                    'duration' => '0.500000',
+                ],
+                [
+                    'width' => 256,
+                    'height' => 256,
+                    'nb_frames' => '2',
+                    'nb_read_frames' => '2',
+                    'pix_fmt' => 'gray',
+                    'duration' => '0.500000',
+                ],
+            ],
+            'format' => ['duration' => '0.500000'],
+        ], JSON_THROW_ON_ERROR));
+
+        $this->assertSame([
+            'width' => 256,
+            'height' => 256,
+            'frames' => 2,
+            'duration' => 0.5,
+            'alpha' => 'stream',
         ], $metadata);
     }
 

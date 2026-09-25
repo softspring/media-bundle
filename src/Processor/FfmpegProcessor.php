@@ -277,7 +277,7 @@ class FfmpegProcessor implements ProcessorInterface
         $filter = implode(',', $filters);
 
         if ('avif' === $targetFormat && 'packed' === $metadata['alpha']) {
-            $filterGraph = sprintf('[0:v:0]split=2[color_source][alpha_source];[color_source]%s,format=yuv420p[color];[alpha_source]alphaextract,%s,format=gray[alpha]', $filter, $filter);
+            $filterGraph = sprintf('[0:v:0]split=2[color_source][alpha_source];[color_source]%s,format=yuv420p,setparams=colorspace=bt709[color];[alpha_source]alphaextract,%s,format=gray,setparams=colorspace=unknown[alpha]', $filter, $filter);
             $command[] = '-filter_complex';
             $command[] = $filterGraph;
             $command[] = '-map';
@@ -285,7 +285,7 @@ class FfmpegProcessor implements ProcessorInterface
             $command[] = '-map';
             $command[] = '[alpha]';
         } elseif ('avif' === $targetFormat && 'stream' === $metadata['alpha']) {
-            $filterGraph = sprintf('[0:v:0]%s,format=yuv420p[color];[0:v:1]%s,format=gray[alpha]', $filter, $filter);
+            $filterGraph = sprintf('[0:v:0]%s,format=yuv420p,setparams=colorspace=bt709[color];[0:v:1]%s,format=gray,setparams=colorspace=unknown[alpha]', $filter, $filter);
             $command[] = '-filter_complex';
             $command[] = $filterGraph;
             $command[] = '-map';
