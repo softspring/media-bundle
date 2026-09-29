@@ -118,7 +118,7 @@ class FfmpegProcessorTest extends TestCase
 
         $this->assertCommandOption($processor->command, '-map', '[color]');
         $this->assertContains('[alpha]', $processor->command);
-        $this->assertContains('[0:v:0]split=2[color_source][alpha_source];[color_source]scale=200:100:flags=lanczos,format=yuv420p,setparams=colorspace=bt709[color];[alpha_source]alphaextract,scale=200:100:flags=lanczos,format=gray,setparams=colorspace=unknown[alpha]', $processor->command);
+        $this->assertContains('[0:v:0]format=rgba,split=2[color_source][alpha_source];[color_source]scale=200:100:flags=lanczos,format=yuv420p,setparams=colorspace=bt709[color];[alpha_source]alphaextract,scale=200:100:flags=lanczos,format=gray,setparams=colorspace=unknown[alpha]', $processor->command);
     }
 
     public function testSanitizesColorMetadataWhenEncodingAvifWithSeparateAlphaStream(): void

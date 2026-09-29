@@ -334,7 +334,10 @@ class FfmpegProcessor implements ProcessorInterface
         $colorInput = sprintf('0:v:%d', $metadata['stream'] ?? 0);
 
         if ('avif' === $targetFormat && 'packed' === $metadata['alpha']) {
-            $filterGraph = sprintf('[%s]split=2[color_source][alpha_source];[color_source]%s,format=yuv420p,setparams=colorspace=bt709[color];[alpha_source]alphaextract,%s,format=gray,setparams=colorspace=unknown[alpha]', $colorInput, $filter, $filter);
+            // Normalize packed alpha before splitting. Without an explicit
+            // format FFmpeg cannot negotiate alphaextract for inputs such as
+            // 16-bit RGBA APNG (rgba64be).
+            $filterGraph = sprintf('[%s]format=rgba,split=2[color_source][alpha_source];[color_source]%s,format=yuv420p,setparams=colorspace=bt709[color];[alpha_source]alphaextract,%s,format=gray,setparams=colorspace=unknown[alpha]', $colorInput, $filter, $filter);
             $command[] = '-filter_complex';
             $command[] = $filterGraph;
             $command[] = '-map';
