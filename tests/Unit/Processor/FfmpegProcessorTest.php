@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Softspring\MediaBundle\Entity\MediaVersion;
 use Softspring\MediaBundle\Processor\FfmpegProcessor;
+use Softspring\MediaBundle\Processor\WebpAnimationNormalizer;
 use Symfony\Component\HttpFoundation\File\File;
 
 class FfmpegProcessorTest extends TestCase
@@ -142,7 +143,9 @@ class FfmpegProcessorTest extends TestCase
 
     public function testEncodesWebpAsIndependentFullFrames(): void
     {
-        $processor = $this->createProcessor($this->temporaryDirectory.'/result.webp');
+        $normalizer = new TestingWebpAnimationNormalizer();
+        $outputPath = $this->temporaryDirectory.'/result.webp';
+        $processor = $this->createProcessor($outputPath, webpAnimationNormalizer: $normalizer);
         $version = $this->createVersion([
             'type' => 'webp',
             'animated' => true,
@@ -157,6 +160,7 @@ class FfmpegProcessorTest extends TestCase
         $this->assertCommandOption($processor->command, '-c:v', 'libwebp');
         $this->assertNotContains('libwebp_anim', $processor->command);
         $this->assertCommandOption($processor->command, '-quality', '85');
+        $this->assertSame([$outputPath], $normalizer->normalizedPaths);
     }
 
     public function testRejectsStaticImages(): void
@@ -177,6 +181,28 @@ class FfmpegProcessorTest extends TestCase
         $this->expectExceptionMessage('The uploaded image is not animated.');
 
         $processor->process($version);
+    }
+
+    public function testRemovesGeneratedWebpWhenNormalizationFails(): void
+    {
+        $normalizer = new TestingWebpAnimationNormalizer();
+        $normalizer->exception = new RuntimeException('Invalid animated WebP.');
+        $outputPath = $this->temporaryDirectory.'/result.webp';
+        $processor = $this->createProcessor($outputPath, webpAnimationNormalizer: $normalizer);
+        $version = $this->createVersion(['type' => 'webp', 'animated' => true]);
+        $inputPath = $this->temporaryDirectory.'/input.webp';
+        file_put_contents($inputPath, 'animated input');
+        $version->setUpload(new File($inputPath));
+
+        try {
+            $processor->process($version);
+            $this->fail('Invalid animated WebP output must be rejected.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame('Invalid animated WebP.', $exception->getMessage());
+        }
+
+        $this->assertFileDoesNotExist($outputPath);
+        $this->assertFileExists($inputPath);
     }
 
     public function testRejectsAnimationOverConfiguredFrameLimit(): void
@@ -309,12 +335,13 @@ class FfmpegProcessorTest extends TestCase
         $this->assertContains('[0:v:1]scale=512:512:flags=lanczos,format=yuv420p,setparams=colorspace=bt709[color];[0:v:2]scale=512:512:flags=lanczos,format=gray,setparams=colorspace=unknown[alpha]', $processor->command);
     }
 
-    private function createProcessor(?string $outputPath = null, ?array $metadata = null): TestingFfmpegProcessor
+    private function createProcessor(?string $outputPath = null, ?array $metadata = null, ?TestingWebpAnimationNormalizer $webpAnimationNormalizer = null): TestingFfmpegProcessor
     {
         return new TestingFfmpegProcessor(
             '/usr/local/bin/ffmpeg',
             '/usr/local/bin/ffprobe',
             12,
+            $webpAnimationNormalizer ?? new TestingWebpAnimationNormalizer(),
             $outputPath ?? $this->temporaryDirectory.'/result.avif',
             $metadata ?? [
                 'width' => 200,
@@ -355,10 +382,11 @@ class TestingFfmpegProcessor extends FfmpegProcessor
         string $ffmpegBinary,
         string $ffprobeBinary,
         int $ffmpegTimeout,
+        WebpAnimationNormalizer $webpAnimationNormalizer,
         private readonly string $outputPath,
         private readonly array $metadata,
     ) {
-        parent::__construct($ffmpegBinary, $ffprobeBinary, $ffmpegTimeout);
+        parent::__construct($ffmpegBinary, $ffprobeBinary, $ffmpegTimeout, $webpAnimationNormalizer);
     }
 
     public function parseProbeJson(string $output): array
@@ -380,5 +408,21 @@ class TestingFfmpegProcessor extends FfmpegProcessor
     {
         $this->command = $command;
         file_put_contents($this->outputPath, 'encoded animation');
+    }
+}
+
+class TestingWebpAnimationNormalizer extends WebpAnimationNormalizer
+{
+    public array $normalizedPaths = [];
+
+    public ?RuntimeException $exception = null;
+
+    public function normalizeFullFrames(string $path): void
+    {
+        $this->normalizedPaths[] = $path;
+
+        if ($this->exception instanceof RuntimeException) {
+            throw $this->exception;
+        }
     }
 }

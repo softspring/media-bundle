@@ -34,6 +34,7 @@ class FfmpegProcessor implements ProcessorInterface
         protected string $ffmpegBinary,
         protected string $ffprobeBinary,
         protected int $ffmpegTimeout,
+        protected WebpAnimationNormalizer $webpAnimationNormalizer,
     ) {
     }
 
@@ -95,6 +96,10 @@ class FfmpegProcessor implements ProcessorInterface
 
         try {
             $this->runFfmpeg($command);
+
+            if ('webp' === $targetFormat) {
+                $this->webpAnimationNormalizer->normalizeFullFrames($outputPath);
+            }
 
             $outputSize = is_file($outputPath) ? filesize($outputPath) : false;
             if (false === $outputSize || 0 === $outputSize) {
