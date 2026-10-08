@@ -32,13 +32,12 @@ class MediaRenderer
             }
 
             return '';
-        } else {
-            if (!$mediaVersion = $media->getVersion($version)) {
-                return '';
-            }
-
-            return $this->getFinalUrl($mediaVersion);
         }
+        if (!$mediaVersion = $media->getVersion($version)) {
+            return '';
+        }
+
+        return $this->getFinalUrl($mediaVersion);
     }
 
     public function mediaVersionUrl(?MediaVersionInterface $version): ?string
@@ -100,18 +99,17 @@ class MediaRenderer
             }
 
             return '';
-        } else {
-            if (!$mediaVersion = $media->getVersion($version)) {
-                return '';
-            }
-
-            // it could be the poster
-            if (str_starts_with($mediaVersion->getFileMimeType(), 'image/')) {
-                return $this->renderImgTag($mediaVersion, $attr);
-            }
-
-            return $this->renderVideoTag($mediaVersion, $attr);
         }
+        if (!$mediaVersion = $media->getVersion($version)) {
+            return '';
+        }
+
+        // it could be the poster
+        if (str_starts_with($mediaVersion->getFileMimeType(), 'image/')) {
+            return $this->renderImgTag($mediaVersion, $attr);
+        }
+
+        return $this->renderVideoTag($mediaVersion, $attr);
     }
 
     public function renderImage(MediaInterface|string|null $media, $version, array $attr = []): string
@@ -130,13 +128,12 @@ class MediaRenderer
             }
 
             return '';
-        } else {
-            if (!$mediaVersion = $media->getVersion($version)) {
-                return '';
-            }
-
-            return $this->renderImgTag($mediaVersion, $attr);
         }
+        if (!$mediaVersion = $media->getVersion($version)) {
+            return '';
+        }
+
+        return $this->renderImgTag($mediaVersion, $attr);
     }
 
     /**

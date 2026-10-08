@@ -72,6 +72,7 @@ class GoogleCloudStorageDriver implements StorageDriverInterface
 
         if ($filePath && null !== $publicBaseUrl && 'null' !== strtolower($publicBaseUrl)) {
             $publicBaseUrl = rtrim($publicBaseUrl, '/');
+
             return "$publicBaseUrl/$filePath";
         }
 
