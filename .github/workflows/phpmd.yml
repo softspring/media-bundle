@@ -27,11 +27,12 @@ jobs:
             -   name: Setup PHP and PHPMD
                 uses: shivammathur/setup-php@v2
                 with:
+                    php-version: '8.4'
                     coverage: none
-                    tools: phpmd
+                    tools: phpmd:3.0.0
 
             -   name: Run PHPMD
-                run: phpmd src sarif .phpmd.xml.dist --reportfile phpmd-results.sarif
+                run: phpmd analyze src --format sarif --ruleset .phpmd.xml.dist --reportfile-sarif phpmd-results.sarif --threads 2 --no-progress
                 continue-on-error: true
 
             -   name: Validate SARIF report
