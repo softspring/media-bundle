@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Softspring\MediaBundle\Migrations;
 
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
@@ -19,7 +18,8 @@ final class Version20260728113500 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        if ($this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+        // DBAL 2 uses PostgreSqlPlatform; DBAL 3/4 use PostgreSQLPlatform.
+        if (is_a($this->connection->getDatabasePlatform(), 'Doctrine\\DBAL\\Platforms\\PostgreSQLPlatform')) {
             $this->addSql(
                 <<<'SQL'
                     DELETE FROM media_version AS mv_duplicate
@@ -67,7 +67,8 @@ final class Version20260728113500 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        if ($this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+        // DBAL 2 uses PostgreSqlPlatform; DBAL 3/4 use PostgreSQLPlatform.
+        if (is_a($this->connection->getDatabasePlatform(), 'Doctrine\\DBAL\\Platforms\\PostgreSQLPlatform')) {
             $this->addSql(sprintf('DROP INDEX %s', self::UNIQUE_INDEX));
 
             return;
