@@ -45,8 +45,11 @@ class StoreFileProcessor implements ProcessorInterface
 
         // clean database options
         $databaseOptions = $version->getOptions() ?? [];
+        $manualUpload = isset($databaseOptions['upload_requirements']);
         unset($databaseOptions['upload_requirements']);
-        unset($databaseOptions['from']);
+        if ('_original' === $version->getVersion() || $manualUpload) {
+            unset($databaseOptions['from']);
+        }
         $version->setOptions($databaseOptions);
 
         if ('image/png' == $upload->getMimeType() && Apng::is($upload->getRealPath())) {

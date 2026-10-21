@@ -1,0 +1,111 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Softspring\MediaBundle\Tests\Unit\Processor;
+
+use Imagine\Gd\Imagine as GdImagine;
+use Imagine\Image\Box;
+use Imagine\Image\ImageInterface;
+use Imagine\Image\ImagineInterface;
+use Imagine\Imagick\Imagine as ImagickImagine;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
+use Softspring\MediaBundle\Entity\MediaVersion;
+use Softspring\MediaBundle\Processor\ImagineProcessor;
+use Symfony\Component\HttpFoundation\File\File;
+
+final class ImagineDriverProcessorTest extends TestCase
+{
+    private array $files = [];
+
+    protected function tearDown(): void
+    {
+        foreach (array_unique($this->files) as $file) {
+            if (is_file($file)) {
+                unlink($file);
+            }
+        }
+    }
+
+    private function version(array $options): MediaVersion
+    {
+        $file = tempnam(sys_get_temp_dir(), 'imagine-driver-test-');
+        $this->files[] = $file;
+        $file .= '.jpg';
+        $this->files[] = $file;
+        copy(__DIR__.'/resources/energy.250x141.96ppi.jpg', $file);
+        $original = new MediaVersion('_original');
+        $original->setFileMimeType('image/jpeg');
+        $original->setWidth(250);
+        $original->setHeight(141);
+        $version = new MediaVersion('small');
+        $version->setOriginalVersion($original);
+        $version->setUpload(new File($file));
+        $version->setOptions($options);
+
+        return $version;
+    }
+
+    public function testDefaultAndExplicitDriversActuallyEncodeFiles(): void
+    {
+        foreach ([null, 'imagick', 'gd'] as $driver) {
+            foreach (['png', 'webp', 'avif'] as $format) {
+                $options = ['type' => $format, 'scale_width' => 100, 'avif_quality' => 90, 'webp_quality' => 82];
+                if (null !== $driver) {
+                    $options['imagine_driver'] = $driver;
+                }
+                $version = $this->version($options);
+                (new ImagineProcessor())->process($version);
+                $file = $version->getUpload()->getRealPath();
+                $this->files[] = $file;
+                $size = getimagesize($file);
+                self::assertSame(100, $size[0]);
+                self::assertSame(56, $size[1]);
+                self::assertSame('image/'.$format, $size['mime']);
+                self::assertGreaterThan(0, filesize($file));
+            }
+        }
+    }
+
+    public function testConfiguredDriverAndResamplingFilterArePassedToImagine(): void
+    {
+        $image = $this->createMock(ImageInterface::class);
+        $image->expects(self::once())->method('resize')->with(self::callback(static fn ($size): bool => 100 === $size->getWidth() && 56 === $size->getHeight()), ImageInterface::FILTER_MITCHELL)->willReturnSelf();
+        $image->method('getSize')->willReturnOnConsecutiveCalls(new Box(250, 141), new Box(100, 56), new Box(100, 56));
+        $image->expects(self::once())->method('save')->with(self::anything(), self::callback(static fn (array $options): bool => !isset($options['imagine_driver']) && 'jpeg' === $options['format']));
+        $imagine = $this->createMock(ImagineInterface::class);
+        $imagine->expects(self::once())->method('open')->willReturn($image);
+        $processor = new class($imagine) extends ImagineProcessor {
+            public ?string $selectedDriver = null;
+
+            public function __construct(private ImagineInterface $imagine)
+            {
+            }
+
+            protected function createImagine(string $driver): ImagineInterface
+            {
+                $this->selectedDriver = $driver;
+
+                return $this->imagine;
+            }
+        };
+        $version = $this->version(['type' => 'jpeg', 'imagine_driver' => 'imagick', 'scale_width' => 100, 'resampling-filter' => ImageInterface::FILTER_MITCHELL]);
+        $processor->process($version);
+        self::assertSame('imagick', $processor->selectedDriver);
+    }
+
+    public function testFactoryUsesCorrectEngineAndRejectsUnknownDrivers(): void
+    {
+        $processor = new class extends ImagineProcessor {
+            public function engine(string $driver): ImagineInterface
+            {
+                return $this->createImagine($driver);
+            }
+        };
+        self::assertInstanceOf(ImagickImagine::class, $processor->engine('imagick'));
+        self::assertInstanceOf(GdImagine::class, $processor->engine('gd'));
+        $this->expectException(InvalidArgumentException::class);
+        $processor->engine('invalid');
+    }
+}

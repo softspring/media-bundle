@@ -2,6 +2,7 @@
 
 namespace Softspring\MediaBundle\DependencyInjection;
 
+use Imagick;
 use Imagine\Image\ImageInterface;
 use Softspring\MediaBundle\Media\DefaultNameGenerator;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
@@ -53,16 +54,20 @@ HELP;
             ],
         ];
 
-        if (function_exists('imagegif') && function_exists('imagecreatefromgif') && ($supportedTypes['versionTypeExtensions'][] = 'gif')) {
+        if (function_exists('imagegif') && function_exists('imagecreatefromgif')) {
+            $supportedTypes['versionTypeExtensions'][] = 'gif';
             $supportedTypes['mime'][] = 'image/gif';
         }
-        if (function_exists('imagejpeg') && function_exists('imagecreatefromjpeg') && ($supportedTypes['versionTypeExtensions'][] = 'jpeg')) {
+        if (function_exists('imagejpeg') && function_exists('imagecreatefromjpeg')) {
+            $supportedTypes['versionTypeExtensions'][] = 'jpeg';
             $supportedTypes['mime'][] = 'image/jpeg';
         }
-        if (function_exists('imagewebp') && function_exists('imagecreatefromwebp') && ($supportedTypes['versionTypeExtensions'][] = 'webp')) {
+        if (function_exists('imagewebp') && function_exists('imagecreatefromwebp')) {
+            $supportedTypes['versionTypeExtensions'][] = 'webp';
             $supportedTypes['mime'][] = 'image/webp';
         }
-        if (function_exists('imageavif') && function_exists('imagecreatefromavif') && ($supportedTypes['versionTypeExtensions'][] = 'avif')) {
+        if (function_exists('imageavif') && function_exists('imagecreatefromavif')) {
+            $supportedTypes['versionTypeExtensions'][] = 'avif';
             $supportedTypes['mime'][] = 'image/avif';
         }
         if (function_exists('imagepng') && function_exists('imagecreatefrompng')) {
@@ -71,6 +76,15 @@ HELP;
             $supportedTypes['mime'][] = 'image/png';
             $supportedTypes['mime'][] = 'image/apng';
         }
+
+        if ($this->isImagineDriverAvailable('imagick')) {
+            foreach ($this->getImagineDriverFormats('imagick') as $format) {
+                $supportedTypes['versionTypeExtensions'][] = $format;
+                $supportedTypes['mime'][] = 'image/'.$format;
+            }
+        }
+        $supportedTypes['mime'] = array_values(array_unique($supportedTypes['mime']));
+        $supportedTypes['versionTypeExtensions'] = array_values(array_unique($supportedTypes['versionTypeExtensions']));
 
         return $supportedTypes;
     }
@@ -84,6 +98,14 @@ HELP;
         $supportedMimeTypes = $this->getSupportedMimeTypes();
 
         $rootNode
+            ->validate()
+                ->always(function (array $config): array {
+                    $config['types'] = self::fixConfigTypes($config['types'] ?? [], $config['imagine']['driver'], $config['imagine']);
+                    $this->validateImagineDrivers($config);
+
+                    return $config;
+                })
+            ->end()
             ->validate()
                 ->ifTrue(function (array $config): bool {
                     return 'google_cloud_storage' === $config['driver'] && empty($config['google_cloud_storage']);
@@ -117,7 +139,9 @@ HELP;
                 })
             ->end()
 
-            ->children()
+        ;
+
+        $rootNode->children()
                 ->scalarNode('entity_manager')
                     ->defaultValue('default')
                 ->end()
@@ -145,6 +169,16 @@ HELP;
                     ->children()
                         ->scalarNode('path')->defaultValue('%kernel.project_dir%/public/media')->end()
                         ->scalarNode('url')->defaultValue('/media')->end()
+                    ->end()
+                ->end()
+
+                ->arrayNode('imagine')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->enumNode('driver')->values(['gd', 'imagick'])->defaultValue('imagick')->end()
+                        ->booleanNode('allow_upscale')->defaultFalse()->end()
+                        ->floatNode('resize_tolerance')->min(0)->max(1)->defaultValue(0.02)->end()
+                        ->booleanNode('preserve_original_encoding')->defaultTrue()->end()
                     ->end()
                 ->end()
 
@@ -263,6 +297,10 @@ HELP;
                         ->end()
 
                         ->children()
+                            ->enumNode('imagine_driver')->values(['gd', 'imagick'])->end()
+                            ->booleanNode('allow_upscale')->end()
+                            ->floatNode('resize_tolerance')->min(0)->max(1)->end()
+                            ->booleanNode('preserve_original_encoding')->end()
                             ->enumNode('type')
                                 ->values(['video', 'image'])
                                 ->defaultValue('image')
@@ -314,6 +352,63 @@ HELP;
         return null !== (new ExecutableFinder())->find($binary);
     }
 
+    protected function isImagineDriverAvailable(string $driver): bool
+    {
+        return extension_loaded($driver) && ('imagick' !== $driver || class_exists(Imagick::class));
+    }
+
+    /** @return list<string> */
+    protected function getImagineDriverFormats(string $driver): array
+    {
+        if (!$this->isImagineDriverAvailable($driver)) {
+            return [];
+        }
+        $formats = [];
+        foreach (['jpeg', 'png', 'gif', 'webp', 'avif'] as $format) {
+            $supported = 'imagick' === $driver
+                ? [] !== Imagick::queryFormats(strtoupper($format))
+                : 2 === count(array_filter(['image'.$format, 'imagecreatefrom'.$format], 'function_exists'));
+            if ($supported) {
+                $formats[] = $format;
+                if ('png' === $format) {
+                    $formats[] = 'apng';
+                }
+            }
+        }
+
+        return $formats;
+    }
+
+    private function validateImagineDrivers(array $config): void
+    {
+        $formats = [];
+        foreach ($config['types'] ?? [] as $typeName => $type) {
+            foreach ($type['versions'] ?? [] as $versionName => $version) {
+                if (!isset($version['imagine_driver'])) {
+                    continue;
+                }
+                $driver = $version['imagine_driver'];
+                if (!$this->isImagineDriverAvailable($driver)) {
+                    throw new InvalidConfigurationException(sprintf('Media version "%s.%s" requires the "%s" Imagine driver. Install and enable ext-%s or configure another imagine_driver.', $typeName, $versionName, $driver, $driver));
+                }
+                $formats[$driver] ??= $this->getImagineDriverFormats($driver);
+                $requiredFormats = 'keep' === $version['type'] ? [] : [$version['type']];
+                $sourceConfig = $type['versions'][$version['from']] ?? [];
+                $sourceMimeTypes = $sourceConfig['upload_requirements']['mimeTypes'] ?? $type['upload_requirements']['mimeTypes'] ?? [];
+                foreach ($sourceMimeTypes as $mime) {
+                    if (in_array($mime, ['image/jpeg', 'image/png', 'image/apng', 'image/gif', 'image/webp', 'image/avif'], true)) {
+                        $requiredFormats[] = substr($mime, 6);
+                    }
+                }
+                foreach (array_unique($requiredFormats) as $format) {
+                    if (!in_array($format, $formats[$driver], true)) {
+                        throw new InvalidConfigurationException(sprintf('Media version "%s.%s": Imagine driver "%s" does not support "%s". Install the corresponding image codec (ImageMagick AVIF requires libheif/HEIC support), or override imagine_driver for this type/version.', $typeName, $versionName, $driver, $format));
+                    }
+                }
+            }
+        }
+    }
+
     private function hasAnimatedVersions(array $config): bool
     {
         foreach ($config['types'] ?? [] as $type) {
@@ -347,9 +442,9 @@ HELP;
                 ->booleanNode('allowLandscape')->end()
                 ->booleanNode('allowPortrait')->end()
                 ->booleanNode('detectCorrupted')->end()
-                ->arrayNode('mimeTypes')->scalarPrototype()->end()->end()
                 ->scalarNode('maxSize')->end()
                 ->booleanNode('binaryFormat')->end()
+                ->arrayNode('mimeTypes')->scalarPrototype()->end()->end()
             ->end()
         ;
 
@@ -362,9 +457,13 @@ HELP;
 
         $node = $treeBuilder->getRootNode();
 
-        $node
-            ->arrayPrototype()
+        $versionNode = $node->arrayPrototype();
+        $versionNode
                 ->normalizeKeys(false)
+                ->validate()
+                    ->ifTrue(static fn (array $version): bool => [] !== array_intersect_key($version, array_flip(['imagine_driver', 'allow_upscale', 'resize_tolerance', 'preserve_original_encoding'])) && (isset($version['upload_requirements']) || ($version['animated'] ?? false)))
+                    ->thenInvalid('Imagine options can only be set on static generated image versions, not uploaded or animated versions.')
+                ->end()
                 ->validate()
                     ->ifTrue(function (array $version): bool {
                         if (empty($version['animated'])) {
@@ -379,7 +478,13 @@ HELP;
                     })
                     ->thenInvalid('Animated versions must be generated, use avif, webp, apng or keep, and set animation options only together with animated: true.')
                 ->end()
-                ->children()
+        ;
+
+        $versionNode->children()
+                    ->enumNode('imagine_driver')->values(['gd', 'imagick'])->end()
+                    ->booleanNode('allow_upscale')->end()
+                    ->floatNode('resize_tolerance')->min(0)->max(1)->end()
+                    ->booleanNode('preserve_original_encoding')->end()
                     ->append($this->getUploadRequirementsNode())
                     ->enumNode('type')->values(['jpeg', 'png', 'webp', 'keep', 'apng', 'avif'])->end()
                     ->booleanNode('animated')->end()
@@ -489,16 +594,29 @@ HELP;
      * Update config types, this can not be done in processors because it would be not used to compare with database versions.
      * Also, can not be set in configuration as default values, because is exclusive for some types.
      */
-    public static function fixConfigTypes(?array $types = null): ?array
+    public static function fixConfigTypes(?array $types = null, string $defaultImagineDriver = 'imagick', array $defaultPolicy = []): ?array
     {
         if (null === $types) {
             return null;
         }
 
+        $policy = array_replace(['allow_upscale' => false, 'resize_tolerance' => 0.02, 'preserve_original_encoding' => true], array_intersect_key($defaultPolicy, array_flip(['allow_upscale', 'resize_tolerance', 'preserve_original_encoding'])));
         foreach ($types as $type => $config) {
+            $types[$type]['imagine_driver'] = $config['imagine_driver'] ?? $defaultImagineDriver;
+            foreach ($policy as $option => $default) {
+                $types[$type][$option] = $config[$option] ?? $default;
+            }
             if ('image' === $config['type']) {
                 foreach ($config['versions'] as $version => $versionConfig) {
                     if (!isset($versionConfig['upload_requirements'])) {
+                        if (!($versionConfig['animated'] ?? false)) {
+                            $types[$type]['versions'][$version]['imagine_driver'] = $versionConfig['imagine_driver'] ?? $types[$type]['imagine_driver'];
+                            foreach (array_keys($policy) as $option) {
+                                $types[$type]['versions'][$version][$option] = $versionConfig[$option] ?? $types[$type][$option];
+                            }
+                        } else {
+                            unset($types[$type]['versions'][$version]['imagine_driver']);
+                        }
                         if (empty($versionConfig['type'])) {
                             $types[$type]['versions'][$version]['type'] = 'keep';
                         }

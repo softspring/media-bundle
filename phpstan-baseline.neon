@@ -13,10 +13,6 @@ parameters:
             path: src/DependencyInjection/Configuration.php
             reportUnmatched: false
         -
-            message: "#Right side of && is always true.#"
-            count: 4
-            path: src/DependencyInjection/Configuration.php
-        -
             message: "#^Parameter \\#1 \\$func of method Doctrine\\\\Common\\\\Collections\\\\Collection\\<mixed,mixed\\>\\:\\:map\\(\\) expects Closure\\(mixed\\=\\)\\: string\\|null, Closure\\(Softspring\\\\MediaBundle\\\\Model\\\\MediaVersionInterface\\)\\: string\\|null given\\.$#"
             count: 1
             path: src/Helper/TypeChecker.php

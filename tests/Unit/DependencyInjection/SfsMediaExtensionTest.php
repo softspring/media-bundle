@@ -56,6 +56,7 @@ class SfsMediaExtensionTest extends TestCase
         $this->assertSame('ffmpeg', $container->getParameter('sfs_media.ffmpeg.binary'));
         $this->assertSame('ffprobe', $container->getParameter('sfs_media.ffmpeg.probe_binary'));
         $this->assertSame(300, $container->getParameter('sfs_media.ffmpeg.timeout'));
+        $this->assertSame('imagick', $container->getParameter('sfs_media.imagine.driver'));
         $this->assertArrayHasKey('image', $container->getParameter('sfs_media.types'));
         $this->assertFalse($container->hasDefinition('sfs_media.admin.media.list_controller'));
     }

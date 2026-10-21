@@ -19,19 +19,63 @@ Media library, media versioning, media rendering, and admin media management for
 - admin media library screens
 - migration tools when type definitions change
 
-### Create from an existing original
+### Static image processing driver
 
-The media detail screen offers a **Create from this** type dropdown. It creates a
-new media from the source's `_original`, copying its name, description and all alt
-translations. Original and generated files belong to the new media; deleting or
-editing either media does not modify the other's files or translations.
+Static generated images use Imagick by default. Override the default globally,
+per media type or per version (version > type > global):
 
-Destinations must be public image types other than the source type, satisfy the
-original's stored dimensions, orientation, ratio, pixels, MIME type and size
-requirements, and have no independently uploaded versions. The downloaded file is
-validated again against the destination's upload requirements before creation.
-Generation uses the existing synchronous processing pipeline. The POST action
-requires create/read permissions and a source-specific CSRF token.
+```yaml
+sfs_media:
+    imagine:
+        driver: imagick # imagick | gd
+        allow_upscale: false
+        resize_tolerance: 0.02
+        preserve_original_encoding: true
+    types:
+        content:
+            imagine_driver: gd
+            versions:
+                small:
+                    type: webp # inherits gd
+                    scale_width: 400
+                large:
+                    type: avif
+                    imagine_driver: imagick
+                    scale_width: 1200
+```
+
+Install `ext-imagick` and the ImageMagick codecs used by your sources and outputs.
+On Alpine, AVIF support requires `imagemagick-heic` (libheif), in addition to the
+PHP Imagick extension. Configuration checks the selected driver and its codecs;
+there is no silent fallback to GD. Set `imagine.driver: gd` to keep using GD.
+
+The resolved `imagine_driver` is stored in each static generated version's options,
+so adding or changing the effective driver is detected by the media migration
+checker, including existing versions created before this option existed. Run the
+normal media migration explicitly to regenerate files; changing configuration
+does not itself run a migration. Type/global driver changes do not affect versions
+with an explicit override. Animated FFmpeg versions and manual uploads do not
+inherit an Imagine driver. `resampling-filter` is passed to the resize operation;
+Imagick supports configurable filters, while GD keeps its native resampling.
+
+The three resize/encoding options follow the same global → type → version
+inheritance (use their names directly on a type or version). Their effective values
+are also persisted and checked for regeneration:
+
+- `allow_upscale: false` caps dimensions at the source size.
+- `resize_tolerance: 0.02` skips proportional reductions of 2% or less. For example,
+  a 1127px source requested at 1120px stays at 1127px. Set `0` for strict resizing.
+  Tolerance does not apply when both width and height are explicitly requested.
+- `preserve_original_encoding: true` keeps an independent byte-for-byte copy when
+  dimensions and format remain unchanged, unless flattening or an explicit output
+  resolution is requested. Quality settings do not force recompression in this
+  case; set this option to `false` to force encoding. Format conversions and larger
+  reductions still encode normally.
+
+Picture width descriptors use the actual generated width and duplicate widths
+within a source are removed. These options apply only to static generated images,
+not animated FFmpeg versions or manual uploads. Existing stored files are unchanged
+until a media migration/regeneration is explicitly run.
 
 ### Delayed Google Cloud Storage deletion
 
@@ -146,7 +190,21 @@ Animation options:
 - `max_duration`: reject longer source animations, in seconds.
 - `max_frames`: reject sources containing more frames.
 
-The processor only handles generated versions explicitly marked with `animated: true`. Manual versions keep their uploaded file, and regular generated images continue through the GD processor.
+The processor only handles generated versions explicitly marked with `animated: true`. Manual versions keep their uploaded file, and regular generated images use the configured Imagine driver.
+
+## Create from an existing original
+
+The media detail screen offers a **Create from this** type dropdown. It creates a
+new media from the source's `_original`, copying its name, description and all alt
+translations. Original and generated files belong to the new media; deleting or
+editing either media does not modify the other's files or translations.
+
+Destinations must be public image types other than the source type, satisfy the
+original's stored dimensions, orientation, ratio, pixels, MIME type and size
+requirements, and have no independently uploaded versions. The downloaded file is
+validated again against the destination's upload requirements before creation.
+Generation uses the existing synchronous processing pipeline. The POST action
+requires create/read permissions and a source-specific CSRF token.
 
 ## Package Files
 
