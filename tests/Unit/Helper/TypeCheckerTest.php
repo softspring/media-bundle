@@ -51,6 +51,11 @@ class TypeCheckerTest extends TestCase
                         'db' => 150,
                         'string' => 'scale_width: 150 => 100',
                     ],
+                    'scale_height' => [
+                        'config' => 200,
+                        'db' => null,
+                        'string' => 'scale_height: null => 200',
+                    ],
                 ],
             ],
             'delete' => [
@@ -133,5 +138,26 @@ class TypeCheckerTest extends TestCase
             'animation: {"max_duration":12,"max_frames":240} => {"max_duration":10,"max_frames":240}',
             $result['changed']['animated']['animation']['string'],
         );
+    }
+
+    public function testAddingChangingAndRemovingDriverOptionsTriggersRegeneration(): void
+    {
+        foreach ([[[], ['imagine_driver' => 'imagick']], [['imagine_driver' => 'gd'], ['imagine_driver' => 'imagick']], [['imagine_driver' => 'imagick'], []]] as [$stored, $configured]) {
+            $media = new Media();
+            $version = new MediaVersion('large', $media);
+            $version->setOptions($stored);
+            $result = TypeChecker::checkMedia($media, ['versions' => ['large' => $configured]]);
+            self::assertArrayHasKey('imagine_driver', $result['changed']['large']);
+        }
+    }
+
+    public function testPersistedEffectiveDriverDoesNotRegenerateAgain(): void
+    {
+        $media = new Media();
+        $version = new MediaVersion('large', $media);
+        $version->setOptions(['imagine_driver' => 'imagick']);
+        $result = TypeChecker::checkMedia($media, ['versions' => ['large' => ['imagine_driver' => 'imagick']]]);
+        self::assertSame(['large'], $result['ok']);
+        self::assertSame([], $result['changed']);
     }
 }

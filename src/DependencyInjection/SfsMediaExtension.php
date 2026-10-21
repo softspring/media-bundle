@@ -34,7 +34,8 @@ class SfsMediaExtension extends Extension implements PrependExtensionInterface
         $container->setParameter('sfs_media.media.find_field_name', $config['media']['find_field_name'] ?? null);
         $container->setParameter('sfs_media.version.class', $config['version']['class']);
         $container->setParameter('sfs_media.version.find_field_name', $config['version']['find_field_name'] ?? null);
-        $container->setParameter('sfs_media.types', Configuration::fixConfigTypes($config['types'] ?? null));
+        $container->setParameter('sfs_media.types', $config['types']);
+        $container->setParameter('sfs_media.imagine.driver', $config['imagine']['driver']);
         $container->setParameter('sfs_media.ffmpeg.binary', $config['ffmpeg']['binary']);
         $container->setParameter('sfs_media.ffmpeg.probe_binary', $config['ffmpeg']['probe_binary']);
         $container->setParameter('sfs_media.ffmpeg.timeout', $config['ffmpeg']['timeout']);

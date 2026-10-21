@@ -2,9 +2,9 @@
 
 namespace Softspring\MediaBundle\Tests\Unit\Render;
 
-use Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Exception;
 use PHPUnit\Framework\TestCase;
 use Softspring\MediaBundle\Entity\Media;
 use Softspring\MediaBundle\Entity\MediaVersion;
@@ -125,6 +125,34 @@ class MediaRendererTest extends TestCase
 
         $expectedPicture = '<picture ><source media="(min-width: 200w)" srcset="https://example.com/image.l.jpeg 1x, https://example.com/image.xl.jpeg 2x" /><source media="(min-width: 200w)" srcset="image.s.jpeg" /><img width="400" height="300" src="https://example.com/image.xl.jpeg" alt="" /></picture>';
         $this->assertEquals($expectedPicture, $renderer->renderPicture($media, '_default', [], ['width' => 400, 'height' => 300]));
+    }
+
+    public function testPictureUsesActualWidthsAndDeduplicatesCappedVersions(): void
+    {
+        $types = self::TYPES;
+        $types['background']['pictures']['_default']['sources'] = [[
+            'srcset' => [
+                ['version' => 'l', 'suffix' => '1120w'],
+                ['version' => 'xl', 'suffix' => '1800w'],
+            ],
+        ]];
+        $renderer = new MediaRenderer(
+            new MediaTypesCollection([new ConfigMediaTypeProvider($types)]),
+            new FilesystemStorageDriver('path', 'url'),
+            $this->createMock(EntityManagerInterface::class)
+        );
+        $media = $this->createMediaWithImageVersions();
+        $media->getVersion('xl')->setWidth(1127);
+        $large = new MediaVersion('l', $media);
+        $large->setUrl('https://example.com/image.l.jpeg');
+        $large->setWidth(1127);
+        $large->setHeight(295);
+
+        $html = $renderer->renderPicture($media, '_default');
+        self::assertStringContainsString('srcset="https://example.com/image.l.jpeg 1127w"', $html);
+        self::assertStringNotContainsString('1120w', $html);
+        self::assertStringNotContainsString('1800w', $html);
+        self::assertSame(1, substr_count($html, '1127w'));
     }
 
     public function testPictureException(): void

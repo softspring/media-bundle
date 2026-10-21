@@ -46,6 +46,7 @@
         "symfony/yaml": "^6.4 || ^7.4 || ^8.0"
     },
     "suggest": {
+        "ext-imagick": "Required by the default Imagine driver; configure imagine.driver: gd to use GD instead",
         "google/cloud-storage": "Required to integrate media storage in GCS",
         "softspring/crudl-controller": "Required if you want to enable admin controllers"
     },
