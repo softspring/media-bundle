@@ -159,9 +159,22 @@ class MediaRenderer
         $html = '<picture '.$this->htmlAttributes($pictureAttr).'>';
         foreach ($config['pictures'][$picture]['sources'] ?? [] as $source) {
             $sourceAttrs = $source['attrs'] ?? [];
-            $sourceAttrs['srcset'] = implode(', ', array_map(function (array $srcset) use ($media): string {
-                return $this->getFinalUrl($media->getVersion($srcset['version'])).($srcset['suffix'] ? " {$srcset['suffix']}" : '');
-            }, $source['srcset']));
+            $candidates = [];
+            foreach ($source['srcset'] as $entry) {
+                $version = $media->getVersion($entry['version']);
+                $suffix = $entry['suffix'] ?? '';
+                if (preg_match('/^\d+w$/', $suffix) && $version?->getWidth() > 0) {
+                    $suffix = $version->getWidth().'w';
+                    // Several requested sizes can resolve to the same width when upscaling is disabled.
+                    if (isset($candidates[$suffix])) {
+                        continue;
+                    }
+                    $candidates[$suffix] = $this->getFinalUrl($version).' '.$suffix;
+                } else {
+                    $candidates[] = $this->getFinalUrl($version).($suffix ? ' '.$suffix : '');
+                }
+            }
+            $sourceAttrs['srcset'] = implode(', ', $candidates);
             $html .= '<source '.$this->htmlAttributes($sourceAttrs).' />';
         }
 

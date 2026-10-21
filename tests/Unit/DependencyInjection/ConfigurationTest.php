@@ -5,8 +5,8 @@ namespace Softspring\MediaBundle\Tests\Unit\DependencyInjection;
 use PHPUnit\Framework\TestCase;
 use Softspring\MediaBundle\DependencyInjection\Configuration;
 use Softspring\MediaBundle\Media\DefaultNameGenerator;
-use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends TestCase
 {
@@ -23,6 +23,7 @@ class ConfigurationTest extends TestCase
             ],
             'entity_manager' => 'default',
             'driver' => 'filesystem',
+            'imagine' => ['driver' => 'imagick', 'allow_upscale' => false, 'resize_tolerance' => 0.02, 'preserve_original_encoding' => true],
             'ffmpeg' => [
                 'binary' => 'ffmpeg',
                 'probe_binary' => 'ffprobe',
@@ -81,20 +82,20 @@ class ConfigurationTest extends TestCase
                         ],
                         'pictures' => [
                         ],
-//            versions:
-//                _thumbnail: { type: 'jpeg', scale_width: 300, jpeg_quality: 70, resolution-x: 72, resolution-y: 72 } # admin thumbnail
-//                xs: { type: 'jpeg', scale_width: 360, jpeg_quality: 70, resolution-x: 72, resolution-y: 72 }
-//                sm: { type: 'jpeg', scale_width: 768, jpeg_quality: 70, resolution-x: 72, resolution-y: 72 }
-//                md: { type: 'jpeg', scale_width: 1024, jpeg_quality: 70, resolution-x: 72, resolution-y: 72 }
-//                xl: { type: 'jpeg', scale_width: 1280, jpeg_quality: 70, resolution-x: 72, resolution-y: 72 }
-//            pictures:
-//                _default:
-//                    sources:
-//                        - { srcset: [{ version: sm, suffix: '1x' }, { version: xs, suffix: '2x' }], attrs: { media: "(min-width: 200w)" } }
-//                        - { srcset: [{ version: sm }], attrs: { media: "(min-width: 500w)", sizes: "100vw" } }
-//                        - { srcset: [{ version: xs }], attrs: { media: "(min-width: 200w)", sizes: "50vw" } }
-//                    img:
-//                        src_version: xl
+                        //            versions:
+                        //                _thumbnail: { type: 'jpeg', scale_width: 300, jpeg_quality: 70, resolution-x: 72, resolution-y: 72 } # admin thumbnail
+                        //                xs: { type: 'jpeg', scale_width: 360, jpeg_quality: 70, resolution-x: 72, resolution-y: 72 }
+                        //                sm: { type: 'jpeg', scale_width: 768, jpeg_quality: 70, resolution-x: 72, resolution-y: 72 }
+                        //                md: { type: 'jpeg', scale_width: 1024, jpeg_quality: 70, resolution-x: 72, resolution-y: 72 }
+                        //                xl: { type: 'jpeg', scale_width: 1280, jpeg_quality: 70, resolution-x: 72, resolution-y: 72 }
+                        //            pictures:
+                        //                _default:
+                        //                    sources:
+                        //                        - { srcset: [{ version: sm, suffix: '1x' }, { version: xs, suffix: '2x' }], attrs: { media: "(min-width: 200w)" } }
+                        //                        - { srcset: [{ version: sm }], attrs: { media: "(min-width: 500w)", sizes: "100vw" } }
+                        //                        - { srcset: [{ version: xs }], attrs: { media: "(min-width: 200w)", sizes: "50vw" } }
+                        //                    img:
+                        //                        src_version: xl
                     ],
                 ],
             ],
@@ -106,6 +107,7 @@ class ConfigurationTest extends TestCase
             ],
             'entity_manager' => 'other_em',
             'driver' => 'filesystem',
+            'imagine' => ['driver' => 'imagick', 'allow_upscale' => false, 'resize_tolerance' => 0.02, 'preserve_original_encoding' => true],
             'ffmpeg' => [
                 'binary' => 'ffmpeg',
                 'probe_binary' => 'ffprobe',
@@ -124,6 +126,10 @@ class ConfigurationTest extends TestCase
                 'background' => [
                     'name' => 'Background image',
                     'type' => 'image',
+                    'imagine_driver' => 'imagick',
+                    'allow_upscale' => false,
+                    'resize_tolerance' => 0.02,
+                    'preserve_original_encoding' => true,
                     'generator' => DefaultNameGenerator::class,
                     'upload_requirements' => [
                         'minWidth' => 1280,
@@ -141,7 +147,11 @@ class ConfigurationTest extends TestCase
                             'resolution-y' => 72,
                             'resampling-filter' => 'lanczos',
                             'resolution-units' => 'ppi',
-                            'from' => '_original'
+                            'from' => '_original',
+                            'imagine_driver' => 'imagick',
+                            'allow_upscale' => false,
+                            'resize_tolerance' => 0.02,
+                            'preserve_original_encoding' => true,
                         ],
                     ],
                     'pictures' => [
