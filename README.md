@@ -19,6 +19,20 @@ Media library, media versioning, media rendering, and admin media management for
 - admin media library screens
 - migration tools when type definitions change
 
+### Create from an existing original
+
+The media detail screen offers a **Create from this** type dropdown. It creates a
+new media from the source's `_original`, copying its name, description and all alt
+translations. Original and generated files belong to the new media; deleting or
+editing either media does not modify the other's files or translations.
+
+Destinations must be public image types other than the source type, satisfy the
+original's stored dimensions, orientation, ratio, pixels, MIME type and size
+requirements, and have no independently uploaded versions. The downloaded file is
+validated again against the destination's upload requirements before creation.
+Generation uses the existing synchronous processing pipeline. The POST action
+requires create/read permissions and a source-specific CSRF token.
+
 ### Delayed Google Cloud Storage deletion
 
 Set `sfs_media.google_cloud_storage.delayed_deletion_days` to a positive integer to keep a removed object available at its existing URL until the configured delay has elapsed:
