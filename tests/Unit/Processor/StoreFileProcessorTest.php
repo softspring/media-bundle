@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Softspring\MediaBundle\Entity\Media;
 use Softspring\MediaBundle\Entity\MediaVersion;
 use Softspring\MediaBundle\Exception\InvalidTypeException;
+use Softspring\MediaBundle\Helper\TypeChecker;
 use Softspring\MediaBundle\Media\NameGeneratorInterface;
 use Softspring\MediaBundle\Media\NameGeneratorProvider;
 use Softspring\MediaBundle\Model\MediaInterface;
@@ -106,6 +107,31 @@ class StoreFileProcessorTest extends TestCase
         $this->assertSame([], $version->getOptions());
         $this->assertSame('stored://generated-poster-'.basename($sourcePath), $version->getUrl());
         $this->assertFileExists($sourcePath);
+    }
+
+    public function testGeneratedOptionsRemainStableAfterStorage(): void
+    {
+        $sourcePath = tempnam(sys_get_temp_dir(), 'media-store-generated-');
+        copy(__DIR__.'/../../example.png', $sourcePath);
+        try {
+            $media = new Media();
+            $media->setType('image');
+            $options = [
+                'from' => '_original', 'type' => 'png', 'imagine_driver' => 'imagick',
+                'allow_upscale' => false, 'resize_tolerance' => 0.02, 'preserve_original_encoding' => true,
+            ];
+            $version = new MediaVersion('large', $media);
+            $version->setOptions($options);
+            $version->setUpload(new File($sourcePath), true);
+            $this->createProcessor(new StoreFileStorageDriver())->process($version);
+
+            self::assertSame($options, $version->getOptions());
+            $check = TypeChecker::checkMedia($media, ['versions' => ['large' => $options]]);
+            self::assertSame(['large'], $check['ok']);
+            self::assertSame([], $check['changed']);
+        } finally {
+            unlink($sourcePath);
+        }
     }
 
     private function createProcessor(StoreFileStorageDriver $storage): StoreFileProcessor

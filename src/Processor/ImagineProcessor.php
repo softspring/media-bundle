@@ -3,8 +3,13 @@
 namespace Softspring\MediaBundle\Processor;
 
 use Exception;
-use Imagine\Gd\Imagine;
+use Imagine\Gd\Imagine as GdImagine;
 use Imagine\Image\Box;
+use Imagine\Image\BoxInterface;
+use Imagine\Image\ImageInterface;
+use Imagine\Image\ImagineInterface;
+use Imagine\Imagick\Imagine as ImagickImagine;
+use InvalidArgumentException;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -65,23 +70,30 @@ class ImagineProcessor implements ProcessorInterface
             return;
         }
 
-        $imagine = new Imagine();
-        $gdMedia = $imagine->open($version->getUpload()->getRealPath());
+        $imagine = $this->createImagine($options['imagine_driver'] ?? 'imagick');
+        $image = $imagine->open($version->getUpload()->getRealPath());
 
-        // scale if needed
-        $scaleWidth = $options['scale_width'] ?? null;
-        $scaleHeight = $options['scale_height'] ?? null;
-        if (null !== $scaleWidth && null === $scaleHeight) {
-            $scaleHeight = $scaleWidth * $originalVersion->getHeight() / $originalVersion->getWidth();
-        } elseif (null === $scaleWidth && null !== $scaleHeight) {
-            $scaleWidth = $scaleHeight * $originalVersion->getWidth() / $originalVersion->getHeight();
-        }
-        if ($scaleWidth && $scaleHeight) {
-            $gdMedia->resize(new Box($scaleWidth, $scaleHeight));
+        $sourceSize = $image->getSize();
+        $targetSize = $this->calculateDimensions($sourceSize, $options);
+        $resize = $targetSize->getWidth() !== $sourceSize->getWidth() || $targetSize->getHeight() !== $sourceSize->getHeight();
+
+        $version->setWidth($targetSize->getWidth());
+        $version->setHeight($targetSize->getHeight());
+
+        $sourceMime = $originalVersion->getFileMimeType() ?: $version->getUpload()->getMimeType();
+        $targetMime = 'image/'.('jpg' === $saveFormat ? 'jpeg' : $saveFormat);
+        if (!$resize && ($options['preserve_original_encoding'] ?? true) && $sourceMime === $targetMime
+            && !($options['flatten'] ?? false) && !isset($options['resolution-x']) && !isset($options['resolution-y'])) {
+            // VersionFileCopyProcessor already made an independent copy. Do not re-encode it.
+            return;
         }
 
-        $version->setWidth($gdMedia->getSize()->getWidth());
-        $version->setHeight($gdMedia->getSize()->getHeight());
+        if ($resize) {
+            $image->resize($targetSize, $options['resampling-filter'] ?? ImageInterface::FILTER_LANCZOS);
+        }
+
+        $version->setWidth($image->getSize()->getWidth());
+        $version->setHeight($image->getSize()->getHeight());
 
         // https://imagine.readthedocs.io/en/stable/usage/introduction.html#save-medias
         $validOptions = array_flip(['png_compression_level', 'webp_quality', 'flatten', 'jpeg_quality', 'resolution-units', 'resolution-x', 'resolution-y', 'resampling-filter', 'avif_quality']);
@@ -92,14 +104,50 @@ class ImagineProcessor implements ProcessorInterface
         $fileName = $version->getUpload()->getRealPath();
         $fileNameParts = explode('.', $fileName);
         $fileExtension = end($fileNameParts);
-        if (isset($options['type']) && $options['type'] !== $fileExtension) {
-            $fileNameParts[count($fileNameParts) - 1] = $options['type'];
+        if ($saveFormat !== $fileExtension) {
+            $fileNameParts[count($fileNameParts) - 1] = $saveFormat;
             $fileName = implode('.', $fileNameParts);
             touch($fileName);
             $version->setUpload(new File($fileName));
         }
 
-        $gdMedia->save($version->getUpload()->getRealPath(), $saveOptions);
+        $image->save($version->getUpload()->getRealPath(), $saveOptions);
+    }
+
+    protected function calculateDimensions(BoxInterface $source, array $options): Box
+    {
+        $width = $source->getWidth();
+        $height = $source->getHeight();
+        $requestedWidth = $options['scale_width'] ?? null;
+        $requestedHeight = $options['scale_height'] ?? null;
+        if (!$requestedWidth && !$requestedHeight) {
+            return new Box($width, $height);
+        }
+        $targetWidth = $requestedWidth ?: $requestedHeight * $width / $height;
+        $targetHeight = $requestedHeight ?: $requestedWidth * $height / $width;
+        if (!($options['allow_upscale'] ?? false)) {
+            $factor = min(1, $width / $targetWidth, $height / $targetHeight);
+            $targetWidth *= $factor;
+            $targetHeight *= $factor;
+        }
+        // Two explicit dimensions are treated as a strict shape; tolerance only applies to proportional downsizing.
+        if (!$requestedWidth || !$requestedHeight) {
+            $ratio = $targetWidth / $width;
+            if ($ratio <= 1 && 1 - $ratio <= ($options['resize_tolerance'] ?? 0.02) + 1e-12) {
+                return new Box($width, $height);
+            }
+        }
+
+        return new Box(max(1, (int) floor($targetWidth + 1e-9)), max(1, (int) floor($targetHeight + 1e-9)));
+    }
+
+    protected function createImagine(string $driver): ImagineInterface
+    {
+        return match ($driver) {
+            'gd' => new GdImagine(),
+            'imagick' => new ImagickImagine(),
+            default => throw new InvalidArgumentException(sprintf('Unsupported Imagine driver "%s".', $driver)),
+        };
     }
 
     protected function getSaveFormat(array $options, MediaVersionInterface $currentVersion): string

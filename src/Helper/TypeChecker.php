@@ -30,10 +30,16 @@ class TypeChecker
             }
 
             $changedOptions = [];
-            foreach ($version->getOptions() ?? [] as $option => $value) {
-                $configuredVersion = $typeConfig['versions'][$version->getVersion()];
+            $databaseOptions = $version->getOptions() ?? [];
+            $configuredVersion = $typeConfig['versions'][$version->getVersion()];
+            // Uploaded versions have no generated options to migrate.
+            $optionKeys = isset($configuredVersion['upload_requirements'])
+                ? array_keys($databaseOptions)
+                : array_unique([...array_keys($databaseOptions), ...array_keys($configuredVersion)]);
+            foreach ($optionKeys as $option) {
+                $value = $databaseOptions[$option] ?? null;
                 $configuredOption = $configuredVersion[$option] ?? null;
-                if (!array_key_exists($option, $configuredVersion) || !self::optionsAreEqual($configuredOption, $value)) {
+                if (!array_key_exists($option, $configuredVersion) || !array_key_exists($option, $databaseOptions) || !self::optionsAreEqual($configuredOption, $value)) {
                     $changedOptions[$option] = [
                         'config' => $configuredOption,
                         'db' => $value,
@@ -41,7 +47,6 @@ class TypeChecker
                     ];
                 }
             }
-            // TODO search for old configuration values
             if ([] !== $changedOptions) {
                 $checkResult['changed'][$version->getVersion()] = $changedOptions;
                 continue;
