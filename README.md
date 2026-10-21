@@ -192,6 +192,20 @@ Animation options:
 
 The processor only handles generated versions explicitly marked with `animated: true`. Manual versions keep their uploaded file, and regular generated images use the configured Imagine driver.
 
+## Create from an existing original
+
+The media detail screen offers a **Create from this** type dropdown. It creates a
+new media from the source's `_original`, copying its name, description and all alt
+translations. Original and generated files belong to the new media; deleting or
+editing either media does not modify the other's files or translations.
+
+Destinations must be public image types other than the source type, satisfy the
+original's stored dimensions, orientation, ratio, pixels, MIME type and size
+requirements, and have no independently uploaded versions. The downloaded file is
+validated again against the destination's upload requirements before creation.
+Generation uses the existing synchronous processing pipeline. The POST action
+requires create/read permissions and a source-specific CSRF token.
+
 ## Package Files
 
 - [Features](FEATURES.md)

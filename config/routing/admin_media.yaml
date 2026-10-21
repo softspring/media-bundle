@@ -23,6 +23,11 @@ sfs_media_admin_medias_update:
     controller: sfs_media.admin.media.controller::update
     path: /{media}/update
 
+sfs_media_admin_medias_create_from:
+    controller: Softspring\MediaBundle\Admin\CreateFromMediaController
+    path: /{media}/create-from
+    methods: [POST]
+
 sfs_media_admin_medias_delete:
     controller: sfs_media.admin.media.controller::delete
     path: /{media}/delete

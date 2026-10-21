@@ -19,6 +19,10 @@ services:
     Softspring\MediaBundle\Admin\ActionListener\:
         resource: '../../../src/Admin/ActionListener/Media*'
 
+    Softspring\MediaBundle\Admin\CreateFromMediaController:
+        public: true
+        tags: ['controller.service_arguments']
+
     sfs_media.admin.media.controller:
         class: Softspring\Component\CrudlController\Controller\CrudlController
         public: true

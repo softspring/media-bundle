@@ -1,4 +1,7 @@
 admin_medias:
+    create_from:
+        success_flash: 'Media "%name%" created from the original image.'
+        error_flash: 'The new media could not be created. The source media has not been changed.'
     modal:
         title: "Select media"
         actions:
@@ -53,6 +56,7 @@ admin_medias:
             upload.button: "Select main media"
 
     read:
+        actions.create_from.button: 'Create from this'
         meta.title: "%name%"
         title: "%name%"
         breadcrumb: "Details"
