@@ -94,11 +94,11 @@ class CreateFromMediaTest extends TestCase
     public function testPortraitAndSquareRestrictions(): void
     {
         $creator = $this->creator(['target' => ['upload_requirements' => ['allowPortrait' => false, 'allowSquare' => false]]]);
-        $source = $this->source();
-        $source->getVersion('_original')->setWidth(500);
-        self::assertSame([], $creator->getCompatibleTypes($source));
-        $source->getVersion('_original')->setWidth(600);
-        self::assertSame([], $creator->getCompatibleTypes($source));
+        foreach ([500, 600] as $width) {
+            $source = $this->source();
+            $source->getVersion('_original')->setWidth($width);
+            self::assertSame([], $creator->getCompatibleTypes($source));
+        }
     }
 
     public function testRejectsForgedIncompatibleTargetsBeforeDownloadingOrSaving(): void
