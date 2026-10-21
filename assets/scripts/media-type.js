@@ -1,4 +1,5 @@
 import {Modal} from 'bootstrap';
+import {getAllowedMediaSelections, updateMediaVersionSelectorVisibility} from './media-selection';
 
 window.addEventListener('load', (event) => {
     const mediaTypeModal = document.getElementById('mediaTypeModal');
@@ -199,11 +200,35 @@ window.addEventListener('load', (event) => {
         const mediaInput = document.getElementById(mediaTypeModal.clickedButton.dataset.mediaTypeField);
         const mediaInputWidget = document.getElementById(mediaTypeModal.clickedButton.dataset.mediaTypeField + '_widget');
         const versionSelector = document.querySelector('[data-media-type-select-version][data-media-type-field=' + mediaInput.id + ']');
+        const choices = getAllowedMediaSelections(selectedMedia, JSON.parse(mediaInput.dataset.mediaTypeConfig || '{}'));
         let versionSelect;
 
         if (versionSelector) {
+            if (!choices.length) {
+                let warning = mediaTypeModal.querySelector('[data-media-selection-error]');
+                if (!warning) {
+                    warning = document.createElement('div');
+                    warning.className = 'alert alert-warning';
+                    warning.setAttribute('data-media-selection-error', '');
+                    warning.setAttribute('role', 'alert');
+                    mediaTypeModal.querySelector('.modal-body').prepend(warning);
+                }
+                warning.textContent = 'This media has no allowed version, picture or video set for this field.';
+                return;
+            }
             versionSelect = versionSelector.nextElementSibling;
             versionSelect.innerHTML = '';
+            updateMediaVersionSelectorVisibility(versionSelector, choices.length);
+            for (const choice of choices) {
+                const item = document.createElement('li');
+                const link = document.createElement('a');
+                link.className = 'dropdown-item';
+                link.dataset.mediaVersionValue = choice.value;
+                link.href = '#';
+                link.textContent = choice.label;
+                item.append(link);
+                versionSelect.append(item);
+            }
         }
 
         // clean previews data versions
@@ -224,27 +249,6 @@ window.addEventListener('load', (event) => {
             }
             mediaInput.dataset[key] = selectedMedia.dataset[key];
 
-            // TODO show dropdown-headers
-
-            if (versionSelector) {
-                if (key.match(/^mediaImage/i)) {
-                    let versionValue = key.replace(/^mediaImage\-?/i, '');
-                    versionValue = versionValue.charAt(0).toLowerCase() + versionValue.slice(1);
-                    versionSelect.insertAdjacentHTML('beforeend', '<li><a class="dropdown-item" data-media-version-value="image#' + versionValue + '" href="#">' + versionValue + '</a></li>');
-                } else if (key.match(/^mediaVideoSet/i)) {
-                    let versionValue = key.replace(/^mediaVideoSet\-?/i, '');
-                    versionValue = versionValue.charAt(0).toLowerCase() + versionValue.slice(1);
-                    versionSelect.insertAdjacentHTML('beforeend', '<li><a class="dropdown-item" data-media-version-value="videoSet#' + versionValue + '" href="#">' + versionValue + '</a></li>');
-                } else if (key.match(/^mediaVideo/i)) {
-                    let versionValue = key.replace(/^mediaVideo\-?/i, '');
-                    versionValue = versionValue.charAt(0).toLowerCase() + versionValue.slice(1);
-                    versionSelect.insertAdjacentHTML('beforeend', '<li><a class="dropdown-item" data-media-version-value="video#' + versionValue + '" href="#">' + versionValue + '</a></li>');
-                } else if (key.match(/^mediaPicture/i)) {
-                    let versionValue = key.replace(/^mediaPicture\-?/i, '');
-                    versionValue = versionValue.charAt(0).toLowerCase() + versionValue.slice(1);
-                    versionSelect.insertAdjacentHTML('beforeend', '<li><a class="dropdown-item" data-media-version-value="picture#' + versionValue + '" href="#">' + versionValue + '</a></li>');
-                }
-            }
         }
 
         if (versionSelector) {
@@ -315,6 +319,7 @@ window.addEventListener('load', (event) => {
         if (versionSelector) {
             versionSelector.innerHTML = '';
             versionSelector.nextElementSibling.innerHTML = '';
+            updateMediaVersionSelectorVisibility(versionSelector, 0);
             const mediaVersionInput = document.getElementById(versionSelector.dataset.mediaVersionTypeField);
             mediaVersionInput.setAttribute('value', '');
             mediaVersionInput.value = '';
@@ -349,13 +354,14 @@ window.addEventListener('load', (event) => {
      */
     document.addEventListener('click', function (event) {
         if (!event.target || !event.target.hasAttribute('data-media-version-value')) return;
+        event.preventDefault();
         const selectedOption = event.target;
 
         const versionSelector = selectedOption.closest('ul').previousElementSibling;
         versionSelector.innerText = selectedOption.innerText;
 
         const mediaVersionInput = document.getElementById(versionSelector.dataset.mediaVersionTypeField);
-        mediaVersionInput.setAttribute('value', selectedOption.mediaVersionValue);
+        mediaVersionInput.setAttribute('value', selectedOption.dataset.mediaVersionValue);
         mediaVersionInput.value = selectedOption.dataset.mediaVersionValue;
 
         // dispatches media version selected event
@@ -541,4 +547,3 @@ function initDropZone(dropZone) {
         }
     }
 }
-
