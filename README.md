@@ -19,6 +19,17 @@ Media library, media versioning, media rendering, and admin media management for
 - admin media library screens
 - migration tools when type definitions change
 
+### Configured media selections
+
+Media fields restrict both their modal choices and submitted values to
+`media_types`. For example, `content: { picture: two_columns }` exposes only
+`picture#two_columns`, not raw image versions or other picture sets. Image,
+video, picture and video-set choices follow the configured order and must exist
+on the selected media. The version selector is hidden for zero or one choice.
+Existing invalid selections remain visible as invalid; migrate saved module data
+before expecting it to validate under a narrower allow-list. Rebuild/install the
+bundle's assets when updating.
+
 ### Delayed Google Cloud Storage deletion
 
 Set `sfs_media.google_cloud_storage.delayed_deletion_days` to a positive integer to keep a removed object available at its existing URL until the configured delay has elapsed:

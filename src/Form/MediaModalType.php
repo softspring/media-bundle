@@ -3,12 +3,17 @@
 namespace Softspring\MediaBundle\Form;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Softspring\MediaBundle\Helper\MediaSelectionChoices;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Type\MediaTypesCollection;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -58,15 +63,36 @@ class MediaModalType extends AbstractType
         $transformer = new CallbackTransformer(function ($value) {
             return $value;
         }, function ($value) {
-            return is_string($value) ? $this->em->getRepository(MediaInterface::class)->findOneById($value) : $value;
+            if ('' === $value) {
+                return null;
+            }
+            if (!is_string($value)) {
+                return $value;
+            }
+            $media = $this->em->getRepository(MediaInterface::class)->findOneById($value);
+            if (!$media instanceof MediaInterface) {
+                throw new TransformationFailedException('The selected media does not exist.');
+            }
+
+            return $media;
         });
 
         $builder->addModelTransformer($transformer);
         $builder->addViewTransformer($transformer);
+        $builder->addEventListener(FormEvents::POST_SUBMIT, static function (FormEvent $event) use ($options): void {
+            if (!$event->getForm()->isSynchronized()) {
+                return;
+            }
+            $media = $event->getForm()->getData();
+            if ($media instanceof MediaInterface && null !== $options['media_types'] && !array_key_exists($media->getType() ?? '', $options['media_types'])) {
+                $event->getForm()->addError(new FormError('This media type is not allowed.'));
+            }
+        });
     }
 
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
+        $view->vars['media_selection_restricted'] = null !== $options['media_types'];
         if (null === $options['media_types']) {
             foreach ($this->mediaTypesCollection->getTypes(false) as $type => $typeConfig) {
                 if ('image' == $typeConfig['type']) {
@@ -94,6 +120,10 @@ class MediaModalType extends AbstractType
         }
 
         $view->vars['media_types'] = $options['media_types'];
+        $media = $form->getData();
+        $view->vars['media_version_choices'] = $media instanceof MediaInterface
+            ? MediaSelectionChoices::forMedia($media, $options['media_types'], $this->mediaTypesCollection->getTypes()[$media->getType()] ?? [])
+            : [];
         $view->vars['show_thumbnail'] = $options['show_thumbnail'];
         $view->vars['image_attr'] = $options['media_attr'] + $options['image_attr'];
         $view->vars['video_attr'] = $options['media_attr'] + $options['video_attr'];
