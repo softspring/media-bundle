@@ -10,6 +10,32 @@
 
 Media library, media versioning, media rendering, and admin media management for Symfony applications.
 
+## Parallel media migrations
+
+The migration command defaults to a single process. Start with two workers and
+increase only after measuring CPU and memory usage, especially with animated
+media and AVIF (the encoders may also use multiple threads).
+
+```bash
+php bin/console sfs:media:types-migration --workers=2 --batch-size=100
+php bin/console sfs:media:types-migration --workers=2 --type=background --dry-run
+```
+
+Workers partition media IDs deterministically. A media and all its versions are
+processed by one worker, in version order. IDs are paginated and Doctrine's
+identity map is cleared after each media. Each worker reports timings and counts;
+the parent returns a nonzero exit code if any worker fails. Dry runs report
+version changes without modifying media or storage. Existing matching versions
+are not regenerated; rerunning checks the remaining differences.
+
+Distributed runners can use `--worker-index=0 --worker-count=4` (indexes 0–3),
+instead of `--workers`. Every task must use the same configuration, filters and
+worker count, and a unique index. Do not run overlapping migration jobs against
+the same media concurrently: partitioning is not a cross-job lock. Do not change
+media type configuration during a run. No Messenger worker or PHP threading
+extension is required; local workers use Symfony Process and the project's
+`bin/console`. The worker count must fit the resources allocated to the container.
+
 ## What It Provides
 
 - configurable media types for images and videos
