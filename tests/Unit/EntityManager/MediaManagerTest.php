@@ -147,6 +147,32 @@ class MediaManagerTest extends TestCase
         $this->createManager()->migrate($media);
     }
 
+    public function testForcedMigrationReplacesGeneratedVersionsButPreservesUploads(): void
+    {
+        $versionManager = new TestingMediaVersionManager();
+        $manager = $this->createManager($versionManager);
+        $media = new Media();
+        $media->setType('image');
+        $original = new MediaVersion('_original', $media);
+        $manual = new MediaVersion('manual', $media);
+        $manual->setOptions(['old_upload_option' => true]);
+        foreach (['thumbnail', 'large'] as $name) {
+            $version = new MediaVersion($name, $media);
+            $version->setOptions(self::TYPES['image']['versions'][$name]);
+        }
+
+        $manager->migrate($media, null, true);
+
+        self::assertSame(['thumbnail', 'large'], array_map(static fn (MediaVersionInterface $v): ?string => $v->getVersion(), $versionManager->deleted));
+        self::assertCount(2, $versionManager->saved);
+        self::assertSame($original, $media->getVersion('_original'));
+        self::assertSame($manual, $media->getVersion('manual'));
+        foreach ($versionManager->saved as $version) {
+            self::assertSame($original, $version->getOriginalVersion());
+            self::assertArrayNotHasKey('__force', $version->getOptions());
+        }
+    }
+
     public function testMigratingFlag(): void
     {
         $manager = $this->createManager();

@@ -33,6 +33,7 @@ class TypesMigrationCommand extends Command
             ->addOption('worker-index', null, InputOption::VALUE_REQUIRED, 'Zero-based shard index (for distributed workers)', '0')
             ->addOption('worker-count', null, InputOption::VALUE_REQUIRED, 'Total number of distributed shards', '1')
             ->addOption('type', null, InputOption::VALUE_REQUIRED, 'Only migrate this media type')
+            ->addOption('force', null, InputOption::VALUE_NONE, 'Regenerate generated versions even when their configuration is unchanged')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Report planned changes without writing media or files');
     }
 
@@ -81,6 +82,9 @@ class TypesMigrationCommand extends Command
                 }
                 if ($input->getOption('dry-run')) {
                     $arguments[] = '--dry-run';
+                }
+                if ($input->getOption('force')) {
+                    $arguments[] = '--force';
                 }
                 $processes[$index] = $process = $this->createWorkerProcess($arguments);
                 $process->start();
@@ -171,10 +175,10 @@ class TypesMigrationCommand extends Command
                     $output->writeln(sprintf('Media "%s" of type "%s"', $media->getName(), $media->getType()));
 
                     if ($input->getOption('dry-run')) {
-                        $changes = TypeChecker::checkMedia($media, $typeConfig);
+                        $changes = TypeChecker::checkMedia($media, $typeConfig, (bool) $input->getOption('force'));
                         $output->writeln(sprintf('Dry run: %d new, %d changed, %d deleted versions.', count($changes['new']), count($changes['changed']), count($changes['delete'])));
                     } else {
-                        $this->mediaManager->migrate($media, $output);
+                        $this->mediaManager->migrate($media, $output, (bool) $input->getOption('force'));
                     }
 
                     $output->writeln('');

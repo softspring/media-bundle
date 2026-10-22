@@ -102,13 +102,13 @@ class MediaManager implements MediaManagerInterface
     /**
      * @throws MigrateMediaException
      */
-    public function migrate(MediaInterface $media, ?OutputInterface $output = null): void
+    public function migrate(MediaInterface $media, ?OutputInterface $output = null, bool $force = false): void
     {
         $errors = [];
         try {
             $typeConfig = $this->mediaTypesCollection->getType($media->getType());
 
-            $checkVersions = TypeChecker::checkMedia($media, $typeConfig);
+            $checkVersions = TypeChecker::checkMedia($media, $typeConfig, $force);
 
             foreach ($checkVersions['ok'] as $versionId) {
                 if ('_original' !== $versionId && $output instanceof OutputInterface) {
