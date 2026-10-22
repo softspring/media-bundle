@@ -19,6 +19,8 @@ media and AVIF (the encoders may also use multiple threads).
 ```bash
 php bin/console sfs:media:types-migration --workers=2 --batch-size=100
 php bin/console sfs:media:types-migration --workers=2 --type=background --dry-run
+php bin/console sfs:media:types-migration --workers=4 --type=background --force --dry-run
+php bin/console sfs:media:types-migration --workers=4 --type=background --force --no-debug
 ```
 
 Workers partition media IDs deterministically. A media and all its versions are
@@ -27,6 +29,14 @@ identity map is cleared after each media. Each worker reports timings and counts
 the parent returns a nonzero exit code if any worker fails. Dry runs report
 version changes without modifying media or storage. Existing matching versions
 are not regenerated; rerunning checks the remaining differences.
+
+Use `--force` to rebuild generated versions even when their configuration is
+unchanged, for example after updating image codecs. It preserves `_original` and
+configured manual/uploaded versions. Normal migration cleanup of obsolete
+versions still applies. Combine it with `--type` to limit its scope and with
+`--dry-run` to inspect the plan without writing anything. Without `--dry-run`,
+forced regeneration replaces generated versions and uploads their new files;
+it can be expensive. Force is opt-in and is forwarded to every worker.
 
 Distributed runners can use `--worker-index=0 --worker-count=4` (indexes 0–3),
 instead of `--workers`. Every task must use the same configuration, filters and

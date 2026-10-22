@@ -11,6 +11,31 @@ use Softspring\MediaBundle\Helper\TypeChecker;
 
 class TypeCheckerTest extends TestCase
 {
+    public function testForceOnlyRebuildsGeneratedVersions(): void
+    {
+        $media = new Media();
+        new MediaVersion('_original', $media);
+        $generated = new MediaVersion('small', $media);
+        $generated->setOptions(['type' => 'webp']);
+        $manual = new MediaVersion('manual', $media);
+        $manual->setOptions(['old_upload_option' => true]);
+        $config = ['versions' => [
+            'small' => ['type' => 'webp'],
+            'manual' => ['upload_requirements' => ['required' => false]],
+            'new_manual' => ['upload_requirements' => ['required' => false]],
+            'new_generated' => ['type' => 'webp'],
+        ]];
+
+        $normal = TypeChecker::checkMedia($media, $config);
+        self::assertContains('small', $normal['ok']);
+        $forced = TypeChecker::checkMedia($media, $config, true);
+        self::assertSame(['_original', 'manual'], $forced['ok']);
+        self::assertSame(['small'], array_keys($forced['changed']));
+        self::assertSame('forced regeneration', $forced['changed']['small']['__force']['string']);
+        self::assertSame(['new_generated'], array_values($forced['new']));
+        self::assertSame(['new_manual'], array_values($forced['manual']));
+    }
+
     public function testCheckMedia(): void
     {
         $media = new Media();

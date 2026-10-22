@@ -18,7 +18,7 @@ interface MediaManagerInterface extends CrudlEntityManagerInterface
 
     public function generateVersionEntity(MediaInterface $media, string $versionKey): MediaVersionInterface;
 
-    public function migrate(MediaInterface $media, ?OutputInterface $output = null): void;
+    public function migrate(MediaInterface $media, ?OutputInterface $output = null, bool $force = false): void;
 
     public function isMigrating(): bool;
 

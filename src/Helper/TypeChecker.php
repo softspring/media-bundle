@@ -7,7 +7,7 @@ use Softspring\MediaBundle\Model\MediaVersionInterface;
 
 class TypeChecker
 {
-    public static function checkMedia(MediaInterface $media, array $typeConfig): array
+    public static function checkMedia(MediaInterface $media, array $typeConfig, bool $force = false): array
     {
         $checkResult = [
             'new' => [],
@@ -32,6 +32,10 @@ class TypeChecker
             $changedOptions = [];
             $databaseOptions = $version->getOptions() ?? [];
             $configuredVersion = $typeConfig['versions'][$version->getVersion()];
+            if ($force && isset($configuredVersion['upload_requirements'])) {
+                $checkResult['ok'][] = $version->getVersion();
+                continue;
+            }
             // Uploaded versions have no generated options to migrate.
             $optionKeys = isset($configuredVersion['upload_requirements'])
                 ? array_keys($databaseOptions)
@@ -46,6 +50,13 @@ class TypeChecker
                         'string' => sprintf('%s: %s => %s', $option, self::optionToString($value), self::optionToString($configuredOption)),
                     ];
                 }
+            }
+            if ($force) {
+                $changedOptions['__force'] = [
+                    'config' => null,
+                    'db' => null,
+                    'string' => 'forced regeneration',
+                ];
             }
             if ([] !== $changedOptions) {
                 $checkResult['changed'][$version->getVersion()] = $changedOptions;

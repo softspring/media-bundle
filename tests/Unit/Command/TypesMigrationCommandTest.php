@@ -19,7 +19,7 @@ use Symfony\Component\Process\Process;
 
 class TypesMigrationCommandTest extends TestCase
 {
-    private function command(array $ids, array &$visited, bool $fail = false): TestingTypesMigrationCommand
+    private function command(array $ids, array &$visited, bool $fail = false, bool $force = false): TestingTypesMigrationCommand
     {
         $media = new Media();
         $media->setName('Test');
@@ -37,6 +37,8 @@ class TypesMigrationCommandTest extends TestCase
         $manager->method('getEntityManager')->willReturn($em);
         if ($fail) {
             $manager->method('migrate')->willThrowException(new RuntimeException('Failed encoding'));
+        } elseif ($force) {
+            $manager->expects($this->once())->method('migrate')->with($media, $this->anything(), true);
         } else {
             $manager->expects($this->never())->method('migrate');
         }
@@ -81,10 +83,11 @@ class TypesMigrationCommandTest extends TestCase
         $command = $this->command([], $visited);
         $command->workerExitCode = 1;
         $tester = new CommandTester($command);
-        self::assertSame(1, $tester->execute(['--workers' => 2, '--dry-run' => true, '--type' => 'content', '--batch-size' => 7]));
+        self::assertSame(1, $tester->execute(['--workers' => 2, '--dry-run' => true, '--force' => true, '--type' => 'content', '--batch-size' => 7]));
         self::assertCount(2, $command->workerArguments);
         foreach ($command->workerArguments as $arguments) {
             self::assertContains('--dry-run', $arguments);
+            self::assertContains('--force', $arguments);
             self::assertContains('--type=content', $arguments);
             self::assertContains('--batch-size=7', $arguments);
             self::assertContains('--worker-count=2', $arguments);
@@ -105,6 +108,20 @@ class TypesMigrationCommandTest extends TestCase
         $tester = new CommandTester($this->command([], $visited));
         self::assertSame(0, $tester->execute(['--workers' => 2, '--dry-run' => true]));
         self::assertStringContainsString('2 successful, 0 failed', $tester->getDisplay());
+    }
+
+    public function testForceIsPassedToMediaManager(): void
+    {
+        $visited = [];
+        $tester = new CommandTester($this->command(['1'], $visited, false, true));
+        self::assertSame(0, $tester->execute(['--force' => true]));
+    }
+
+    public function testForcedDryRunDoesNotCallMigration(): void
+    {
+        $visited = [];
+        $tester = new CommandTester($this->command(['1'], $visited));
+        self::assertSame(0, $tester->execute(['--force' => true, '--dry-run' => true]));
     }
 }
 
