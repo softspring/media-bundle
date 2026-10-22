@@ -104,16 +104,15 @@ class MediaManager implements MediaManagerInterface
      */
     public function migrate(MediaInterface $media, ?OutputInterface $output = null): void
     {
+        $errors = [];
         try {
             $typeConfig = $this->mediaTypesCollection->getType($media->getType());
 
             $checkVersions = TypeChecker::checkMedia($media, $typeConfig);
 
             foreach ($checkVersions['ok'] as $versionId) {
-                if ('_original' !== $versionId) {
-                    if ($output instanceof OutputInterface) {
-                        $output->writeln(sprintf(' - version "%s" is <fg=green>OK</>', $versionId));
-                    }
+                if ('_original' !== $versionId && $output instanceof OutputInterface) {
+                    $output->writeln(sprintf(' - version "%s" is <fg=green>OK</>', $versionId));
                 }
             }
 
@@ -129,6 +128,7 @@ class MediaManager implements MediaManagerInterface
                     }
                 } catch (Exception $e) {
                     $message = sprintf('Error creating version %s', $versionId);
+                    $errors[] = new MigrateMediaException($message, 0, $e);
                     if ($output instanceof OutputInterface) {
                         $output->writeln("<error>$message</error>");
                         $output->writeln($e->getMessage());
@@ -153,6 +153,7 @@ class MediaManager implements MediaManagerInterface
                     }
                 } catch (Exception $e) {
                     $message = sprintf('Error updating version %s', $versionId);
+                    $errors[] = new MigrateMediaException($message, 0, $e);
                     if ($output instanceof OutputInterface) {
                         $output->writeln("<error>$message</error>");
                         $output->writeln($e->getMessage());
@@ -174,6 +175,7 @@ class MediaManager implements MediaManagerInterface
                     }
                 } catch (Exception $e) {
                     $message = sprintf('Error deleting version %s', $versionId);
+                    $errors[] = new MigrateMediaException($message, 0, $e);
                     if ($output instanceof OutputInterface) {
                         $output->writeln("<error>$message</error>");
                         $output->writeln($e->getMessage());
@@ -214,12 +216,16 @@ class MediaManager implements MediaManagerInterface
             }
         } catch (InvalidTypeException $e) {
             $message = sprintf('Missing media type "%s"', $media->getType());
+            $errors[] = new MigrateMediaException($message, 0, $e);
             if ($output instanceof OutputInterface) {
                 $output->writeln("<error>$message</error>");
                 $output->writeln($e->getMessage());
             } else {
                 throw new MigrateMediaException($message, 0, $e);
             }
+        }
+        if ([] !== $errors) {
+            throw new MigrateMediaException(implode('; ', array_map(fn (MigrateMediaException $error): string => $error->getMessage(), $errors)), 0, $errors[0]);
         }
     }
 
