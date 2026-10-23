@@ -8,6 +8,8 @@ use Imagine\Image\Box;
 use Imagine\Image\BoxInterface;
 use Imagine\Image\ImageInterface;
 use Imagine\Image\ImagineInterface;
+use Imagine\Image\Palette\RGB;
+use Imagine\Imagick\Image as ImagickImage;
 use Imagine\Imagick\Imagine as ImagickImagine;
 use InvalidArgumentException;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
@@ -100,6 +102,8 @@ class ImagineProcessor implements ProcessorInterface
         $saveOptions = array_intersect_key($options, $validOptions);
         $saveOptions['format'] = $saveFormat;
 
+        $this->normalizeAvifColorProfile($image, $saveFormat);
+
         // change format if needed
         $fileName = $version->getUpload()->getRealPath();
         $fileNameParts = explode('.', $fileName);
@@ -112,6 +116,20 @@ class ImagineProcessor implements ProcessorInterface
         }
 
         $image->save($version->getUpload()->getRealPath(), $saveOptions);
+    }
+
+    protected function normalizeAvifColorProfile(ImageInterface $image, string $format): void
+    {
+        if ('avif' !== $format || !$image instanceof ImagickImage) {
+            return;
+        }
+        $profile = $image->getImagick()->getImageProfiles('icc')['icc'] ?? null;
+        if (is_string($profile) && strlen($profile) >= 20 && 'RGB ' !== substr($profile, 16, 4)) {
+            // ImageMagick encodes AVIF as RGB/YUV but may retain a source GRAY
+            // or CMYK ICC profile. Browsers reject this mismatch even though
+            // ImageMagick/GD can decode it. Transform, do not simply strip ICC.
+            $image->profile((new RGB())->profile());
+        }
     }
 
     protected function calculateDimensions(BoxInterface $source, array $options): Box

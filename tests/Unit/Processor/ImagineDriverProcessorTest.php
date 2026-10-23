@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Softspring\MediaBundle\Tests\Unit\Processor;
 
+use Imagick;
 use Imagine\Gd\Imagine as GdImagine;
 use Imagine\Image\Box;
 use Imagine\Image\ImageInterface;
 use Imagine\Image\ImagineInterface;
+use Imagine\Image\Metadata\MetadataBag;
+use Imagine\Image\Palette\RGB;
+use Imagine\Imagick\Image as ImagickImage;
 use Imagine\Imagick\Imagine as ImagickImagine;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -66,6 +70,38 @@ final class ImagineDriverProcessorTest extends TestCase
                 self::assertGreaterThan(0, filesize($file));
             }
         }
+    }
+
+    public function testAvifConvertsNonRgbIccProfilesInsteadOfCopyingThem(): void
+    {
+        foreach (['GRAY', 'CMYK', 'RGB ', ''] as $space) {
+            $native = $this->createMock(Imagick::class);
+            $native->method('getImageProfiles')->with('icc')->willReturn('' === $space ? [] : ['icc' => str_repeat("\0", 16).$space]);
+            $native->expects(in_array($space, ['GRAY', 'CMYK'], true) ? self::once() : self::never())->method('profileImage')->with('icc', (new RGB())->profile()->data());
+            $image = new ImagickImage($native, new RGB(), new MetadataBag());
+            $processor = new class extends ImagineProcessor {
+                public function normalize(ImageInterface $image, string $format): void
+                {
+                    $this->normalizeAvifColorProfile($image, $format);
+                }
+            };
+            $processor->normalize($image, 'avif');
+        }
+    }
+
+    public function testNonAvifOutputDoesNotChangeColorProfiles(): void
+    {
+        $native = $this->createMock(Imagick::class);
+        $native->expects(self::never())->method('getImageProfiles');
+        $native->expects(self::never())->method('profileImage');
+        $image = new ImagickImage($native, new RGB(), new MetadataBag());
+        $processor = new class extends ImagineProcessor {
+            public function normalize(ImageInterface $image, string $format): void
+            {
+                $this->normalizeAvifColorProfile($image, $format);
+            }
+        };
+        $processor->normalize($image, 'webp');
     }
 
     public function testConfiguredDriverAndResamplingFilterArePassedToImagine(): void

@@ -184,6 +184,31 @@ class MediaManagerTest extends TestCase
         $this->assertTrue($manager->isMigrating());
     }
 
+    public function testAdminRegenerationPreservesOriginalAndManualVersions(): void
+    {
+        $versions = new TestingMediaVersionManager();
+        $manager = $this->createManager($versions);
+        $media = new Media();
+        $media->setType('image');
+        $original = new MediaVersion('_original', $media);
+        $manual = new MediaVersion('manual', $media);
+        foreach (['thumbnail', 'large'] as $key) {
+            $version = new MediaVersion($key, $media);
+            $version->setOptions(self::TYPES['image']['versions'][$key]);
+        }
+
+        $manager->migrate($media, null, true);
+
+        self::assertCount(2, $versions->saved);
+        self::assertCount(2, $versions->deleted);
+        self::assertSame($original, $media->getVersion('_original'));
+        self::assertSame($manual, $media->getVersion('manual'));
+        foreach ($versions->saved as $version) {
+            self::assertSame($original, $version->getOriginalVersion());
+            self::assertArrayNotHasKey('__force', $version->getOptions());
+        }
+    }
+
     public function testDuplicateStats(): void
     {
         $manager = $this->createManager();
