@@ -1,0 +1,11 @@
+{% trans_default_domain 'sfs_media_admin' %}
+<p>{{ 'admin_medias.regenerate.message'|trans }}</p>
+<ul>
+    {% for version in versions %}<li>{{ version }}</li>{% endfor %}
+</ul>
+<p>{{ 'admin_medias.regenerate.warning'|trans }}</p>
+<form method="post" action="{{ url('sfs_media_admin_medias_regenerate', {'media': media}) }}">
+    <input type="hidden" name="_token" value="{{ csrf_token('sfs_media_regenerate_' ~ media.id) }}">
+    <a href="{{ url('sfs_media_admin_medias_read', {'media': media}) }}" class="{{ cancel_class|default('btn btn-outline-secondary') }}">{{ 'admin_medias.regenerate.cancel'|trans }}</a>
+    <button type="submit" class="{{ submit_class|default('btn btn-primary') }}">{{ 'admin_medias.regenerate.confirm'|trans }}</button>
+</form>

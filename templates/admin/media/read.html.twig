@@ -15,6 +15,7 @@
 {% block content %}
     <div class="float-end">
         {% include '@SfsMedia/admin/media/read_create_from.html.twig' %}
+        {% include '@SfsMedia/admin/media/read_regenerate.html.twig' %}
         {% if (checkVersions.new|length) + (checkVersions.delete|length) + (checkVersions.changed|length) %}
             {% if is_granted('PERMISSION_SFS_MEDIA_ADMIN_MEDIAS_MIGRATE', media) %}
                 <a href="{{ url('sfs_media_admin_medias_migrate', {'media': media}) }}"

@@ -23,6 +23,10 @@ services:
         public: true
         tags: ['controller.service_arguments']
 
+    Softspring\MediaBundle\Admin\RegenerateMediaController:
+        public: true
+        tags: ['controller.service_arguments']
+
     sfs_media.admin.media.controller:
         class: Softspring\Component\CrudlController\Controller\CrudlController
         public: true

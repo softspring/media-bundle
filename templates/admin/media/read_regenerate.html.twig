@@ -1,0 +1,7 @@
+{% trans_default_domain 'sfs_media_admin' %}
+{% set generated_versions = type_config.versions|filter((options, key) => key != '_original' and options.upload_requirements is not defined) %}
+{% if generated_versions|length and media.version('_original').url|default(false) and is_granted('PERMISSION_SFS_MEDIA_ADMIN_MEDIAS_MIGRATE', media) %}
+    <a href="{{ url('sfs_media_admin_medias_regenerate', {'media': media}) }}" class="btn btn-outline-primary">
+        {{ 'admin_medias.regenerate.button'|trans }}
+    </a>
+{% endif %}
