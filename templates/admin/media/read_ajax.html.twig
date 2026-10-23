@@ -5,6 +5,7 @@
 {% include '@SfsMedia/admin/media/read_version_alerts.html.twig' %}
 
 <div class="header-btns d-none">
+    {% include '@SfsMedia/admin/media/read_regenerate.html.twig' %}
     {% if (checkVersions.new|length) + (checkVersions.delete|length) + (checkVersions.changed|length) %}
         {% if is_granted('PERMISSION_SFS_MEDIA_ADMIN_MEDIAS_MIGRATE', media) %}
             <a href="{{ url('sfs_media_admin_medias_migrate', {'media': media}) }}" class="btn btn-primary">{{ 'admin_medias.read.actions.migrate.button'|trans }}</a>

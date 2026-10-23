@@ -1,4 +1,13 @@
 admin_medias:
+    regenerate:
+        button: 'Regenerate versions'
+        title: 'Regenerate versions of "%name%"'
+        message: 'All generated versions of this media will be rebuilt, even if their configuration has not changed. Originals and configured manual uploads are preserved.'
+        warning: 'Processing is synchronous and may take some time. Obsolete versions are removed as in a normal migration. Wait for the result before repeating this action.'
+        confirm: 'Regenerate versions'
+        cancel: 'Cancel'
+        success_flash: 'Media versions regenerated successfully.'
+        error_flash: 'Some versions could not be regenerated. Check the logs before retrying; the original has not been replaced.'
     create_from:
         success_flash: 'Media "%name%" created from the original image.'
         error_flash: 'The new media could not be created. The source media has not been changed.'

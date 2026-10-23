@@ -1,4 +1,13 @@
 admin_medias:
+    regenerate:
+        button: 'Rehacer versiones'
+        title: 'Rehacer versiones de "%name%"'
+        message: 'Se regenerarán todas las versiones generadas de este media, aunque no haya cambiado su configuración. Se conservan los originales y las versiones manuales configuradas.'
+        warning: 'El proceso es síncrono y puede tardar. Las versiones obsoletas se eliminan como en una migración normal. Espera al resultado antes de repetir la acción.'
+        confirm: 'Rehacer versiones'
+        cancel: 'Cancelar'
+        success_flash: 'Las versiones del media se han regenerado correctamente.'
+        error_flash: 'No se han podido regenerar algunas versiones. Revisa los logs antes de reintentarlo; el original no se ha reemplazado.'
     create_from:
         success_flash: 'Media "%name%" creada a partir de la imagen original.'
         error_flash: 'No se ha podido crear la nueva media. La media de origen no se ha modificado.'

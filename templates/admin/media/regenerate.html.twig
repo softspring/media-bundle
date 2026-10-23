@@ -1,0 +1,9 @@
+{% trans_default_domain 'sfs_media_admin' %}
+{% extends '@SfsMedia/admin_layout.html.twig' %}
+{% block title %}{{ 'admin_medias.regenerate.title'|trans({'%name%': media.name}) }}{% endblock %}
+{% block content %}
+    <h1 class="h3">{{ 'admin_medias.regenerate.title'|trans({'%name%': media.name}) }}</h1>
+    <div class="container-fluid bg-white p-4">
+        {% include '@SfsMedia/admin/media/regenerate_form.html.twig' %}
+    </div>
+{% endblock %}

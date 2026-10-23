@@ -32,6 +32,11 @@ sfs_media_admin_medias_delete:
     controller: sfs_media.admin.media.controller::delete
     path: /{media}/delete
 
+sfs_media_admin_medias_regenerate:
+    controller: Softspring\MediaBundle\Admin\RegenerateMediaController
+    path: /{media}/regenerate
+    methods: [GET, POST]
+
 sfs_media_admin_medias_migrate:
     controller: sfs_media.admin.media.controller::apply
     path: /{media}/migrate

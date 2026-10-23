@@ -46,6 +46,18 @@ media type configuration during a run. No Messenger worker or PHP threading
 extension is required; local workers use Symfony Process and the project's
 `bin/console`. The worker count must fit the resources allocated to the container.
 
+## Regenerate versions from the admin
+
+The media detail page includes **Regenerate versions** when the user has the
+media migration permission and the media has an original file and generated
+versions. This opens a confirmation page listing the generated version keys.
+Only a confirmed, CSRF-protected POST starts the synchronous regeneration.
+Originals and configured manual uploads are preserved; generated versions are
+rebuilt even when their options already match. Normal cleanup of obsolete
+versions still applies. On completion the user returns to the media detail page
+with a success/error notification. Large animations may take time: wait for the
+result before retrying. The standard and Sylius admin templates are supported.
+
 ## What It Provides
 
 - configurable media types for images and videos
