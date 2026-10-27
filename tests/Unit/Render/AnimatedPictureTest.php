@@ -15,33 +15,27 @@ use Softspring\MediaBundle\Type\MediaTypesCollection;
 
 final class AnimatedPictureTest extends TestCase
 {
-    public function testAnimationSkipsStaticSourceAndUsesAvifImg(): void
+    public function testAnimatedPictureIncludesAvifWebpAndJpegFallback(): void
     {
         $html = $this->render(true);
-        self::assertStringNotContainsString('still.jpg', $html);
         self::assertStringContainsString('srcset="https://media.example/animated.avif 1x"', $html);
-        self::assertStringContainsString('src="https://media.example/animated.avif"', $html);
-        self::assertStringNotContainsString('skip_if_animated', $html);
-    }
-
-    public function testStaticImageRetainsAllSourcesAndUsesAvifImg(): void
-    {
-        $html = $this->render(false);
+        self::assertStringContainsString('srcset="https://media.example/animated.webp 1x"', $html);
         self::assertStringContainsString('srcset="https://media.example/still.jpg 1x"', $html);
         self::assertStringContainsString('src="https://media.example/animated.avif"', $html);
+        self::assertSame(3, substr_count($html, '<source '));
     }
 
-    public function testSkippingSourcesIsOptIn(): void
+    public function testStaticImageRetainsTheSamePictureSources(): void
     {
-        self::assertStringContainsString('srcset="https://media.example/still.jpg 1x"', $this->render(true, false));
+        self::assertSame($this->render(true), $this->render(false));
     }
 
-    private function render(bool $animated, bool $skip = true): string
+    private function render(bool $animated): string
     {
         $media = new Media();
         $media->setType('content');
         $media->setMetadataField('animated', $animated);
-        foreach (['still' => 'still.jpg', 'moving' => 'animated.avif'] as $name => $file) {
+        foreach (['still' => 'still.jpg', 'moving' => 'animated.avif', 'webp' => 'animated.webp'] as $name => $file) {
             $version = new MediaVersion($name, $media);
             $version->setUrl('https://media.example/'.$file);
             $version->setWidth(400);
@@ -50,8 +44,9 @@ final class AnimatedPictureTest extends TestCase
         $types = new MediaTypesCollection([new ConfigMediaTypeProvider(['content' => [
             'pictures' => ['_default' => [
                 'sources' => [
-                    ['skip_if_animated' => $skip, 'srcset' => [['version' => 'still', 'suffix' => '1x']], 'attrs' => ['type' => 'image/jpeg']],
                     ['srcset' => [['version' => 'moving', 'suffix' => '1x']], 'attrs' => ['type' => 'image/avif']],
+                    ['srcset' => [['version' => 'webp', 'suffix' => '1x']], 'attrs' => ['type' => 'image/webp']],
+                    ['srcset' => [['version' => 'still', 'suffix' => '1x']], 'attrs' => ['type' => 'image/jpeg']],
                 ],
                 'img' => ['src_version' => 'moving'],
             ]],

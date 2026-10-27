@@ -34,35 +34,40 @@ sfs_media:
 ```
 
 
-### Animation-aware pictures
+### Animated images in pictures
 
-Use `skip_if_animated: true` on an individual picture source to omit it when
-the original image is animated. Sources are kept by default. Use an AVIF
-version as `img.src_version` for both static and animated originals:
+AVIF and WebP versions preserve animation automatically when the original is
+animated. The same picture configuration works for static images and animations;
+sources are rendered in their configured order without animation filtering:
 
 ```yaml
+versions:
+    avif: { type: avif }
+    webp: { type: webp }
 pictures:
     _default:
         sources:
-            - srcset: [{ version: modern }]
+            - srcset: [{ version: avif }]
               attrs: { type: image/avif }
-            - srcset: [{ version: legacy }]
-              attrs: { type: image/jpeg }
-              skip_if_animated: true
+            - srcset: [{ version: webp }]
+              attrs: { type: image/webp }
         img:
-            src_version: modern
+            src_version: avif
 ```
 
-`modern` must name an animation-preserving version (for example AVIF with
-`animated: keep`); `legacy` can be JPEG. The animation condition always refers
-to the original image, even when some generated versions extract a still frame.
-Upload and regeneration store its boolean detection result in
-`media.metadata.animated`. Rendering reads this flag without downloading files
-or running FFprobe. Regenerate existing media before relying on these options;
-older APNG originals can also be recognized from their stored MIME type.
+The default `animated: keep` retains animation in supported image formats;
+`animated: no` explicitly generates a still image. JPEG is always static.
+Animated images do not need a poster. Upload and regeneration store detection
+in `media.metadata.animated`; picture rendering never downloads originals or
+runs FFprobe. Animated WebP inputs use Imagick and a lossless RGBA APNG bridge
+when passed to FFmpeg, preserving frame timing and transparency.
 
 `webx` is not a supported output format. WebM belongs in video sets, while
 picture sources and `<img>` use image formats.
+
+Configured storage public base URLs apply consistently to image URLs, picture
+sources, image fallbacks, video sources, and posters. Stored `gs://` references
+remain unchanged when using a CDN or local proxy hostname.
 
 ## Parallel media migrations
 

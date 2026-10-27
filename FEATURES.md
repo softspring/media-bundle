@@ -15,7 +15,7 @@ Functional definition for `softspring/media-bundle`.
 - Provides storage drivers for local filesystem and Google Cloud Storage.
 - Inherits image generation options from global and type defaults, with version overrides.
 - Automatically detects image animations, validates upload animation policies, and preserves supported animations without duplicate media types.
-- Supports animation-aware picture sources while rendering without downloading original files.
+- Renders the same AVIF and WebP picture sources for static images and animations without downloading original files.
 - Ships processors for file copying, static image resizing and conversion, FFmpeg-backed animated image resizing and conversion, file storage, and upload metadata extraction.
 - Exposes Twig helpers to render images, pictures, videos, video sets, and media URLs.
 - Provides forms and admin screens to upload, browse, migrate, and select media entries.

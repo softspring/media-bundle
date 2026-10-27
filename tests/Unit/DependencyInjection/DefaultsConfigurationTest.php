@@ -11,20 +11,20 @@ use Symfony\Component\Config\Definition\Processor;
 
 final class DefaultsConfigurationTest extends TestCase
 {
-    public function testPictureAnimationOptionsAreNormalized(): void
+    public function testPictureSourcesAreRetainedWithoutAnimationOptions(): void
     {
         $config = (new Processor())->processConfiguration(new Configuration(), [['types' => ['content' => [
             'pictures' => ['_default' => [
                 'sources' => [
-                    ['srcset' => [['version' => 'jpeg']], 'skip_if_animated' => true],
+                    ['srcset' => [['version' => 'avif']]],
                     ['srcset' => [['version' => 'webp']]],
                 ],
                 'img' => ['src_version' => 'avif'],
             ]],
         ]]]]);
         $picture = $config['types']['content']['pictures']['_default'];
-        self::assertTrue($picture['sources'][0]['skip_if_animated']);
-        self::assertFalse($picture['sources'][1]['skip_if_animated']);
+        self::assertSame('avif', $picture['sources'][0]['srcset'][0]['version']);
+        self::assertSame('webp', $picture['sources'][1]['srcset'][0]['version']);
         self::assertSame('avif', $picture['img']['src_version']);
     }
 

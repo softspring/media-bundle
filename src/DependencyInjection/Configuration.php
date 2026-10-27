@@ -571,7 +571,6 @@ HELP;
                     ->arrayNode('sources')
                         ->arrayPrototype()
                             ->children()
-                                ->booleanNode('skip_if_animated')->defaultFalse()->end()
                                 ->arrayNode('srcset')
                                     ->arrayPrototype()
                                         ->children()

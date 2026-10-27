@@ -125,6 +125,19 @@ final class AutomaticAnimationTest extends TestCase
         $this->encode(AnimationFixtures::png(3), ['type' => 'avif', 'animation' => ['max_frames' => 2]]);
     }
 
+    public function testAnimatedWebpUploadRetainsFramesAndVariableDelaysInAvif(): void
+    {
+        if (!extension_loaded('imagick')) {
+            self::markTestSkipped('Imagick is required for animated WebP decoding.');
+        }
+        $webp = $this->encode(AnimationFixtures::png(3), ['type' => 'webp']);
+        $avif = $this->encode(file_get_contents($webp->getUpload()->getRealPath()), ['type' => 'avif'], 'image/webp');
+        $streams = $this->probe($avif)['streams'];
+        self::assertSame(3, (int) $streams[0]['nb_read_frames']);
+        self::assertCount(2, $streams, 'Transparency must survive WebP decoding.');
+        self::assertEqualsWithDelta(0.6, (float) $streams[0]['duration'], 0.02);
+    }
+
     private function encode(string $bytes, array $options, string $mime = 'image/png'): MediaVersion
     {
         $path = tempnam(sys_get_temp_dir(), 'auto-animation-');

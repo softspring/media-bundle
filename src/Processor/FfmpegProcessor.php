@@ -84,8 +84,24 @@ class FfmpegProcessor implements ImageProcessorInterface
             return;
         }
 
-        $inputPath = $version->getUpload()->getRealPath();
+        $sourcePath = $version->getUpload()->getRealPath();
+        $inputPath = $sourcePath;
         $options = $version->getOptions();
+        if ('image/webp' === $version->getUpload()->getMimeType() && $this->animationDetector->isAnimated($sourcePath)) {
+            $inputPath = (new WebpAnimationDecoder())->decode($sourcePath, $this->ffmpegBinary, $this->ffmpegTimeout, $options['animation']['max_frames'] ?? null);
+        }
+        try {
+            $this->processInput($version, $inputPath, $options);
+        } finally {
+            if ($inputPath !== $sourcePath) {
+                @unlink($inputPath);
+            }
+        }
+        @unlink($sourcePath);
+    }
+
+    private function processInput(MediaVersionInterface $version, string $inputPath, array $options): void
+    {
         $animationOptions = $options['animation'] ?? [];
         $metadata = $this->probeAnimation($inputPath);
 
