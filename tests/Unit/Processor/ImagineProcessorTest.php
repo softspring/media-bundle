@@ -7,6 +7,7 @@ use Imagine\Image\ImageInterface;
 use PHPUnit\Framework\TestCase;
 use Softspring\MediaBundle\Entity\MediaVersion;
 use Softspring\MediaBundle\Processor\ImagineProcessor;
+use Softspring\MediaBundle\Tests\Fixtures\AnimationFixtures;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -87,7 +88,14 @@ class ImagineProcessorTest extends TestCase
         $version->setOriginalVersion($originalVersion);
         $version->setOptions(['type' => 'avif', 'animated' => true]);
 
-        $this->assertFalse($processor->supports($version));
+        $path = $this->resultsPath.'/animated.gif';
+        file_put_contents($path, AnimationFixtures::gif());
+        $version->setUpload(new File($path));
+        try {
+            $this->assertFalse($processor->supports($version));
+        } finally {
+            unlink($path);
+        }
     }
 
     public function testNothingToProcessWhenNoUploadFile(): void

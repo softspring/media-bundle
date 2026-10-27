@@ -10,6 +10,7 @@ use Softspring\MediaBundle\EntityManager\MediaManagerInterface;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Storage\StorageDriverInterface;
 use Softspring\MediaBundle\Type\MediaTypesCollection;
+use Softspring\MediaBundle\Validator\Constraints\Animation;
 use Softspring\MediaBundle\Validator\Constraints\Image;
 use Softspring\TranslatableBundle\Model\Translation;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -45,7 +46,14 @@ class CreateFromMedia
             if (array_filter($type['versions'], static fn (array $version): bool => isset($version['upload_requirements']))) {
                 continue;
             }
-            $requirements = new Image(...($type['upload_requirements'] ?? []));
+            $uploadRequirements = $type['upload_requirements'] ?? [];
+            $animation = $uploadRequirements['animation'] ?? 'accepted';
+            unset($uploadRequirements['animation']);
+            $animated = $source->getMetadataField('animated');
+            if ((true === $animated && 'no' === $animation) || (false === $animated && 'required' === $animation)) {
+                continue;
+            }
+            $requirements = new Image(...$uploadRequirements);
             foreach (['minWidth' => $width, 'minHeight' => $height, 'minPixels' => $width * $height, 'minRatio' => $ratio] as $option => $value) {
                 if (null !== $requirements->$option && $value < $requirements->$option) {
                     continue 2;
@@ -92,7 +100,10 @@ class CreateFromMedia
             $original = $source->getVersion('_original');
             $this->storage->download($original->getUrl(), $path);
             $upload = new UploadedFile($path, $source->getName() ?: 'original', null, null, true);
-            $violations = $this->validator->validate($upload, new Image(...($compatible[$type]['upload_requirements'] ?? [])));
+            $requirements = $compatible[$type]['upload_requirements'] ?? [];
+            $animation = $requirements['animation'] ?? 'accepted';
+            unset($requirements['animation']);
+            $violations = $this->validator->validate($upload, [new Image(...$requirements), new Animation($animation)]);
             if (count($violations) > 0) {
                 $messages = [];
                 foreach ($violations as $violation) {

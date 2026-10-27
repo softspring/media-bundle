@@ -10,6 +10,65 @@
 
 Media library, media versioning, media rendering, and admin media management for Symfony applications.
 
+## Generation defaults
+
+Generated image versions inherit processing options from `sfs_media.defaults`
+and then from their media type's `defaults` block. Explicit version options
+have the highest priority. Nested animation settings are merged by key.
+Only options relevant to the output format are passed to its processor.
+Manual uploads and video types do not inherit image processing defaults.
+
+```yaml
+sfs_media:
+    defaults:
+        avif_quality: 85
+        animation: { max_frames: 500, speed: 6 }
+    types:
+        content:
+            defaults:
+                avif_quality: 88
+                animation: { speed: 5 }
+            versions:
+                normal: { type: avif } # Quality 88; max_frames 500; speed 5.
+                detailed: { type: avif, avif_quality: 90 }
+```
+
+
+### Animated images in pictures
+
+AVIF and WebP versions preserve animation automatically when the original is
+animated. The same picture configuration works for static images and animations;
+sources are rendered in their configured order without animation filtering:
+
+```yaml
+versions:
+    avif: { type: avif }
+    webp: { type: webp }
+pictures:
+    _default:
+        sources:
+            - srcset: [{ version: avif }]
+              attrs: { type: image/avif }
+            - srcset: [{ version: webp }]
+              attrs: { type: image/webp }
+        img:
+            src_version: avif
+```
+
+The default `animated: keep` retains animation in supported image formats;
+`animated: no` explicitly generates a still image. JPEG is always static.
+Animated images do not need a poster. Upload and regeneration store detection
+in `media.metadata.animated`; picture rendering never downloads originals or
+runs FFprobe. Animated WebP inputs use Imagick and a lossless RGBA APNG bridge
+when passed to FFmpeg, preserving frame timing and transparency.
+
+`webx` is not a supported output format. WebM belongs in video sets, while
+picture sources and `<img>` use image formats.
+
+Configured storage public base URLs apply consistently to image URLs, picture
+sources, image fallbacks, video sources, and posters. Stored `gs://` references
+remain unchanged when using a CDN or local proxy hostname.
+
 ## Parallel media migrations
 
 The migration command defaults to a single process. Start with two workers and
@@ -196,60 +255,67 @@ Explicit image attributes passed to the renderer still take precedence over the 
 
 ## Animated image versions
 
-Generated animated versions use `ffprobe` to validate the source and `ffmpeg` to resize and encode every frame. Both binaries must be installed in the application runtime. Processing is synchronous; applications should keep duration and frame limits conservative until background generation is available.
+Image types accept still and animated uploads without separate animation types.
+The detector inspects PNG/APNG, GIF, WebP and AVIF files independently of their
+extension. Animated inputs use FFmpeg; still images use the configured Imagine
+driver. Image animations render in pictures without a manual poster. Video
+versions and their video sets keep their existing processing path.
 
 ```yaml
 sfs_media:
+    defaults:
+        avif_quality: 85
+        animation: { max_frames: 500 }
     ffmpeg:
         binary: ffmpeg
         probe_binary: ffprobe
         timeout: 300
-
     types:
-        animation:
+        content:
+            defaults:
+                animation: { speed: 6 }
             upload_requirements:
-                mimeTypes: [image/avif, image/apng, image/gif]
+                animation: accepted
+                mimeTypes: [image/png, image/apng, image/avif, image/gif]
             versions:
-                small_avif:
-                    type: avif
-                    animated: true
-                    scale_width: 400
-                    avif_quality: 82
-                    animation:
-                        loop: 0
-                        speed: 6
-                        max_duration: 3
-                        max_frames: 75
-                small_webp:
-                    type: webp
-                    animated: true
-                    scale_width: 400
-                    webp_quality: 82
-                    animation:
-                        loop: 0
-                        max_duration: 3
-                        max_frames: 75
+                small_avif: { type: avif, scale_width: 400 }
+                small_webp: { type: webp, scale_width: 400, webp_quality: 82 }
+                still: { type: avif, scale_width: 400, animated: no }
 ```
 
-Supported generated targets are AVIF, WebP and APNG. `type: keep` also preserves animated GIF input. Source timing and frame rate are preserved unless `animation.fps` is set.
+`upload_requirements.animation` accepts `accepted` (the default), `no` or
+`required`. Compatible-type choices use known animation metadata and creation
+validates the downloaded original again. Generated versions use `animated: keep`
+by default for animation-capable formats. Set `animated: no` to extract a still
+frame; JPEG always produces a still image. Legacy boolean values on versions
+are normalized to `keep`/`no`; migrate configurations to the explicit values.
 
-Animated WebP outputs use independent full frames. This is slightly larger than lossy partial-frame animation, but avoids accumulated composition errors that appear as trails or stripes in browsers.
+Supported animated targets are AVIF, WebP, PNG/APNG and GIF; `type: keep` retains
+the input format. Timing and frame rate are preserved unless `animation.fps` is
+set. PNG input explicitly selects the APNG demuxer, including files with a
+separate default image outside the animation. Animated WebP output uses
+independent full frames to avoid composition trails in browsers.
 
-When at least one version uses `animated: true`, configuration compilation checks that the configured `ffmpeg` and `ffprobe` binaries are executable. It fails early with their configured names and installation instructions if either binary is missing. Types without animated versions do not require FFmpeg.
+FFmpeg and FFprobe must be installed when processing animated uploads. A profile
+requiring animation checks both binaries during configuration compilation.
+Accepted animation does not make static-only processing depend on FFmpeg.
+The runtime must also support the uploaded format: FFmpeg 6.1 cannot reliably
+demux animated WebP input; use APNG, AVIF or GIF with that runtime.
 
-FFmpeg 6.1, currently shipped by Alpine 3.22, can encode animated WebP but cannot reliably demux it as an input. Use AVIF, APNG or GIF uploads with that runtime. Animated WebP can be enabled as an upload source when the deployed FFmpeg build includes its newer animated WebP demuxer.
+Animation processing options (in global/type defaults or per version):
 
-Animation options:
-
-- `fps`: resample the output frame rate, from 1 to 120.
-- `loop`: output loop count; `0` means infinite.
-- `crf`: AVIF constant-quality value, from 0 to 63. When omitted, it is derived from `avif_quality`.
-- `speed`: AVIF encoding speed (`libaom-av1` `cpu-used`), from 0 to 8.
+- `fps`: output frame rate, 1–120; omitted preserves source timing.
+- `loop`: loop count; `0` means infinite.
+- `crf`: AVIF quality, 0–63; derived from `avif_quality` when omitted.
+- `speed`: AVIF encoding speed, 0–8.
 - `keyframe_interval`: encoder GOP size.
-- `max_duration`: reject longer source animations, in seconds.
-- `max_frames`: reject sources containing more frames.
+- `max_duration`: maximum source duration in seconds.
+- `max_frames`: maximum source frame count.
 
-The processor only handles generated versions explicitly marked with `animated: true`. Manual versions keep their uploaded file, and regular generated images use the configured Imagine driver.
+Limits reject excessive animations instead of silently truncating them.
+Processing is synchronous; regenerate large collections outside HTTP requests.
+Manual uploads do not inherit generation defaults. The former `Tools\Apng`
+utility is replaced by the unified `Tools\AnimationDetector` service.
 
 ## Create from an existing original
 

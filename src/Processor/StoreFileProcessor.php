@@ -7,7 +7,7 @@ use Softspring\MediaBundle\Media\NameGeneratorProvider;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
 use Softspring\MediaBundle\Storage\StorageDriverInterface;
-use Softspring\MediaBundle\Tools\Apng;
+use Softspring\MediaBundle\Tools\AnimationDetector;
 use Softspring\MediaBundle\Type\MediaTypesCollection;
 use Symfony\Component\HttpFoundation\File\File;
 
@@ -17,7 +17,7 @@ class StoreFileProcessor implements ProcessorInterface
     protected NameGeneratorProvider $nameGeneratorProvider;
     protected StorageDriverInterface $storage;
 
-    public function __construct(MediaTypesCollection $mediaTypesCollection, NameGeneratorProvider $nameGeneratorProvider, StorageDriverInterface $storage)
+    public function __construct(MediaTypesCollection $mediaTypesCollection, NameGeneratorProvider $nameGeneratorProvider, StorageDriverInterface $storage, private readonly AnimationDetector $animationDetector = new AnimationDetector())
     {
         $this->mediaTypesCollection = $mediaTypesCollection;
         $this->nameGeneratorProvider = $nameGeneratorProvider;
@@ -43,6 +43,10 @@ class StoreFileProcessor implements ProcessorInterface
             return;
         }
 
+        if ('_original' === $version->getVersion() && $version->getMedia() instanceof MediaInterface && str_starts_with($upload->getMimeType() ?? '', 'image/')) {
+            $version->getMedia()->setMetadataField('animated', $this->animationDetector->isAnimated($upload->getRealPath()));
+        }
+
         // clean database options
         $databaseOptions = $version->getOptions() ?? [];
         $manualUpload = isset($databaseOptions['upload_requirements']);
@@ -52,7 +56,7 @@ class StoreFileProcessor implements ProcessorInterface
         }
         $version->setOptions($databaseOptions);
 
-        if ('image/png' == $upload->getMimeType() && Apng::is($upload->getRealPath())) {
+        if ('image/png' == $upload->getMimeType() && $this->animationDetector->isAnimated($upload->getRealPath())) {
             $version->setFileMimeType('image/apng');
         } else {
             $version->setFileMimeType($upload->getMimeType());

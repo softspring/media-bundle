@@ -2,9 +2,11 @@
 
 namespace Softspring\MediaBundle\EntityListener;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Softspring\MediaBundle\EntityManager\MediaManagerInterface;
+use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
 use Softspring\MediaBundle\Processor\ProcessorProvider;
 use Softspring\MediaBundle\Storage\StorageDriverInterface;
@@ -21,12 +23,33 @@ class MediaVersionListener
 
     public function prePersist(MediaVersionInterface $mediaVersion, LifecycleEventArgs $eventArgs): void
     {
-        $this->processorProvider->applyProcessors($mediaVersion);
+        $this->processUpload($mediaVersion, $eventArgs);
     }
 
     public function preUpdate(MediaVersionInterface $mediaVersion, LifecycleEventArgs $eventArgs): void
     {
+        $this->processUpload($mediaVersion, $eventArgs);
+    }
+
+    private function processUpload(MediaVersionInterface $mediaVersion, LifecycleEventArgs $eventArgs): void
+    {
+        $media = $mediaVersion->getMedia();
+        $metadata = $media?->getMetadata();
         $this->processorProvider->applyProcessors($mediaVersion);
+        if (!$media instanceof MediaInterface || $metadata === $media->getMetadata()) {
+            return;
+        }
+
+        // Processors run during flush, after the parent media's change set may
+        // already have been computed. Include newly detected animation metadata.
+        $em = $eventArgs->getObjectManager();
+        if (!$em instanceof EntityManagerInterface) {
+            return;
+        }
+        $uow = $em->getUnitOfWork();
+        if ([] !== $uow->getOriginalEntityData($media)) {
+            $uow->recomputeSingleEntityChangeSet($em->getClassMetadata(get_class($media)), $media);
+        }
     }
 
     public function preRemove(MediaVersionInterface $mediaVersion, LifecycleEventArgs $eventArgs): void

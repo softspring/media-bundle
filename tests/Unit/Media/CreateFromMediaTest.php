@@ -13,6 +13,7 @@ use Softspring\MediaBundle\EntityManager\MediaManagerInterface;
 use Softspring\MediaBundle\Media\CreateFromMedia;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Storage\StorageDriverInterface;
+use Softspring\MediaBundle\Tests\Fixtures\AnimationFixtures;
 use Softspring\MediaBundle\Type\ConfigMediaTypeProvider;
 use Softspring\MediaBundle\Type\MediaTypesCollection;
 use Softspring\TranslatableBundle\Model\Translation;
@@ -56,7 +57,7 @@ class CreateFromMediaTest extends TestCase
     public function testCompatibleTypesRespectAllMetadataConstraintsAndDoNotDownload(): void
     {
         $types = [
-            'source' => [], 'valid' => ['upload_requirements' => ['minWidth' => 1200, 'minHeight' => 600, 'mimeTypes' => ['image/png'], 'maxSize' => '1k']],
+            'source' => [], 'valid' => ['upload_requirements' => ['animation' => 'accepted', 'minWidth' => 1200, 'minHeight' => 600, 'mimeTypes' => ['image/png'], 'maxSize' => '1k']],
             'wildcard' => ['upload_requirements' => ['mimeTypes' => ['image/*']]],
             'too_wide' => ['upload_requirements' => ['minWidth' => 1201]],
             'too_tall' => ['upload_requirements' => ['minHeight' => 601]],
@@ -75,6 +76,45 @@ class CreateFromMediaTest extends TestCase
         $storage = $this->createMock(StorageDriverInterface::class);
         $storage->expects(self::never())->method('download');
         self::assertSame(['valid', 'wildcard'], array_keys($this->creator($types, storage: $storage)->getCompatibleTypes($this->source())));
+    }
+
+    public function testAnimationPoliciesUseKnownMetadataWithoutDownloading(): void
+    {
+        $storage = $this->createMock(StorageDriverInterface::class);
+        $storage->expects(self::never())->method('download');
+        $creator = $this->creator([
+            'accepted' => ['upload_requirements' => ['animation' => 'accepted']],
+            'static' => ['upload_requirements' => ['animation' => 'no']],
+            'animated' => ['upload_requirements' => ['animation' => 'required']],
+        ], storage: $storage);
+        $source = $this->source();
+        self::assertSame(['accepted', 'static', 'animated'], array_keys($creator->getCompatibleTypes($source)));
+        $source->setMetadataField('animated', true);
+        self::assertSame(['accepted', 'animated'], array_keys($creator->getCompatibleTypes($source)));
+        $source->setMetadataField('animated', false);
+        self::assertSame(['accepted', 'static'], array_keys($creator->getCompatibleTypes($source)));
+    }
+
+    public function testAnimationPolicyIsValidatedAgainstDownloadedBytes(): void
+    {
+        foreach (['no' => 2, 'required' => 1] as $policy => $frames) {
+            $manager = $this->createMock(MediaManagerInterface::class);
+            $manager->expects(self::never())->method('createEntityForType');
+            $manager->expects(self::never())->method('saveEntity');
+            $path = null;
+            $storage = $this->createMock(StorageDriverInterface::class);
+            $storage->expects(self::once())->method('download')->willReturnCallback(static function ($url, $target) use (&$path, $frames): void {
+                $path = $target;
+                file_put_contents($target, AnimationFixtures::png($frames));
+            });
+            try {
+                $this->creator(['target' => ['upload_requirements' => ['animation' => $policy]]], $manager, $storage)->create($this->source(), 'target');
+                self::fail('The actual animation policy must be validated.');
+            } catch (InvalidArgumentException $exception) {
+                self::assertStringContainsString('no' === $policy ? 'not accepted' : 'required', $exception->getMessage());
+                self::assertFileDoesNotExist($path);
+            }
+        }
     }
 
     public function testMissingOriginalDimensionsAndNonImagesHaveNoDestinations(): void
@@ -133,7 +173,7 @@ class CreateFromMediaTest extends TestCase
             self::assertSame(sha1_file(__DIR__.'/../../example.png'), sha1_file($media->getVersion('_original')->getUpload()->getRealPath()));
             self::assertNull($media->getVersion('_original')->getUrl());
         });
-        $created = $this->creator(['target' => ['upload_requirements' => ['mimeTypes' => ['image/png']]]], $manager, $storage)->create($source, 'target');
+        $created = $this->creator(['target' => ['upload_requirements' => ['animation' => 'accepted', 'mimeTypes' => ['image/png']]]], $manager, $storage)->create($source, 'target');
         self::assertSame($new, $created);
         self::assertSame($source->getName(), $created->getName());
         self::assertSame($source->getDescription(), $created->getDescription());

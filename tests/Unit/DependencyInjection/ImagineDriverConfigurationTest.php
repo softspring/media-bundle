@@ -61,7 +61,7 @@ final class ImagineDriverConfigurationTest extends TestCase
         self::assertSame('gd', $config['types']['image']['versions']['small']['imagine_driver']);
     }
 
-    public function testDriversAreNotInheritedByAnimatedManualOrVideoVersions(): void
+    public function testDriversApplyToAutomaticImagesButNotManualOrVideoVersions(): void
     {
         $config = $this->process(['types' => [
             'image' => ['imagine_driver' => 'gd', 'versions' => [
@@ -70,9 +70,8 @@ final class ImagineDriverConfigurationTest extends TestCase
             ]],
             'video' => ['type' => 'video', 'versions' => ['poster' => ['upload_requirements' => ['mimeTypes' => ['image/png']]]]],
         ]]);
-        foreach (['animated', 'poster'] as $name) {
-            self::assertArrayNotHasKey('imagine_driver', $config['types']['image']['versions'][$name]);
-        }
+        self::assertSame('gd', $config['types']['image']['versions']['animated']['imagine_driver']);
+        self::assertArrayNotHasKey('imagine_driver', $config['types']['image']['versions']['poster']);
         self::assertArrayNotHasKey('imagine_driver', $config['types']['video']['versions']['poster']);
     }
 
@@ -154,14 +153,14 @@ final class ImagineDriverConfigurationTest extends TestCase
         self::assertSame('gd', $result['changed']['inherited']['imagine_driver']['config']);
     }
 
-    public function testDriverOnAnimatedOrUploadedVersionIsRejected(): void
+    public function testDriverOnUploadedVersionIsRejected(): void
     {
-        foreach ([['type' => 'webp', 'animated' => true], ['upload_requirements' => ['mimeTypes' => ['image/png']]]] as $version) {
+        foreach ([['upload_requirements' => ['mimeTypes' => ['image/png']]]] as $version) {
             try {
                 $this->process(['types' => ['image' => ['versions' => ['small' => $version + ['imagine_driver' => 'gd']]]]]);
                 self::fail('Non-Imagine versions must not accept an Imagine driver');
             } catch (InvalidConfigurationException $exception) {
-                self::assertStringContainsString('static generated image versions', $exception->getMessage());
+                self::assertStringContainsString('generated image versions', $exception->getMessage());
             }
         }
     }

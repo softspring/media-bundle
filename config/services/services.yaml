@@ -58,6 +58,12 @@ services:
     Softspring\MediaBundle\Processor\:
         resource: '../../src/Processor/*'
 
+    Softspring\MediaBundle\Tools\AnimationDetector: ~
+
+    Softspring\MediaBundle\Validator\Constraints\AnimationValidator: ~
+
+    Softspring\MediaBundle\Validator\Constraints\ImageValidator: ~
+
     Softspring\MediaBundle\EntityListener\MediaVersionListener:
         tags:
             - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'Softspring\MediaBundle\Model\MediaVersion' }

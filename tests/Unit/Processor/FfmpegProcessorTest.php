@@ -9,6 +9,7 @@ use RuntimeException;
 use Softspring\MediaBundle\Entity\MediaVersion;
 use Softspring\MediaBundle\Processor\FfmpegProcessor;
 use Softspring\MediaBundle\Processor\WebpAnimationNormalizer;
+use Softspring\MediaBundle\Tests\Fixtures\AnimationFixtures;
 use Symfony\Component\HttpFoundation\File\File;
 
 class FfmpegProcessorTest extends TestCase
@@ -40,13 +41,16 @@ class FfmpegProcessorTest extends TestCase
         $processor = $this->createProcessor();
         $version = $this->createVersion(['type' => 'avif', 'animated' => true]);
 
+        $path = $this->temporaryDirectory.'/source.gif';
+        file_put_contents($path, AnimationFixtures::gif());
+        $version->setUpload(new File($path));
         $this->assertTrue($processor->supports($version));
 
         $version->setOptions(['type' => 'avif']);
-        $this->assertFalse($processor->supports($version));
+        $this->assertTrue($processor->supports($version));
 
-        $version->setOptions(['type' => 'jpeg', 'animated' => true]);
-        $this->assertFalse($processor->supports($version));
+        $version->setOptions(['type' => 'jpeg', 'animated' => 'no']);
+        $this->assertTrue($processor->supports($version));
 
         $version->setOptions([
             'type' => 'avif',
@@ -61,6 +65,9 @@ class FfmpegProcessorTest extends TestCase
         $processor = $this->createProcessor();
         $version = $this->createVersion(['type' => 'keep', 'animated' => true], 'image/gif');
 
+        $path = $this->temporaryDirectory.'/source.gif';
+        file_put_contents($path, AnimationFixtures::gif());
+        $version->setUpload(new File($path));
         $this->assertTrue($processor->supports($version));
     }
 

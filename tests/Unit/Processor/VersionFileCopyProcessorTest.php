@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Softspring\MediaBundle\Tests\Unit\Processor;
 
 use PHPUnit\Framework\TestCase;
+use Softspring\MediaBundle\Entity\Media;
 use Softspring\MediaBundle\Entity\MediaVersion;
+use Softspring\MediaBundle\Tests\Fixtures\AnimationFixtures;
 use Softspring\MediaBundle\Processor\VersionFileCopyProcessor;
 use Softspring\MediaBundle\Storage\StorageDriverInterface;
 use Symfony\Component\HttpFoundation\File\File;
@@ -47,6 +49,31 @@ class VersionFileCopyProcessorTest extends TestCase
         $processor->process($version);
 
         $this->assertNull($version->getUpload());
+    }
+
+    public function testRegenerationRecordsAnimationBeforeStillFrameConversion(): void
+    {
+        $path = tempnam(sys_get_temp_dir(), 'media-original-apng-');
+        $copy = null;
+        try {
+            file_put_contents($path, AnimationFixtures::png(2));
+            $media = new Media();
+            $original = new MediaVersion('_original', $media);
+            $original->setFileMimeType('image/png');
+            $original->setUpload(new File($path), true);
+            $version = new MediaVersion('jpeg', $media);
+            $version->setOriginalVersion($original);
+            $version->setOptions(['type' => 'jpeg']);
+            (new VersionFileCopyProcessor(new VersionCopyStorageDriver()))->process($version);
+            $copy = $version->getUpload()->getRealPath();
+
+            self::assertTrue($media->getMetadataField('animated'));
+        } finally {
+            unlink($path);
+            if (null !== $copy) {
+                unlink($copy);
+            }
+        }
     }
 
     public function testCopiesOriginalUploadToGeneratedVersion(): void

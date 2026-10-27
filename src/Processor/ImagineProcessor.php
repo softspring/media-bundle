@@ -13,11 +13,16 @@ use Imagine\Imagick\Image as ImagickImage;
 use Imagine\Imagick\Imagine as ImagickImagine;
 use InvalidArgumentException;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
+use Softspring\MediaBundle\Tools\AnimationDetector;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class ImagineProcessor implements ProcessorInterface
+class ImagineProcessor implements ImageProcessorInterface
 {
+    public function __construct(private readonly AnimationDetector $animationDetector = new AnimationDetector())
+    {
+    }
+
     public static function getPriority(): int
     {
         return 0;
@@ -44,7 +49,7 @@ class ImagineProcessor implements ProcessorInterface
             throw new Exception('Processor support method requires version options are initialized');
         }
 
-        if ($version->getOptions()['animated'] ?? false) {
+        if ($this->animationDetector->isAnimatedVersion($version)) {
             return false;
         }
 
@@ -54,7 +59,7 @@ class ImagineProcessor implements ProcessorInterface
         }
 
         // target type can not be other than an image
-        return in_array($version->getOptions()['type'], ['jpeg', 'png', 'gif', 'webp', 'avif', 'keep']);
+        return in_array($version->getOptions()['type'], ['jpeg', 'png', 'apng', 'gif', 'webp', 'avif', 'keep']);
     }
 
     public function process(MediaVersionInterface $version): void
@@ -171,7 +176,10 @@ class ImagineProcessor implements ProcessorInterface
     protected function getSaveFormat(array $options, MediaVersionInterface $currentVersion): string
     {
         if ('keep' !== $options['type']) {
-            return $options['type'];
+            return match ($options['type']) {
+                'apng' => 'png',
+                default => $options['type'],
+            };
         }
 
         $saveFormat = $currentVersion->getUpload()->getExtension();

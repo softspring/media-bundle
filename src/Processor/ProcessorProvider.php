@@ -32,8 +32,15 @@ class ProcessorProvider
 
     public function applyProcessors(MediaVersionInterface $version): void
     {
-        foreach ($this->getProcessors($version) as $processor) {
+        $imageProcessed = false;
+        foreach ($this->processors as $processor) {
+            // File-copy processors must finish before an encoder inspects the
+            // source. Do not re-encode an FFmpeg result through Imagine.
+            if (($imageProcessed && $processor instanceof ImageProcessorInterface) || !$processor->supports($version)) {
+                continue;
+            }
             $processor->process($version);
+            $imageProcessed = $imageProcessed || $processor instanceof ImageProcessorInterface;
         }
     }
 }

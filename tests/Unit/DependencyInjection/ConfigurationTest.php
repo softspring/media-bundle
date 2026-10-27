@@ -39,6 +39,7 @@ class ConfigurationTest extends TestCase
                 'find_field_name' => 'id',
             ],
             'types' => [],
+            'defaults' => [],
         ];
 
         $processor = new Processor();
@@ -122,6 +123,7 @@ class ConfigurationTest extends TestCase
                 'class' => 'App\Entity\MediaVersion',
                 'find_field_name' => 'identificator',
             ],
+            'defaults' => [],
             'types' => [
                 'background' => [
                     'name' => 'Background image',
@@ -137,6 +139,7 @@ class ConfigurationTest extends TestCase
                         'allowLandscape' => true,
                         'allowPortrait' => false,
                         'mimeTypes' => ['image/png', 'image/jpeg'],
+                        'animation' => 'accepted',
                     ],
                     'versions' => [
                         '_thumbnail' => [
@@ -159,6 +162,7 @@ class ConfigurationTest extends TestCase
                     'video_sets' => [
                     ],
                     'private' => false,
+                    'defaults' => [],
                 ],
             ],
         ];
@@ -250,7 +254,7 @@ class ConfigurationTest extends TestCase
         $this->assertSame('/usr/local/bin/ffmpeg', $config['ffmpeg']['binary']);
         $this->assertSame('/usr/local/bin/ffprobe', $config['ffmpeg']['probe_binary']);
         $this->assertSame(600, $config['ffmpeg']['timeout']);
-        $this->assertTrue($config['types']['animation']['versions']['small']['animated']);
+        $this->assertSame('keep', $config['types']['animation']['versions']['small']['animated']);
         $this->assertSame(75, $config['types']['animation']['versions']['small']['animation']['max_frames']);
     }
 
@@ -263,6 +267,7 @@ class ConfigurationTest extends TestCase
             'sfs_media' => [
                 'types' => [
                     'animation' => [
+                        'upload_requirements' => ['animation' => 'required'],
                         'versions' => [
                             'small' => [
                                 'type' => 'webp',

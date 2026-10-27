@@ -14,6 +14,7 @@ use Softspring\MediaBundle\Media\NameGeneratorProvider;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Processor\StoreFileProcessor;
 use Softspring\MediaBundle\Storage\StorageDriverInterface;
+use Softspring\MediaBundle\Tests\Fixtures\AnimationFixtures;
 use Softspring\MediaBundle\Type\MediaTypeProviderInterface;
 use Softspring\MediaBundle\Type\MediaTypesCollection;
 use Symfony\Component\HttpFoundation\File\File;
@@ -80,6 +81,7 @@ class StoreFileProcessorTest extends TestCase
 
         $this->assertSame(['quality' => 90], $version->getOptions());
         $this->assertSame('image/png', $version->getFileMimeType());
+        self::assertFalse($media->getMetadataField('animated'));
         $this->assertSame(filesize($sourcePath), $version->getFileSize());
         $this->assertSame(sha1_file($sourcePath), $version->getSha1());
         $this->assertSame(sha1_file($sourcePath), $media->getSha1());
@@ -131,6 +133,25 @@ class StoreFileProcessorTest extends TestCase
             self::assertSame([], $check['changed']);
         } finally {
             unlink($sourcePath);
+        }
+    }
+
+    public function testStoresAnimatedPngWithApngMimeType(): void
+    {
+        $path = tempnam(sys_get_temp_dir(), 'media-store-apng-');
+        try {
+            file_put_contents($path, AnimationFixtures::png(2));
+            $media = new Media();
+            $media->setType('image');
+            $version = new MediaVersion('_original', $media);
+            $version->setUpload(new File($path), true);
+
+            $this->createProcessor(new StoreFileStorageDriver())->process($version);
+
+            self::assertSame('image/apng', $version->getFileMimeType());
+            self::assertTrue($media->getMetadataField('animated'));
+        } finally {
+            unlink($path);
         }
     }
 
