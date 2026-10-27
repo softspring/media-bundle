@@ -2,7 +2,7 @@
 
 namespace Softspring\MediaBundle\Validator\Constraints;
 
-use Softspring\MediaBundle\Tools\Apng;
+use Softspring\MediaBundle\Tools\AnimationDetector;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\ImageValidator as BaseImageValidator;
@@ -10,6 +10,10 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class ImageValidator extends BaseImageValidator
 {
+    public function __construct(private readonly AnimationDetector $animationDetector = new AnimationDetector())
+    {
+    }
+
     public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof Image) {
@@ -32,7 +36,7 @@ class ImageValidator extends BaseImageValidator
         foreach ($this->context->getViolations() as $v => $violation) {
             if (str_starts_with($violation->getMessage(), substr($constraint->mimeTypesMessage, 0, strpos($constraint->mimeTypesMessage, '({{')))) {
                 $mime = $uploadedFile->getMimeType();
-                if ('image/png' === $mime && Apng::is($uploadedFile->getRealPath()) && in_array('image/apng', $mimeTypes)) {
+                if ('image/png' === $mime && $this->animationDetector->isAnimated($uploadedFile->getRealPath()) && in_array('image/apng', $mimeTypes)) {
                     $this->context->getViolations()->remove($v);
                 }
             }

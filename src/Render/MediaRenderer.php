@@ -9,6 +9,7 @@ use Softspring\MediaBundle\Exception\InvalidTypeException;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
 use Softspring\MediaBundle\Storage\StorageDriverInterface;
+use Softspring\MediaBundle\Tools\AnimationDetector;
 use Softspring\MediaBundle\Type\MediaTypesCollection;
 
 class MediaRenderer
@@ -17,6 +18,7 @@ class MediaRenderer
         protected MediaTypesCollection $mediaTypesCollection,
         protected StorageDriverInterface $storageDriver,
         protected EntityManagerInterface $em,
+        protected AnimationDetector $animationDetector = new AnimationDetector(),
     ) {
     }
 
@@ -156,8 +158,16 @@ class MediaRenderer
             throw new Exception('picture config is not set for '.$media->getType());
         }
 
+        $animated = null;
+        $isAnimated = function () use ($media, &$animated): bool {
+            return $animated ??= $this->animationDetector->isAnimatedMedia($media);
+        };
+
         $html = '<picture '.$this->htmlAttributes($pictureAttr).'>';
         foreach ($config['pictures'][$picture]['sources'] ?? [] as $source) {
+            if (($source['skip_if_animated'] ?? false) && $isAnimated()) {
+                continue;
+            }
             $sourceAttrs = $source['attrs'] ?? [];
             $candidates = [];
             foreach ($source['srcset'] as $entry) {

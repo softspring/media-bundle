@@ -5,6 +5,7 @@ namespace Softspring\MediaBundle\DependencyInjection;
 use Imagick;
 use Imagine\Image\ImageInterface;
 use Softspring\MediaBundle\Media\DefaultNameGenerator;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -50,6 +51,7 @@ HELP;
                 'video/mp4',
             ],
             'versionTypeExtensions' => [
+                'keep',
                 'svg',
             ],
         ];
@@ -100,7 +102,7 @@ HELP;
         $rootNode
             ->validate()
                 ->always(function (array $config): array {
-                    $config['types'] = self::fixConfigTypes($config['types'] ?? [], $config['imagine']['driver'], $config['imagine']);
+                    $config['types'] = self::fixConfigTypes($config['types'] ?? [], $config['imagine']['driver'], $config['imagine'], $config['defaults']);
                     $this->validateImagineDrivers($config);
 
                     return $config;
@@ -171,6 +173,8 @@ HELP;
                         ->scalarNode('url')->defaultValue('/media')->end()
                     ->end()
                 ->end()
+
+                ->append($this->getDefaultsNode())
 
                 ->arrayNode('imagine')
                     ->addDefaultsIfNotSet()
@@ -308,6 +312,8 @@ HELP;
                             ->scalarNode('name')->end()
                             ->booleanNode('private')->defaultFalse()->end()
                             ->scalarNode('description')->end()
+                            ->append($this->getDefaultsNode())
+
                             ->scalarNode('generator')->defaultValue(DefaultNameGenerator::class)->end()
                             ->append($this->getUploadRequirementsNode())
                             ->append($this->getVersionsNode())
@@ -411,15 +417,58 @@ HELP;
 
     private function hasAnimatedVersions(array $config): bool
     {
+        // Accepting animation does not require an encoder for static uploads.
+        // Required animation must be usable as soon as the container boots.
         foreach ($config['types'] ?? [] as $type) {
-            foreach ($type['versions'] ?? [] as $version) {
-                if ($version['animated'] ?? false) {
-                    return true;
-                }
+            if ('required' === ($type['upload_requirements']['animation'] ?? 'accepted')) {
+                return true;
             }
         }
 
         return false;
+    }
+
+    public function getAnimationOptionsNode(): NodeDefinition
+    {
+        $node = (new TreeBuilder('animation'))->getRootNode();
+        $node->children()
+            ->integerNode('fps')->min(1)->max(120)->end()
+            ->integerNode('loop')->min(0)->max(65535)->end()
+            ->integerNode('crf')->min(0)->max(63)->end()
+            ->integerNode('speed')->min(0)->max(8)->end()
+            ->integerNode('keyframe_interval')->min(1)->end()
+            ->floatNode('max_duration')->min(0.001)->end()
+            ->integerNode('max_frames')->min(2)->end()
+        ->end();
+
+        return $node;
+    }
+
+    public function getDefaultsNode(): NodeDefinition
+    {
+        /** @var ArrayNodeDefinition $node */
+        $node = (new TreeBuilder('defaults'))->getRootNode();
+        $node->normalizeKeys(false)->addDefaultsIfNotSet();
+        $children = $node->children();
+        $children->enumNode('imagine_driver')->values(['gd', 'imagick'])->end();
+        $children->booleanNode('allow_upscale')->end();
+        $children->floatNode('resize_tolerance')->min(0)->max(1)->end();
+        $children->booleanNode('preserve_original_encoding')->end();
+        $children->integerNode('scale_width')->min(1)->end();
+        $children->integerNode('scale_height')->min(1)->end();
+        $children->integerNode('png_compression_level')->min(0)->max(9)->end();
+        $children->integerNode('webp_quality')->min(0)->max(100)->end();
+        $children->integerNode('jpeg_quality')->min(0)->max(100)->end();
+        $children->integerNode('avif_quality')->min(0)->max(100)->end();
+        $children->booleanNode('flatten')->end();
+        $children->integerNode('resolution-x')->end();
+        $children->integerNode('resolution-y')->end();
+        $children->scalarNode('resampling-filter')->end();
+        $children->scalarNode('resolution-units')->end();
+        $children->enumNode('animated')->values(['keep', 'no'])->end();
+        $children->append($this->getAnimationOptionsNode());
+
+        return $node;
     }
 
     public function getUploadRequirementsNode(): NodeDefinition
@@ -430,6 +479,7 @@ HELP;
 
         $node
             ->children()
+                ->enumNode('animation')->values(['no', 'accepted', 'required'])->end()
                 ->integerNode('minWidth')->end()
                 ->integerNode('minHeight')->end()
                 ->integerNode('maxWidth')->end()
@@ -459,26 +509,16 @@ HELP;
 
         $versionNode = $node->arrayPrototype();
         $versionNode
-                ->normalizeKeys(false)
-                ->validate()
-                    ->ifTrue(static fn (array $version): bool => [] !== array_intersect_key($version, array_flip(['imagine_driver', 'allow_upscale', 'resize_tolerance', 'preserve_original_encoding'])) && (isset($version['upload_requirements']) || ($version['animated'] ?? false)))
-                    ->thenInvalid('Imagine options can only be set on static generated image versions, not uploaded or animated versions.')
-                ->end()
-                ->validate()
-                    ->ifTrue(function (array $version): bool {
-                        if (empty($version['animated'])) {
-                            return isset($version['animation']);
-                        }
+            ->normalizeKeys(false)
+            ->validate()
+                ->ifTrue(static fn (array $version): bool => isset($version['upload_requirements']) && (isset($version['animated']) || isset($version['animation'])))
+                ->thenInvalid('Animation processing options belong to generated versions. Use upload_requirements.animation for manual uploads.')
+            ->end();
 
-                        if (isset($version['upload_requirements'])) {
-                            return true;
-                        }
-
-                        return isset($version['type']) && !in_array($version['type'], ['avif', 'webp', 'apng', 'keep'], true);
-                    })
-                    ->thenInvalid('Animated versions must be generated, use avif, webp, apng or keep, and set animation options only together with animated: true.')
-                ->end()
-        ;
+        $versionNode->validate()
+            ->ifTrue(static fn (array $version): bool => isset($version['upload_requirements']) && [] !== array_intersect(['imagine_driver', 'allow_upscale', 'resize_tolerance', 'preserve_original_encoding'], array_keys($version)))
+            ->thenInvalid('Imagine processing options belong to generated image versions, not manual uploads.')
+        ->end();
 
         $versionNode->children()
                     ->enumNode('imagine_driver')->values(['gd', 'imagick'])->end()
@@ -486,19 +526,12 @@ HELP;
                     ->floatNode('resize_tolerance')->min(0)->max(1)->end()
                     ->booleanNode('preserve_original_encoding')->end()
                     ->append($this->getUploadRequirementsNode())
-                    ->enumNode('type')->values(['jpeg', 'png', 'webp', 'keep', 'apng', 'avif'])->end()
-                    ->booleanNode('animated')->end()
-                    ->arrayNode('animation')
-                        ->children()
-                            ->integerNode('fps')->min(1)->max(120)->end()
-                            ->integerNode('loop')->min(0)->max(65535)->end()
-                            ->integerNode('crf')->min(0)->max(63)->end()
-                            ->integerNode('speed')->min(0)->max(8)->end()
-                            ->integerNode('keyframe_interval')->min(1)->end()
-                            ->floatNode('max_duration')->min(0.001)->end()
-                            ->integerNode('max_frames')->min(2)->end()
-                        ->end()
+                    ->enumNode('type')->values(['jpeg', 'png', 'webp', 'keep', 'apng', 'avif', 'gif'])->end()
+                    ->enumNode('animated')
+                        ->beforeNormalization()->ifTrue(static fn (mixed $value): bool => is_bool($value))->then(static fn (bool $value): string => $value ? 'keep' : 'no')->end()
+                        ->values(['keep', 'no'])
                     ->end()
+                    ->append($this->getAnimationOptionsNode())
                     ->integerNode('scale_width')->end()
                     ->integerNode('scale_height')->end()
                     ->integerNode('png_compression_level')->end()
@@ -538,6 +571,7 @@ HELP;
                     ->arrayNode('sources')
                         ->arrayPrototype()
                             ->children()
+                                ->booleanNode('skip_if_animated')->defaultFalse()->end()
                                 ->arrayNode('srcset')
                                     ->arrayPrototype()
                                         ->children()
@@ -594,41 +628,48 @@ HELP;
      * Update config types, this can not be done in processors because it would be not used to compare with database versions.
      * Also, can not be set in configuration as default values, because is exclusive for some types.
      */
-    public static function fixConfigTypes(?array $types = null, string $defaultImagineDriver = 'imagick', array $defaultPolicy = []): ?array
+    public static function fixConfigTypes(?array $types = null, string $defaultImagineDriver = 'imagick', array $defaultPolicy = [], array $defaults = []): ?array
     {
         if (null === $types) {
             return null;
         }
 
         $policy = array_replace(['allow_upscale' => false, 'resize_tolerance' => 0.02, 'preserve_original_encoding' => true], array_intersect_key($defaultPolicy, array_flip(['allow_upscale', 'resize_tolerance', 'preserve_original_encoding'])));
+        $keys = array_flip(['imagine_driver', 'allow_upscale', 'resize_tolerance', 'preserve_original_encoding', 'scale_width', 'scale_height', 'png_compression_level', 'webp_quality', 'jpeg_quality', 'avif_quality', 'flatten', 'resolution-x', 'resolution-y', 'resampling-filter', 'resolution-units', 'animated', 'animation']);
+        $qualities = ['avif_quality' => ['avif', 'keep'], 'webp_quality' => ['webp', 'keep'], 'jpeg_quality' => ['jpeg', 'keep'], 'png_compression_level' => ['png', 'apng', 'keep']];
         foreach ($types as $type => $config) {
-            $types[$type]['imagine_driver'] = $config['imagine_driver'] ?? $defaultImagineDriver;
-            foreach ($policy as $option => $default) {
-                $types[$type][$option] = $config[$option] ?? $default;
+            if ('image' !== $config['type']) {
+                continue;
             }
-            if ('image' === $config['type']) {
-                foreach ($config['versions'] as $version => $versionConfig) {
-                    if (!isset($versionConfig['upload_requirements'])) {
-                        if (!($versionConfig['animated'] ?? false)) {
-                            $types[$type]['versions'][$version]['imagine_driver'] = $versionConfig['imagine_driver'] ?? $types[$type]['imagine_driver'];
-                            foreach (array_keys($policy) as $option) {
-                                $types[$type]['versions'][$version][$option] = $versionConfig[$option] ?? $types[$type][$option];
-                            }
-                        } else {
-                            unset($types[$type]['versions'][$version]['imagine_driver']);
-                        }
-                        if (empty($versionConfig['type'])) {
-                            $types[$type]['versions'][$version]['type'] = 'keep';
-                        }
-                        // default keep
-                        if (empty($versionConfig['resampling-filter'])) {
-                            $types[$type]['versions'][$version]['resampling-filter'] = ImageInterface::FILTER_LANCZOS;
-                        }
-                        if (empty($versionConfig['resolution-units'])) {
-                            $types[$type]['versions'][$version]['resolution-units'] = ImageInterface::RESOLUTION_PIXELSPERINCH;
-                        }
+            $inherited = array_replace_recursive($policy, ['imagine_driver' => $defaultImagineDriver], array_intersect_key($defaults, $keys), array_intersect_key($config, $keys), array_intersect_key($config['defaults'] ?? [], $keys));
+            $types[$type]['imagine_driver'] = $inherited['imagine_driver'];
+            foreach (array_keys($policy) as $option) {
+                $types[$type][$option] = $inherited[$option];
+            }
+            $types[$type]['upload_requirements']['animation'] ??= 'accepted';
+            foreach ($config['versions'] as $version => $versionConfig) {
+                if (isset($versionConfig['upload_requirements'])) {
+                    $types[$type]['versions'][$version]['upload_requirements']['animation'] ??= 'accepted';
+                    continue;
+                }
+                $effective = array_replace_recursive($inherited, $versionConfig);
+                $format = $effective['type'] = $versionConfig['type'] ?? 'keep';
+                foreach ($qualities as $option => $formats) {
+                    if (!in_array($format, $formats, true)) {
+                        unset($effective[$option]);
                     }
                 }
+                if (in_array($format, ['avif', 'webp', 'png', 'apng', 'gif', 'keep'], true)) {
+                    $effective['animated'] ??= 'keep';
+                    if ('no' === $effective['animated']) {
+                        unset($effective['animation']);
+                    }
+                } else {
+                    unset($effective['animated'], $effective['animation']);
+                }
+                $effective['resampling-filter'] ??= ImageInterface::FILTER_LANCZOS;
+                $effective['resolution-units'] ??= ImageInterface::RESOLUTION_PIXELSPERINCH;
+                $types[$type]['versions'][$version] = $effective;
             }
         }
 

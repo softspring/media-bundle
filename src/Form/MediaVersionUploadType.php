@@ -3,6 +3,7 @@
 namespace Softspring\MediaBundle\Form;
 
 use Softspring\MediaBundle\EntityManager\MediaVersionManagerInterface;
+use Softspring\MediaBundle\Validator\Constraints\Animation;
 use Softspring\MediaBundle\Validator\Constraints\Image;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -38,9 +39,12 @@ class MediaVersionUploadType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $requirements = $options['upload_requirements'];
+        $animation = $requirements['animation'] ?? 'accepted';
+        unset($requirements['animation']);
         $builder->add('upload', FileType::class, [
             'required' => $options['required_upload'],
-            'constraints' => new Image(...$options['upload_requirements']),
+            'constraints' => [new Image(...$requirements), new Animation($animation)],
         ]);
     }
 

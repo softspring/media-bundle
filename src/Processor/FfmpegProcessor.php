@@ -7,12 +7,13 @@ namespace Softspring\MediaBundle\Processor;
 use JsonException;
 use RuntimeException;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
+use Softspring\MediaBundle\Tools\AnimationDetector;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Process\Process;
 use Throwable;
 
-class FfmpegProcessor implements ProcessorInterface
+class FfmpegProcessor implements ImageProcessorInterface
 {
     private const array SUPPORTED_SOURCE_MIME_TYPES = [
         'image/apng',
@@ -35,6 +36,7 @@ class FfmpegProcessor implements ProcessorInterface
         protected string $ffprobeBinary,
         protected int $ffmpegTimeout,
         protected WebpAnimationNormalizer $webpAnimationNormalizer,
+        protected AnimationDetector $animationDetector = new AnimationDetector(),
     ) {
     }
 
@@ -61,7 +63,7 @@ class FfmpegProcessor implements ProcessorInterface
             throw new RuntimeException('Processor support method requires version options are initialized');
         }
 
-        if (!($version->getOptions()['animated'] ?? false)) {
+        if (!$this->animationDetector->isAnimatedVersion($version)) {
             return false;
         }
 
@@ -69,7 +71,7 @@ class FfmpegProcessor implements ProcessorInterface
             return false;
         }
 
-        return in_array($this->getTargetFormat($version), ['apng', 'avif', 'gif', 'webp'], true);
+        return in_array($this->getTargetFormat($version), ['apng', 'avif', 'gif', 'webp', 'png', 'jpeg'], true);
     }
 
     public function process(MediaVersionInterface $version): void
@@ -87,7 +89,9 @@ class FfmpegProcessor implements ProcessorInterface
         $animationOptions = $options['animation'] ?? [];
         $metadata = $this->probeAnimation($inputPath);
 
-        $this->validateAnimation($metadata, $animationOptions);
+        if ($this->keepAnimation($options)) {
+            $this->validateAnimation($metadata, $animationOptions);
+        }
 
         [$width, $height] = $this->calculateDimensions($metadata, $options);
         $targetFormat = $this->getTargetFormat($version);
@@ -97,7 +101,7 @@ class FfmpegProcessor implements ProcessorInterface
         try {
             $this->runFfmpeg($command);
 
-            if ('webp' === $targetFormat) {
+            if ('webp' === $targetFormat && $this->keepAnimation($options)) {
                 $this->webpAnimationNormalizer->normalizeFullFrames($outputPath);
             }
 
@@ -119,12 +123,28 @@ class FfmpegProcessor implements ProcessorInterface
     }
 
     /**
+     * APNG may have a default IDAT image outside the animation. FFmpeg's
+     * automatic probing can mistake that valid layout for a static PNG.
+     * This processor only receives animated sources; select the APNG demuxer
+     * explicitly for PNG input, independently of its filename extension.
+     */
+    private function inputFormatOptions(string $path): array
+    {
+        if (is_file($path) && in_array((new File($path))->getMimeType(), ['image/png', 'image/apng'], true)) {
+            return ['-f', 'apng'];
+        }
+
+        return [];
+    }
+
+    /**
      * @return array{width: int, height: int, frames: int, duration: float|null, alpha: 'packed'|'stream'|null, stream: int, alpha_stream: int|null}
      */
     protected function probeAnimation(string $path): array
     {
         $process = new Process([
             $this->ffprobeBinary,
+            ...$this->inputFormatOptions($path),
             '-v',
             'error',
             '-select_streams',
@@ -288,14 +308,26 @@ class FfmpegProcessor implements ProcessorInterface
     {
         $width = $options['scale_width'] ?? null;
         $height = $options['scale_height'] ?? null;
-
-        if (null !== $width && null === $height) {
-            $height = max(1, (int) round($width * $metadata['height'] / $metadata['width']));
-        } elseif (null === $width && null !== $height) {
-            $width = max(1, (int) round($height * $metadata['width'] / $metadata['height']));
+        if (null === $width && null === $height) {
+            return [$metadata['width'], $metadata['height']];
+        }
+        $targetWidth = $width ?? $height * $metadata['width'] / $metadata['height'];
+        $targetHeight = $height ?? $width * $metadata['height'] / $metadata['width'];
+        if (!($options['allow_upscale'] ?? false)) {
+            $factor = min(1, $metadata['width'] / $targetWidth, $metadata['height'] / $targetHeight);
+            $targetWidth *= $factor;
+            $targetHeight *= $factor;
+        }
+        if ((null === $width || null === $height) && $targetWidth <= $metadata['width'] && 1 - $targetWidth / $metadata['width'] <= ($options['resize_tolerance'] ?? 0.02) + 1e-12) {
+            return [$metadata['width'], $metadata['height']];
         }
 
-        return [$width ?? $metadata['width'], $height ?? $metadata['height']];
+        return [max(1, (int) floor($targetWidth + 1e-9)), max(1, (int) floor($targetHeight + 1e-9))];
+    }
+
+    private function keepAnimation(array $options): bool
+    {
+        return !in_array($options['animated'] ?? 'keep', ['no', false], true) && ($options['type'] ?? 'keep') !== 'jpeg';
     }
 
     protected function getTargetFormat(MediaVersionInterface $version): string
@@ -303,7 +335,10 @@ class FfmpegProcessor implements ProcessorInterface
         $type = $version->getOptions()['type'] ?? 'keep';
 
         if ('keep' !== $type) {
-            return $type;
+            return match ($type) {
+                'png', 'apng' => $this->keepAnimation($version->getOptions()) ? 'apng' : 'png',
+                default => $type,
+            };
         }
 
         return self::MIME_TYPE_FORMATS[$version->getOriginalVersion()?->getFileMimeType()] ?? '';
@@ -330,6 +365,7 @@ class FfmpegProcessor implements ProcessorInterface
             '-loglevel',
             'error',
             '-y',
+            ...$this->inputFormatOptions($inputPath),
             '-i',
             $inputPath,
             '-an',
@@ -371,6 +407,10 @@ class FfmpegProcessor implements ProcessorInterface
             $command[] = '-filter:v';
             $command[] = $filter;
         }
+        if (!$this->keepAnimation($options)) {
+            $command[] = '-frames:v';
+            $command[] = '1';
+        }
         $command[] = '-fps_mode';
         $command[] = 'passthrough';
         if (isset($animationOptions['keyframe_interval'])) {
@@ -381,13 +421,25 @@ class FfmpegProcessor implements ProcessorInterface
         $loop = (string) ($animationOptions['loop'] ?? 0);
 
         switch ($targetFormat) {
+            case 'jpeg':
+                $command[] = '-q:v';
+                $command[] = (string) max(2, min(31, (int) round(2 + (100 - ($options['jpeg_quality'] ?? 85)) * 29 / 100)));
+                break;
+
+            case 'png':
+                $command[] = '-c:v';
+                $command[] = 'png';
+                $command[] = '-compression_level';
+                $command[] = (string) ($options['png_compression_level'] ?? 9);
+                break;
+
             case 'avif':
                 $quality = max(0, min(100, $options['avif_quality'] ?? 80));
                 $crf = $animationOptions['crf'] ?? (int) round((100 - $quality) * 63 / 100);
                 $command[] = '-c:v';
                 $command[] = 'libaom-av1';
                 $command[] = '-still-picture';
-                $command[] = '0';
+                $command[] = $this->keepAnimation($options) ? '0' : '1';
                 $command[] = '-crf';
                 $command[] = (string) $crf;
                 $command[] = '-b:v';
