@@ -16,6 +16,7 @@ use Softspring\MediaBundle\Model\MediaVersionInterface;
 use Softspring\MediaBundle\Tools\AnimationDetector;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Throwable;
 
 class ImagineProcessor implements ImageProcessorInterface
 {
@@ -110,17 +111,32 @@ class ImagineProcessor implements ImageProcessorInterface
         $this->normalizeAvifColorProfile($image, $saveFormat);
 
         // change format if needed
-        $fileName = $version->getUpload()->getRealPath();
+        $sourcePath = $version->getUpload()->getRealPath();
+        $fileName = $sourcePath;
         $fileNameParts = explode('.', $fileName);
         $fileExtension = end($fileNameParts);
         if ($saveFormat !== $fileExtension) {
             $fileNameParts[count($fileNameParts) - 1] = $saveFormat;
             $fileName = implode('.', $fileNameParts);
-            touch($fileName);
-            $version->setUpload(new File($fileName));
         }
 
-        $image->save($version->getUpload()->getRealPath(), $saveOptions);
+        try {
+            $image->save($fileName, $saveOptions);
+        } catch (Throwable $e) {
+            if ($fileName !== $sourcePath) {
+                @unlink($fileName);
+            }
+            throw $e;
+        }
+        if ($fileName !== $sourcePath) {
+            $keepTmpFile = $version->isKeepTmpFile();
+            $version->setUpload(new File($fileName), $keepTmpFile);
+            if (!$keepTmpFile) {
+                // StoreFileProcessor removes the encoded output after upload;
+                // this independent input copy is no longer referenced there.
+                @unlink($sourcePath);
+            }
+        }
     }
 
     protected function normalizeAvifColorProfile(ImageInterface $image, string $format): void

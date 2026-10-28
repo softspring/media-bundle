@@ -136,6 +136,8 @@ class ImagineProcessorTest extends TestCase
         $processor->process($version);
 
         $this->assertEquals('testJpegToPngConversion.png', $version->getUpload()->getBasename());
+        $this->assertFileDoesNotExist($filePath, 'A format change must not leave its temporary input behind.');
+        $this->assertFileExists($originFilePath, 'The source original must remain untouched.');
         [0 => $resultWidth, 1 => $resultHeight, 2 => $imageType, 3 => $htmlAttributes, 'bits' => $bits, 'mime' => $mime] = getimagesize($filePathPng);
         $this->assertEquals(250, $resultWidth);
         $this->assertEquals(141, $resultHeight);

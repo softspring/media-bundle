@@ -15,6 +15,7 @@ use Imagine\Imagick\Image as ImagickImage;
 use Imagine\Imagick\Imagine as ImagickImagine;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Softspring\MediaBundle\Entity\MediaVersion;
 use Softspring\MediaBundle\Processor\ImagineProcessor;
 use Symfony\Component\HttpFoundation\File\File;
@@ -60,7 +61,9 @@ final class ImagineDriverProcessorTest extends TestCase
                     $options['imagine_driver'] = $driver;
                 }
                 $version = $this->version($options);
+                $input = $version->getUpload()->getRealPath();
                 (new ImagineProcessor())->process($version);
+                self::assertFileDoesNotExist($input);
                 $file = $version->getUpload()->getRealPath();
                 $this->files[] = $file;
                 $size = getimagesize($file);
@@ -70,6 +73,53 @@ final class ImagineDriverProcessorTest extends TestCase
                 self::assertGreaterThan(0, filesize($file));
             }
         }
+    }
+
+    public function testKeepTmpFilePreservesInputAndOutputWhenRequested(): void
+    {
+        $version = $this->version(['type' => 'png']);
+        $input = $version->getUpload();
+        $version->setUpload($input, true);
+        (new ImagineProcessor())->process($version);
+        $this->files[] = $version->getUpload()->getRealPath();
+        self::assertFileExists($input->getRealPath());
+        self::assertFileExists($version->getUpload()->getRealPath());
+        self::assertTrue($version->isKeepTmpFile());
+    }
+
+    public function testFailedConversionRemovesPartialOutputAndRetainsInput(): void
+    {
+        $version = $this->version(['type' => 'png']);
+        $input = $version->getUpload();
+        $output = substr($input->getRealPath(), 0, -4).'.png';
+        $this->files[] = $output;
+        $image = $this->createMock(ImageInterface::class);
+        $image->method('getSize')->willReturn(new Box(250, 141));
+        $image->method('save')->willReturnCallback(static function (string $path): never {
+            file_put_contents($path, 'incomplete');
+            throw new RuntimeException('Encoding failed');
+        });
+        $imagine = $this->createMock(ImagineInterface::class);
+        $imagine->method('open')->willReturn($image);
+        $processor = new class($imagine) extends ImagineProcessor {
+            public function __construct(private ImagineInterface $imagine)
+            {
+            }
+
+            protected function createImagine(string $driver): ImagineInterface
+            {
+                return $this->imagine;
+            }
+        };
+        try {
+            $processor->process($version);
+            self::fail('The encoding failure must propagate.');
+        } catch (RuntimeException $e) {
+            self::assertSame('Encoding failed', $e->getMessage());
+        }
+        self::assertSame($input, $version->getUpload());
+        self::assertFileExists($input->getRealPath());
+        self::assertFileDoesNotExist($output);
     }
 
     public function testAvifConvertsNonRgbIccProfilesInsteadOfCopyingThem(): void
@@ -109,7 +159,12 @@ final class ImagineDriverProcessorTest extends TestCase
         $image = $this->createMock(ImageInterface::class);
         $image->expects(self::once())->method('resize')->with(self::callback(static fn ($size): bool => 100 === $size->getWidth() && 56 === $size->getHeight()), ImageInterface::FILTER_MITCHELL)->willReturnSelf();
         $image->method('getSize')->willReturnOnConsecutiveCalls(new Box(250, 141), new Box(100, 56), new Box(100, 56));
-        $image->expects(self::once())->method('save')->with(self::anything(), self::callback(static fn (array $options): bool => !isset($options['imagine_driver']) && 'jpeg' === $options['format']));
+        $image->expects(self::once())->method('save')->with(self::anything(), self::callback(static fn (array $options): bool => !isset($options['imagine_driver']) && 'jpeg' === $options['format']))
+            ->willReturnCallback(static function (string $path) use ($image): ImageInterface {
+                touch($path);
+
+                return $image;
+            });
         $imagine = $this->createMock(ImagineInterface::class);
         $imagine->expects(self::once())->method('open')->willReturn($image);
         $processor = new class($imagine) extends ImagineProcessor {
@@ -128,6 +183,7 @@ final class ImagineDriverProcessorTest extends TestCase
         };
         $version = $this->version(['type' => 'jpeg', 'imagine_driver' => 'imagick', 'scale_width' => 100, 'resampling-filter' => ImageInterface::FILTER_MITCHELL]);
         $processor->process($version);
+        $this->files[] = $version->getUpload()->getRealPath();
         self::assertSame('imagick', $processor->selectedDriver);
     }
 
