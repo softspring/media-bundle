@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
 use Rector\Set\ValueObject\SetList;
+use Rector\Symfony\CodeQuality\Rector\Class_\EventSubscriberToAttributeRector;
 use Rector\ValueObject\PhpVersion;
 
 return RectorConfig::configure()
@@ -17,5 +18,9 @@ return RectorConfig::configure()
         SetList::TYPE_DECLARATION,
     ])
     ->withImportNames()
+    // Keep the existing subscriber interface and getSubscribedEvents() API in 6.x.
+    ->withSkip(class_exists(EventSubscriberToAttributeRector::class) ? [
+        EventSubscriberToAttributeRector::class => [__DIR__.'/src/EventListener/MediaTypeSearchFilterListener.php'],
+    ] : [])
     ->withPhpVersion(PhpVersion::PHP_84)
     ->withComposerBased(symfony: true);

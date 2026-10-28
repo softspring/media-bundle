@@ -81,6 +81,21 @@ class ImagineProcessor implements ImageProcessorInterface
         $imagine = $this->createImagine($options['imagine_driver'] ?? 'imagick');
         $image = $imagine->open($version->getUpload()->getRealPath());
 
+        try {
+            $this->encodeImage($version, $image, $saveFormat);
+        } finally {
+            // Imagine images and their layers reference each other. Native
+            // pixel buffers are not included in PHP's memory accounting, so
+            // waiting for automatic cycle collection can exhaust worker RAM.
+            unset($image, $imagine);
+            gc_collect_cycles();
+        }
+    }
+
+    private function encodeImage(MediaVersionInterface $version, ImageInterface $image, string $saveFormat): void
+    {
+        $options = $version->getOptions();
+        $originalVersion = $version->getOriginalVersion();
         $sourceSize = $image->getSize();
         $targetSize = $this->calculateDimensions($sourceSize, $options);
         $resize = $targetSize->getWidth() !== $sourceSize->getWidth() || $targetSize->getHeight() !== $sourceSize->getHeight();
