@@ -19,6 +19,7 @@ use RuntimeException;
 use Softspring\MediaBundle\Entity\MediaVersion;
 use Softspring\MediaBundle\Processor\ImagineProcessor;
 use Symfony\Component\HttpFoundation\File\File;
+use WeakReference;
 
 final class ImagineDriverProcessorTest extends TestCase
 {
@@ -85,6 +86,42 @@ final class ImagineDriverProcessorTest extends TestCase
         self::assertFileExists($input->getRealPath());
         self::assertFileExists($version->getUpload()->getRealPath());
         self::assertTrue($version->isKeepTmpFile());
+    }
+
+    public function testImageLayerCyclesAreReleasedAfterConversion(): void
+    {
+        $imageReference = null;
+        $imagine = $this->createMock(ImagineInterface::class);
+        $imagine->method('open')->willReturnCallback(static function (string $path) use (&$imageReference): ImageInterface {
+            $image = (new ImagickImagine())->open($path);
+            $imageReference = WeakReference::create($image);
+
+            return $image;
+        });
+        $processor = new class($imagine) extends ImagineProcessor {
+            public function __construct(private ImagineInterface $imagine)
+            {
+            }
+
+            protected function createImagine(string $driver): ImagineInterface
+            {
+                return $this->imagine;
+            }
+        };
+        $automaticGc = gc_enabled();
+        gc_disable();
+        try {
+            $version = $this->version(['type' => 'png']);
+            $processor->process($version);
+            $this->files[] = $version->getUpload()->getRealPath();
+            self::assertInstanceOf(WeakReference::class, $imageReference);
+            self::assertNull($imageReference->get(), 'Image/layer cycles must not retain native pixel buffers between conversions.');
+        } finally {
+            if ($automaticGc) {
+                gc_enable();
+            }
+            gc_collect_cycles();
+        }
     }
 
     public function testFailedConversionRemovesPartialOutputAndRetainsInput(): void
