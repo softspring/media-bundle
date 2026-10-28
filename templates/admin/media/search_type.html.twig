@@ -78,7 +78,10 @@
                             {% if media.isVideo %}
                                 {# nothing yet #}
                             {% elseif media.isImage %}
-                                    {{ media.version('_original').width }}x{{ media.version('_original').height }}
+                                {% set original_version = media.version('_original') %}
+                                {% if original_version and original_version.width and original_version.height %}
+                                    {{ original_version.width }}x{{ original_version.height }}
+                                {% endif %}
                             {% endif %}
                         </p>
                     </div>
