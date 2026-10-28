@@ -9,12 +9,11 @@ use Softspring\MediaBundle\Entity\Media;
 use Softspring\MediaBundle\Entity\MediaVersion;
 use Softspring\MediaBundle\Model\MediaInterface;
 use Symfony\Bridge\Twig\Extension\FormExtension;
-use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
+use Symfony\Bridge\Twig\TokenParser\TransDefaultDomainTokenParser;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\Forms;
-use Symfony\Component\Translation\Translator;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 use Twig\Loader\ChainLoader;
@@ -33,7 +32,10 @@ class MediaSearchTemplateTest extends TestCase
             '@SfsComponents/paginator/pager.html.twig' => '',
         ])]), ['strict_variables' => true]);
         $twig->addExtension(new FormExtension());
-        $twig->addExtension(new TranslationExtension(new Translator('en')));
+        // Translation output is irrelevant here. Isolate it from differences
+        // between supported Symfony/Twig translation visitor versions.
+        $twig->addTokenParser(new TransDefaultDomainTokenParser());
+        $twig->addFilter(new TwigFilter('trans', static fn (string $message): string => $message));
         $twig->addRuntimeLoader(new FactoryRuntimeLoader([
             FormRenderer::class => static fn (): FormRenderer => new FormRenderer(new TwigRendererEngine([], $twig)),
         ]));
