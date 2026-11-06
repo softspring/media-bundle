@@ -1,5 +1,5 @@
 import {Modal} from 'bootstrap';
-import {getAllowedMediaSelections, updateMediaVersionSelectorVisibility} from './media-selection';
+import {getAllowedMediaSelections, updateMediaVersionSelectorVisibility} from './media-selection.js';
 
 window.addEventListener('load', (event) => {
     const mediaTypeModal = document.getElementById('mediaTypeModal');
