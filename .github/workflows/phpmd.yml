@@ -2,9 +2,9 @@ name: Code Scanning
 
 on:
     push:
-        branches: [ 6.0 ]
+        branches: [ '6.1' ]
     pull_request:
-        branches: [ 6.0 ]
+        branches: [ '6.1' ]
     schedule:
         -   cron: '35 13 * * 4'
 

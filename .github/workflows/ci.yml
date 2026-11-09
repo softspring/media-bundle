@@ -2,9 +2,9 @@ name: CI
 
 on:
     push:
-        branches: [ 6.0 ]
+        branches: [ '6.1' ]
     pull_request:
-        branches: [ 6.0 ]
+        branches: [ '6.1' ]
 
 permissions:
     contents: read
@@ -63,7 +63,7 @@ jobs:
                         export SYMFONY_REQUIRE="${{ matrix.symfony-require }}"
                     fi
 
-                    COMPOSER_ROOT_VERSION=6.0.x-dev composer update --prefer-dist --no-interaction --no-progress --prefer-stable ${{ matrix.composer-prefer }}
+                    COMPOSER_ROOT_VERSION=6.1.x-dev composer update --prefer-dist --no-interaction --no-progress --prefer-stable ${{ matrix.composer-prefer }}
 
             -   name: Run package validation
                 run: composer run-tests

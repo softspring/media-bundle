@@ -5,8 +5,8 @@
 [![License](https://img.shields.io/packagist/l/softspring/media-bundle?style=flat-square)](LICENSE)
 [![PHP Version](https://img.shields.io/packagist/dependency-v/softspring/media-bundle/php?style=flat-square)](composer.json)
 [![Downloads](https://img.shields.io/packagist/dt/softspring/media-bundle?style=flat-square)](https://packagist.org/packages/softspring/media-bundle)
-[![CI](https://img.shields.io/github/actions/workflow/status/softspring/media-bundle/ci.yml?branch=6.0&style=flat-square&label=CI)](https://github.com/softspring/media-bundle/actions/workflows/ci.yml)
-[![Coverage](https://img.shields.io/codecov/c/github/softspring/media-bundle?branch=6.0&style=flat-square&token=QW5SRQ0Q1F)](https://app.codecov.io/gh/softspring/media-bundle/tree/6.0)
+[![CI](https://img.shields.io/github/actions/workflow/status/softspring/media-bundle/ci.yml?branch=6.1&style=flat-square&label=CI)](https://github.com/softspring/media-bundle/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/codecov/c/github/softspring/media-bundle?branch=6.1&style=flat-square&token=QW5SRQ0Q1F)](https://app.codecov.io/gh/softspring/media-bundle/tree/6.1)
 
 Media library, media versioning, media rendering, and admin media management for Symfony applications.
 
@@ -25,7 +25,7 @@ This package is part of [Armonic](https://softspring.es/en/armonic).
 
 ## Documentation
 
-[Armonic Documentation](https://armonic.softspring.es/6.0/bundles/media-bundle)
+[Armonic Documentation](https://armonic.softspring.es/6.1@dev/bundles/media-bundle)
 
 ## Features
 
