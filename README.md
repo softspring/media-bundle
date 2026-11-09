@@ -25,7 +25,7 @@ This package is part of [Armonic](https://softspring.es/en/armonic).
 
 ## Documentation
 
-[Armonic Documentation](https://armonic.softspring.es/latest/bundles/media-bundle)
+[Armonic Documentation](https://armonic.softspring.es/6.0/bundles/media-bundle)
 
 ## Features
 
