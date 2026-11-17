@@ -312,6 +312,13 @@ HELP;
                             ->scalarNode('name')->end()
                             ->booleanNode('private')->defaultFalse()->end()
                             ->scalarNode('description')->end()
+                            ->variableNode('meta')
+                                ->treatNullLike([])
+                                ->validate()
+                                    ->ifTrue(static fn (mixed $metadata): bool => !is_array($metadata))
+                                    ->thenInvalid('Media type metadata must be an array.')
+                                ->end()
+                            ->end()
                             ->append($this->getDefaultsNode())
 
                             ->scalarNode('generator')->defaultValue(DefaultNameGenerator::class)->end()

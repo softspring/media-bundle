@@ -6,9 +6,9 @@ services:
         bind:
             $em: '@sfs_media.entity_manager'
             $mediaTypesConfig: '%sfs_media.types%'
-            $processors: !tagged_iterator { tag: sfs_media.media_processor, default_priority_method: getPriority }
-            $nameGenerators: !tagged_iterator { tag: sfs_media.name_generator, default_priority_method: getPriority }
-            $typeProviders: !tagged_iterator { tag: sfs_media.media_type_provider, default_priority_method: getPriority }
+            $processors: !tagged_iterator { tag: sfs_media.media_processor }
+            $nameGenerators: !tagged_iterator { tag: sfs_media.name_generator }
+            $typeProviders: !tagged_iterator { tag: sfs_media.media_type_provider }
             $ffmpegBinary: '%sfs_media.ffmpeg.binary%'
             $ffprobeBinary: '%sfs_media.ffmpeg.probe_binary%'
             $ffmpegTimeout: '%sfs_media.ffmpeg.timeout%'

@@ -4,13 +4,21 @@ declare(strict_types=1);
 
 namespace Softspring\MediaBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use PHPUnit\Framework\TestCase;
 use Softspring\MediaBundle\DependencyInjection\Configuration;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 
 final class DefaultsConfigurationTest extends TestCase
 {
+    public function testMediaTypesPreserveAiInstructions(): void
+    {
+        $config = new Processor()->processConfiguration(new Configuration(), [['types' => ['hero' => [
+            'meta' => ['ai_instructions' => "Use a landscape photo.\nKeep the subject visible when cropped.", 'arbitrary' => ['enabled' => true]],
+        ]]]]);
+        self::assertSame("Use a landscape photo.\nKeep the subject visible when cropped.", $config['types']['hero']['meta']['ai_instructions']);
+    }
+
     public function testPictureSourcesAreRetainedWithoutAnimationOptions(): void
     {
         $config = (new Processor())->processConfiguration(new Configuration(), [['types' => ['content' => [

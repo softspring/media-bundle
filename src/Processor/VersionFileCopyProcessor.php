@@ -6,8 +6,10 @@ use Softspring\MediaBundle\Model\MediaInterface;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
 use Softspring\MediaBundle\Storage\StorageDriverInterface;
 use Softspring\MediaBundle\Tools\AnimationDetector;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\HttpFoundation\File\File;
 
+#[AsTaggedItem(priority: 200)]
 class VersionFileCopyProcessor implements ProcessorInterface
 {
     protected StorageDriverInterface $storageDriver;

@@ -14,10 +14,12 @@ use Imagine\Imagick\Imagine as ImagickImagine;
 use InvalidArgumentException;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
 use Softspring\MediaBundle\Tools\AnimationDetector;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Throwable;
 
+#[AsTaggedItem(priority: 0)]
 class ImagineProcessor implements ImageProcessorInterface
 {
     public function __construct(private readonly AnimationDetector $animationDetector = new AnimationDetector())

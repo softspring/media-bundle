@@ -10,6 +10,8 @@ Functional definition for `softspring/media-bundle`.
 
 ## Main Features
 
+- Order processors, name generators and media type providers through Symfony `AsTaggedItem` attributes or explicit tag priorities without static method discovery.
+
 - Registers media and media version model contracts, default entities, Doctrine mappings, and target entity resolution.
 - Supports media types for images and videos, including upload requirements, generated versions, uploaded versions, pictures, and video sets.
 - Provides storage drivers for local filesystem and Google Cloud Storage.
@@ -26,6 +28,10 @@ Functional definition for `softspring/media-bundle`.
 - Can be extended with custom media entities, media version entities, media type providers, name generators, storage drivers, processors, forms, listeners, and templates.
 - Integrates with `softspring/crudl-controller` for admin UI and with `softspring/permissions-bundle` for admin permissions.
 - Can work with application-specific media usage through `MediaTypeUploadType`, `MediaChoiceType`, modal selectors, and Twig rendering helpers.
+
+## AI usage guidance
+
+- Media type definitions accept optional text in `meta.ai_instructions` alongside upload requirements and versions. CMS API/MCP consumers expose this guidance when selecting and using media types.
 
 ## Expected Capabilities
 

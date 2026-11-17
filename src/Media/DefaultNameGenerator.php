@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Softspring\MediaBundle\Media;
 
 use Softspring\MediaBundle\Model\MediaInterface;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\HttpFoundation\File\File;
 
+#[AsTaggedItem(priority: 0)]
 class DefaultNameGenerator implements NameGeneratorInterface
 {
     public function generateName(MediaInterface $media, string $version, File $file): string

@@ -3,8 +3,10 @@
 namespace Softspring\MediaBundle\Processor;
 
 use Softspring\MediaBundle\Model\MediaVersionInterface;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+#[AsTaggedItem(priority: 255)]
 class UploadedImageSizeProcessor implements ProcessorInterface
 {
     public static function getPriority(): int
