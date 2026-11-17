@@ -8,11 +8,13 @@ use JsonException;
 use RuntimeException;
 use Softspring\MediaBundle\Model\MediaVersionInterface;
 use Softspring\MediaBundle\Tools\AnimationDetector;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Process\Process;
 use Throwable;
 
+#[AsTaggedItem(priority: 10)]
 class FfmpegProcessor implements ImageProcessorInterface
 {
     private const array SUPPORTED_SOURCE_MIME_TYPES = [
